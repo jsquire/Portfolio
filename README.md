@@ -1,6 +1,4 @@
 # Jesse Squire's Portfolio #
-----------
-
 
 ### Overview ###
 

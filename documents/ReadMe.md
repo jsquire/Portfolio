@@ -1,6 +1,4 @@
 # Documents #
-----------
-
 
 ### Overview ###
 
