@@ -7,13 +7,16 @@
 Included in this repository are documents and code meant to serve as representative samples of my work.  The code projects are intentionally small and non-complex.  They are intended only to serve as a window into my coding habits, style, and thought processes, not to illustrate large and complex development projects.  This portfolio is best viewed as an artifact that will continue to evolve over time.
 
 
-Included are projects, documents, and presentations that were either created on personal time or were approved for public release.  While some works may be considered derivative of work done for employers or clients, they were created without referencing any source document or code during my personal time.  To my knowledge nothing contained herein is considered proprietary or confidential to any of my employers, past or present.  In the event that a former employer or client feels otherwise, please contact me and I'd be happy to discuss the disputed material.
+Included are projects, documents, and presentations that were either created as personal items (on personal time, using my own equipment and not intended for any employers or clients) or were approved for public release.  While some works may be considered derivative of work done for employers or clients, they were created without referencing any source document or code from other artifacts.  To my knowledge nothing contained herein is considered proprietary or confidential to any of my employers, past or present.  In the event that a former employer or client feels otherwise, please contact me and I'd be happy to discuss the disputed material.
 
 
 ### Structure ###
 
 * **root**
   <br />_The root contains the overall repository configuration files, license, and general structure._
+  
+* **resume**
+  <br />_The container for my current resume in various formats._  
   
 * **documents**
   <br />_The base container for document samples.  These are further organized by subfolder to catagorize the document type._
