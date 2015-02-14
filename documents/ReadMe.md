@@ -14,3 +14,6 @@ Included in this section are documents of varying purpose and format, covering t
   
 * **project-related**
   <br />_The base container for document samples that are more directly specific to a particular project.  These are  further organized by subfolder to group the documents from a given project together._
+  
+* **hiring-related**
+  <br />_These serve as examples of documents that are centered around hiring activities, including job descriptions, interview materials, and candidate reviews._
