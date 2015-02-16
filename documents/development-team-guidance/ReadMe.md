@@ -6,6 +6,9 @@ Included in this section are documents intended to serve as resources for a deve
 
 ### Items ###
 
+* **developer-introduction.docx**
+  <br />_This document is intended to serve as an on-boarding resource for new developers hired into a .NET-centric development group that operates as a shared services organization within an enterprise.  Team norms, development methodologies, technical environment details, and development tool sets are discussed at a high level to help familiarize new hires with the team and its role in the organization._
+  
 * **coding-conventions.docx**
   <br />_This document details a set of coding conventions for C# development.  First written in late 2005, it is intended to provide a very lightweight and high-level set of common conventions to promote code consistency across a team.  As coding conventions are often a source of friction for a team, every attempt was made to frame these conventions as suggestion and empower team members to concentrate on code and not draconian standards.  To conform to common industry idioms, this document was heavily adapted from published coding practices at Microsoft and attempts to stay within expected norms._
   
