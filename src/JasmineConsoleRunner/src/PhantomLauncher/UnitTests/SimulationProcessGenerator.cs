@@ -26,16 +26,24 @@ namespace GoofyFoot.PhantomLauncher.UnitTests
         public static void Main(string[] args)
         {
           var callCount = 1;
+          var delay     = 250;
           
           if ((args != null) && (args.Length > 0))
           {
             int.TryParse(args[0], out callCount);
           }
 
+          if ((args != null) && (args.Length > 1))
+          {
+            int.TryParse(args[1], out delay);
+            delay = Math.Max(delay, 0);
+          }
+
+
           for (var index = 0; index < callCount; ++index)
           {
             Console.WriteLine(""Simulation"");
-            Thread.Sleep(250);
+            Thread.Sleep(delay);
           }
         }
       }

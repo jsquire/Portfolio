@@ -29,41 +29,6 @@ namespace GoofyFoot.PhantomLauncher.UnitTests
 
     /// <summary>Indicates whether or not Dispose has been called, to prevent redundant disposing.</summary>
     private bool disposed = false;
-
-    /// <summary>
-    ///   The set of data for use with the testing of the Launch method of the 
-    ///   <see cref="T:GoofyFoot.PhantomLauncher.ProcessManager"/>.
-    /// </summary>
-    /// 
-    public static IEnumerable<object[]> LaunchData
-    {
-      get
-      {
-        var rng          = new Random();
-        var elementCount = rng.Next(5, 25);
-
-        var list = new List<object[]>()
-        {
-          new object[] { Int32.MinValue },
-          new object[] { 250 },          
-          new object[] { -1 },
-          new object[] { 0 },
-          new object[] { 1 },
-          new object[] { 2 },
-          new object[] { 3 },
-          new object[] { 99 },
-          new object[] { 100 }
-        };
-                
-        for (var index = 0; index < elementCount; ++index)
-        {
-          list.Add(new object[] { rng.Next(0, 150) });
-        }
-
-        return list;
-      }
-    }
-
     
     /// <summary>
     ///   Initializes a new instance of the <see cref="T:GoofyFoot.PhantomLauncher.UnitTests.ProcessManager"/> class.
@@ -355,10 +320,25 @@ namespace GoofyFoot.PhantomLauncher.UnitTests
     /// </summary>
     /// 
     /// <param name="outputCount">The number of times that the child process should write to the stdout stream.</param>
+    /// <param name="delayMilliseconds">The delay, in milliseconds, that the child process should wait between writes to the output stream.</param>
     /// 
     [Theory()]
-    [MemberData("LaunchData")]
-    public void Launch(int outputCount)
+    [InlineData(Int32.MinValue, 250)]
+    [InlineData(-1, 25)]
+    [InlineData(0, 25)]
+    [InlineData(1, 25)]
+    [InlineData(2, 25)]
+    [InlineData(3, 25)]
+    [InlineData(10, 5)]
+    [InlineData(15, 5)]
+    [InlineData(25, 5)]
+    [InlineData(50, 5)]
+    [InlineData(99, 5)]
+    [InlineData(100, 5)]
+    [InlineData(200, 1)]
+    [InlineData(250, 1)]
+    public void Launch(int outputCount,
+                       int delayMilliseconds)
     {
       var path               = this.testProcessPath.Value;
       var expected           = Math.Max(outputCount, 0);
@@ -378,7 +358,7 @@ namespace GoofyFoot.PhantomLauncher.UnitTests
         ++processorCallCount;
       };
       
-      UnderTest.ProcessManager.Launch(path, outputCount.ToString(), Path.GetDirectoryName(path), segmentProcessor, outputParser);
+      UnderTest.ProcessManager.Launch(path, String.Format("{0} {1}", outputCount, delayMilliseconds), Path.GetDirectoryName(path), segmentProcessor, outputParser);
             
       parserCallCount.Should().Be(expected, "because the parser should be called once per write to stdout.");
       processorCallCount.Should().Be(expected, "because the parser should be called once per write to stdout.");
@@ -402,4 +382,3 @@ namespace GoofyFoot.PhantomLauncher.UnitTests
     
   } // End class ProcessManager
 } // End namespace GoofyFoot.PhantomLauncher.UnitTests
-

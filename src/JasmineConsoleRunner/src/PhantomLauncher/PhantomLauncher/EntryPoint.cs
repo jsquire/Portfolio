@@ -27,15 +27,7 @@ namespace GoofyFoot.PhantomLauncher
         EntryPoint.DisplayHelp<CommandLineContext.Arguments>(CommandLineContext.Arguments.Defaults);
       }
 
-      ProcessManager.DisplaySegmentProcessor segmentProcessor = segments =>
-      {
-        foreach (var segment in segments)
-        {
-          Console.WriteLine(segment.Text);
-        }
-      };
-
-      ProcessManager.Launch(context.Args.PhantomPath, context.Args.TestSuitePath, System.IO.Path.GetTempPath(), segmentProcessor);
+      ProcessManager.Launch(context.Args.PhantomPath, context.Args.TestSuitePath, System.IO.Path.GetTempPath(), EntryPoint.SegmentProcessor);
     }
 
     /// <summary>
@@ -91,6 +83,26 @@ namespace GoofyFoot.PhantomLauncher
 
         Console.WriteLine();
       }
+    }
+
+    /// <summary>
+    ///   Processes a set of display segments, echoing them to the console using the identified color, if present,
+    ///   or default color.
+    /// </summary>
+    /// 
+    /// <param name="segments">The set of display segments to consider.</param>
+    /// 
+    private static void SegmentProcessor(IEnumerable<DisplaySegment> segments)
+    {
+      var defaultColor = Console.ForegroundColor;
+
+      foreach (var segment in segments)
+      {
+        Console.ForegroundColor = segment.Color ?? defaultColor;
+        Console.Write(segment.Text);
+      }
+
+      Console.ForegroundColor = defaultColor;
     }
 
   } // End class EntryPoint
