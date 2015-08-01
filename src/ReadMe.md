@@ -10,3 +10,6 @@ In some cases, the samples may be a subset of functionality, where in others the
 
 * **mAdserve**
   <br />_This project extends and enhances the open source [mAdserve](http://madserve.org "mAdserve") mobile ad platform to allow for serving of rich media ads in addition to the static content-based ads that it was originally designed to deliver._
+  
+* **Jasmine Console Runner**
+  <br />_Many javascript unit testing libraries are able to produce color console output on Unix-based systems by using the standard escape character sequence.  These sequences do not work in the Windows console, nor is there an alternative sequence to do so. This project is a wrapper around the Jasmine unit testing library which allows test output to emit a control character sequence to the stdout stream that can influence the color that it is written with in the console output._

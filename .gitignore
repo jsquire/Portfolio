@@ -36,7 +36,7 @@ bld/
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
 
-#NUNIT
+# NUnit
 *.VisualState.xml
 TestResult.xml
 
@@ -159,11 +159,13 @@ publish/
 *.pubxml
 
 # NuGet Packages
+lib/nuget/*
 packages/*
 *.nupkg
 ## TODO: If the tool you use requires repositories.config
 ## uncomment the next line
-#!packages/repositories.config
+!packages/repositories.config
+!lib/nuget/repositories.config
 
 # Enable "build/" folder in the NuGet Packages folder since
 # NuGet packages use it for MSBuild targets.
