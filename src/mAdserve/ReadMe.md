@@ -8,11 +8,9 @@ Many ads, both static and rich content, attempt to be compatible with as many br
 
 When delivering ads, mAdServe attempts to minimize impact to the host pages by requesting ads asynchronously using its own client-side script, rather than allowing the ads to render directly.  For static ads comprised of nothing but HTML and image content, this approach works well.  However, for rich media ads this causes issues as the behavior of `document.write` changes dramatically after the page has rendered.  Rather than injecting markup inline where the script was referenced, calling `document.write ` after page rendering is complete will overwrite the content of the page.  Since most ad content assumes that it is being rendered synchronously, this resulted in major issues in the host page when mAdserve was used to deliver rich ads with scripted behaviors.
 
-### Assets ###
-
 Developed in early 2013, the assets herein attempt to overcome the issues that plagued the default mAdserve approach of serving ads asynchronously by building up a client-side framework that was able to accommodate ads intended to be rendered synchronously by shimming the default browser behaviors that they rely upon.  Once the rendering is complete, the default browser behavior is restored to ensure that the host page behaves as intended.
 
-Included in this implementation are two files:
+### Items ###
 
 * **ad.js** - This is the rewritten mAdserve client-side behavior script extended to allow for asynchronous rendering of both static and rich mobile ads.
 
