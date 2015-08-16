@@ -13,3 +13,9 @@ In some cases, the samples may be a subset of functionality, where in others the
   
 * **Jasmine Console Runner**
   <br />_Many javascript unit testing libraries are able to produce color console output on Unix-based systems by using the standard escape character sequence.  These sequences do not work in the Windows console, nor is there an alternative sequence to do so. This project is a wrapper around the Jasmine unit testing library which allows test output to emit a control character sequence to the stdout stream that can influence the color that it is written with in the console output._
+  
+* **Scripts**
+  <br />_A collection of miscellaneous small scripts in various languages.  The scripts herein are each self-contained, not part of a larger overall project or ecosystem._
+  
+* **Visual Studio Config Transformations**
+  <br />_Visual Studio web projects have a built-in ability to utilize a base web configuration file and then apply per-build transforms to allow configuration to vary between different environments.  This functionality was initially intended to be used only as part of web deployments run from within Visual Studio.  Because many projects of different types can benefit from defining configuration this way, this project is an early attempt to isolate the built-in transform functionality of Visual Studio Web Deployments and generalize it such that it could be used as part of a build, both local and server-based._

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="GenerateConfigs" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+  <UsingTask TaskName="TransformXml" AssemblyFile="Microsoft.Web.Publishing.Tasks.dll"/>
+  
+  <Target Name="GenerateConfigs">
+    <TransformXml Source="$(BaseFileName).config" 
+                  Transform="$(SourceFilename).$(BuildConfigurationName).config" 
+                  Destination="$(DestinationFilename).config"/>
+  </Target>
+</Project> 
