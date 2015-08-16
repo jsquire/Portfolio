@@ -4,7 +4,7 @@
 
 Developed in early 2015, the source included herein is broken into two separate projects - the script used to bootstrap and PhantomJS and run Jasmine tests, and the C# console application used to wrap that interaction and colorize the output.  
 
-Initially, instead of the C# console application, the intent was to use a simple PowerShell script to capture and colorize the output, however due to the model used by PowerShell for handling asynchronous events it was unable to reliably capture the stdout stream text.  The prototypes for these scripts can be found in the [PowerShell](../../scripts/powershell, "PowerShell") section of the portfolio.
+Initially, instead of the C# console application, the intent was to use a simple PowerShell script to capture and colorize the output, however due to the model used by PowerShell for handling asynchronous events it was unable to reliably capture the stdout stream text.  The prototypes for these scripts can be found in the [PowerShell](../../scripts/powershell "PowerShell") section of the portfolio.
 
 ### Structure ###
 
