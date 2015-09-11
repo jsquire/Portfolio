@@ -25,6 +25,7 @@ namespace GoofyFoot.PhantomLauncher
       if ((context.HasArgumentErrors) || (context.Args.Help))
       {
         EntryPoint.DisplayHelp<CommandLineContext.Arguments>(CommandLineContext.Arguments.Defaults);
+        return;
       }
 
       ProcessManager.Launch(context.Args.PhantomPath, context.Args.TestSuitePath, System.IO.Path.GetTempPath(), EntryPoint.SegmentProcessor);
