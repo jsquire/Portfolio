@@ -85,7 +85,7 @@ namespace GoofyFoot.PhantomLauncher
             
       parser.Setup(arg => arg.TestScriptPath)
             .As("TestScriptPath")
-            .SetDefault(Path.Combine(parser.Object.TestScriptContainer ?? Environment.CurrentDirectory, "test-runner.js"));
+            .SetDefault(Path.Combine(parser.Object.TestScriptContainer ?? Environment.CurrentDirectory, "jasmine-runner.js"));
 
       parser.Setup(arg => arg.PhantomPath)
             .As("PhantomPath")

@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>GoofyFoot.PhantomLauncher</RootNamespace>
     <AssemblyName>PhantomLauncher</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -29,6 +29,7 @@
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
     <NuGetPackageImportStamp>ae2e274d</NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -58,6 +59,9 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>GoofyFoot.PhantomLauncher.EntryPoint</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="FluentCommandLineParser">
@@ -106,14 +110,23 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <UsingTask AssemblyFile="$(SolutionDir)..\..\lib\nuget\ILMerge.Tools.MSBuildToolTask.2.14.1208.49\tools\ILMerge.Tools.MSBuildToolTask.dll" TaskName="ILMerge.Tools.MSBuildToolTask.ILMergeTool" />
-  <!-- Perform the merge into the "dist" folder only for a "Distribution" build -->
-  <Target Name="AfterBuild" Condition="'$(Configuration)'=='Distribution'">
+  <UsingTask AssemblyFile="$(SolutionDir)\..\..\lib\nuget\ILMerge.Tools.MSBuildToolTask.2.14.1208.49\tools\ILMerge.Tools.MSBuildToolTask.dll" TaskName="ILMerge.Tools.MSBuildToolTask.ILMergeTool" />
+  
+  <!-- Perform the merge into the "dist" folder and copy the jasmine runner only for a "Distribution" build -->
+  <Target Name="AfterBuild" Condition="'$(Configuration)'=='Distribution'">    
+    
+    <!-- Ensure that the "dist" folder exists -->
+    <MakeDir Directories="$(SolutionDir)\..\..\dist" Condition="'$(Configuration)'=='Distribution'" />
+    
+    <!-- Merge the PhantomLauncher executable with dependencies -->
     <ItemGroup Condition="'$(Configuration)'=='Distribution'">
-      <ILMergeInputAssemblies Include="$(OutDir)PhantomLauncher.exe" />
-      <ILMergeInputAssemblies Include="$(OutDir)FluentCommandLineParser.dll" />
+      <ILMergeInputAssemblies Include="$(OutDir)\PhantomLauncher.exe" />
+      <ILMergeInputAssemblies Include="$(OutDir)\FluentCommandLineParser.dll" />
     </ItemGroup>
-    <ILMergeTool Condition="'$(Configuration)'=='Distribution'" InputAssemblies="@(ILMergeInputAssemblies)" OutputFile="$(SolutionDir)..\..\dist\PhantomLauncher.exe" ToolPath="$(SolutionDir)..\..\lib\nuget\ilmerge.2.14.1208\tools\ILMerge.exe" />
+    <ILMergeTool Condition="'$(Configuration)'=='Distribution'" InputAssemblies="@(ILMergeInputAssemblies)" OutputFile="$(SolutionDir)\..\..\dist\PhantomLauncher.exe" ToolPath="$(SolutionDir)\..\..\lib\nuget\ilmerge.2.14.1208\tools\ILMerge.exe" />
+
+    <!-- Copy the jasmine test suite runner script, if it exists. -->
+    <Copy SourceFiles="$(SolutionDir)\..\JasmineTestRunner\jasmine-runner.js" DestinationFolder="$(SolutionDir)\..\..\dist" Condition="'$(Configuration)'=='Distribution' AND Exists('$(SolutionDir)\..\JasmineTestRunner\jasmine-runner.js')" />
   </Target>
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
