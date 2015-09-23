@@ -5,13 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 
 
 namespace GoofyFoot.PhantomLauncher
 {
   /// <summary>
-  ///   Manages the child process in which PhantomJS is performing test runs.
+  /// Manages the child process in which PhantomJS is performing test runs.
   /// </summary>
   /// 
   public static class ProcessManager
@@ -121,6 +122,41 @@ namespace GoofyFoot.PhantomLauncher
     }
 
     /// <summary>
+    ///   Formats the arguments needed to for launching the PhantomJS process.
+    /// </summary>
+    /// 
+    /// <param name="jasmineRunnerPath">The full path, including filename, to the script that serves as a shim between PhantomJS and the Jasmine library allowing tests to be run.</param>
+    /// <param name="testSuitePath">The full path, including filename, to the test suite that should be run.</param>
+    /// 
+    /// <returns>The argument string to be passed to the PhantomJS process to run the specified suite of Jasmine tests.</returns>
+    /// 
+    public static string FormatPhantomArguments(string jasmineRunnerPath,
+                                                string testSuitePath)
+    {
+      if (String.IsNullOrWhiteSpace(jasmineRunnerPath))
+      {
+        throw new ArgumentNullException("jasmineRunnerPath");
+      }
+
+      if (String.IsNullOrWhiteSpace(testSuitePath))
+      {
+        throw new ArgumentNullException("testSuitePath");
+      }
+
+      if (!File.Exists(jasmineRunnerPath))
+      {
+        throw new ArgumentException("The Jasmine Runner path does not exist.", "jasmineRunnerPath");
+      }
+
+      if (!File.Exists(testSuitePath))
+      {
+        throw new ArgumentException("The test suite path does not exist.", "testSuitePath");
+      }
+
+      return String.Format("{0} file:///{1}", jasmineRunnerPath, testSuitePath);
+    } 
+
+    /// <summary>
     ///   Launches the specified executable as a child process, capturing its stdout and parsing its output, using a 
     ///   default processor, into a display segment set.
     /// </summary>
@@ -183,11 +219,14 @@ namespace GoofyFoot.PhantomLauncher
         throw new ArgumentException("The path does not exist", "executablePath");
       }
 
+      var dataRecieveCompleted = new ManualResetEvent(false);
+
       var processStartInfo = new ProcessStartInfo
       {
         CreateNoWindow         = true,
         RedirectStandardOutput = true,
         UseShellExecute        = false,
+        ErrorDialog            = false,
         Arguments              = arguments,
         FileName               = executablePath,
         WorkingDirectory       = workingPath
@@ -197,6 +236,7 @@ namespace GoofyFoot.PhantomLauncher
       {        
         if ((args == null ) || (args.Data == null))
         {
+          //dataRecieveCompleted.Set();
           return;
         }
 
@@ -208,13 +248,18 @@ namespace GoofyFoot.PhantomLauncher
       {
         try
         {
-          process.StartInfo = processStartInfo;        
-          process.OutputDataReceived += dataHandler;                   
+          process.StartInfo = processStartInfo;                  
+          process.OutputDataReceived += dataHandler;  
 
           if (process.Start())
           {
             process.BeginOutputReadLine();
-            process.WaitForExit();          
+            process.WaitForExit();
+
+            // Because the data recieved can be sent after the process exited, wait
+            // until a null data event happens or a second has passed to return.
+
+            dataRecieveCompleted.WaitOne(TimeSpan.FromSeconds(1));     
           }
         }
 

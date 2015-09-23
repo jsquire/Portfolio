@@ -80,6 +80,138 @@ namespace GoofyFoot.PhantomLauncher.UnitTests
     }
 
     /// <summary>
+    ///   Validates that the argument for the Jasmine Runner Path must not be null, empty, or whitespace.
+    /// </summary>
+    /// 
+    /// <param name="jasmineRunnerPath">The Jasmine runner path to consider.</param>
+    /// 
+    [Theory()]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void FormatPhantomArgumentsDoesNotAllowEmptyJasmineRunnerPath(string jasmineRunnerPath)
+    {
+      Action actionUnderTest = () => UnderTest.ProcessManager.FormatPhantomArguments(jasmineRunnerPath, Directory.GetFiles(Directory.GetCurrentDirectory()).First());
+
+      actionUnderTest.ShouldThrow<ArgumentNullException>()
+                     .And.ParamName.Should().Be("jasmineRunnerPath", "because the Jasmine Test Runner parameter was null, empty, or whitespace");
+    }
+
+    /// <summary>
+    ///   Validates that the argument for the Jasmine test suite path must not be null, empty, or whitespace.
+    /// </summary>
+    /// 
+    /// <param name="testSuitePath">The Jasmine test suite path to consider.</param>
+    /// 
+    [Theory()]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("  ")]
+    public void FormatPhantomArgumentsDoesNotAllowEmptyJasmineTestSuitePath(string testSuitePath)
+    {
+      Action actionUnderTest = () => UnderTest.ProcessManager.FormatPhantomArguments(Directory.GetFiles(Directory.GetCurrentDirectory()).First(), testSuitePath);
+
+      actionUnderTest.ShouldThrow<ArgumentNullException>()
+                     .And.ParamName.Should().Be("testSuitePath", "because the Jasmine test suite path parameter was null, empty, or whitespace");
+    }
+
+    /// <summary>
+    ///   Validates that the argument for the Jasmine Runner Path is an existing file.
+    /// </summary>
+    /// 
+    [Fact()]
+    public void FormatPhantomArgumentValidatesJasmineRunnerPath()
+    {
+      var tempFile = Path.GetTempFileName();
+      
+      try
+      {
+        Action actionUnderTest = () => UnderTest.ProcessManager.FormatPhantomArguments("bogus", tempFile);
+
+        actionUnderTest.ShouldThrow<ArgumentException>()
+                       .And.ParamName.Should().Be("jasmineRunnerPath", "because the Jasmine test suite path does not exist");
+
+      }
+
+      finally
+      {
+        try { File.Delete(tempFile); }  catch {}
+      }
+    }
+
+    /// <summary>
+    ///   Validates that the argument for the Jasmine test suite path is an existing file.
+    /// </summary>
+    /// 
+    [Fact()]
+    public void FormatPhantomArgumentsValidatesJasmineTestSuitePath()
+    {
+      var tempFile = Path.GetTempFileName();
+      
+      try
+      {
+        Action actionUnderTest = () => UnderTest.ProcessManager.FormatPhantomArguments(tempFile, "bogus");
+
+        actionUnderTest.ShouldThrow<ArgumentException>()
+                       .And.ParamName.Should().Be("testSuitePath", "because the Jasmine test suite path does not exist");
+      }
+
+      finally
+      {
+        try { File.Delete(tempFile); }  catch {}
+      }
+    }
+
+    /// <summary>
+    ///   Validates that the formatted arguments contain both the Jasmine test runner and test suite paths.
+    /// </summary>
+    /// 
+    [Fact()]
+    public void FormatPhantomArgumentsIncludesJasmineRunnerPathAndTestSuitePath()
+    {
+      var tempRunner = Path.GetTempFileName();
+      var tempSuite = Path.GetTempFileName();
+      
+      try
+      {
+        var result = UnderTest.ProcessManager.FormatPhantomArguments(tempRunner, tempSuite);
+
+        result.Should().Contain(tempRunner, "because the Jasmine runner path should be part of the arguments");
+        result.Should().Contain(tempSuite, "because the Jasmine test suite should be part of the arguments");
+      }
+
+      finally
+      {
+        try { File.Delete(tempRunner); }  catch {}
+        try { File.Delete(tempSuite);  }  catch {}
+      }
+    }
+
+    /// <summary>
+    ///   Validates that the formatted arguments contain the HTTP file protocol.
+    /// </summary>
+    /// 
+    [Fact()]
+    public void FormatPhantomArgumentsIncludeHttpFileProtocol()
+    {
+      var tempRunner = Path.GetTempFileName();
+      var tempSuite = Path.GetTempFileName();
+      
+      try
+      {
+        var result = UnderTest.ProcessManager.FormatPhantomArguments(tempRunner, tempSuite);
+
+        result.Should().Contain("file:///", "because the Jasmine test suite path should be formatted as a URI");
+      }
+
+      finally
+      {
+        try { File.Delete(tempRunner); }  catch {}
+        try { File.Delete(tempSuite);  }  catch {}
+      }
+    }
+
+    /// <summary>
     ///   Validates that parsing a null target.
     /// </summary>
     /// 

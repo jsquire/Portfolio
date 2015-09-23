@@ -27,8 +27,10 @@ namespace GoofyFoot.PhantomLauncher
         EntryPoint.DisplayHelp<CommandLineContext.Arguments>(CommandLineContext.Arguments.Defaults);
         return;
       }
+            
+      var phantomArguments = ProcessManager.FormatPhantomArguments(context.Args.TestScriptPath, context.Args.TestScriptPath);
 
-      ProcessManager.Launch(context.Args.PhantomPath, context.Args.TestSuitePath, System.IO.Path.GetTempPath(), EntryPoint.SegmentProcessor);
+      ProcessManager.Launch(context.Args.PhantomPath, phantomArguments, System.IO.Path.GetTempPath(), EntryPoint.SegmentProcessor);
     }
 
     /// <summary>
