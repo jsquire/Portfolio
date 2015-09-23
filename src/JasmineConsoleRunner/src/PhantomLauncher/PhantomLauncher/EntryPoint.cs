@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace GoofyFoot.PhantomLauncher
 {
@@ -28,9 +29,10 @@ namespace GoofyFoot.PhantomLauncher
         return;
       }
             
-      var phantomArguments = ProcessManager.FormatPhantomArguments(context.Args.TestScriptPath, context.Args.TestScriptPath);
+      // Force all paths to be fully qualified when forming the PhantomJS arguments and launching the 
+      var phantomArguments = ProcessManager.FormatPhantomArguments(Path.GetFullPath(context.Args.TestScriptPath), Path.GetFullPath(context.Args.TestSuitePath));
 
-      ProcessManager.Launch(context.Args.PhantomPath, phantomArguments, System.IO.Path.GetTempPath(), EntryPoint.SegmentProcessor);
+      ProcessManager.Launch(Path.GetFullPath(context.Args.PhantomPath), phantomArguments, Path.GetTempPath(), EntryPoint.SegmentProcessor);
     }
 
     /// <summary>
@@ -105,6 +107,7 @@ namespace GoofyFoot.PhantomLauncher
         Console.Write(segment.Text);
       }
 
+      Console.WriteLine();
       Console.ForegroundColor = defaultColor;
     }
 

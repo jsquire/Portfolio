@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 
 
 namespace GoofyFoot.PhantomLauncher
@@ -116,7 +113,7 @@ namespace GoofyFoot.PhantomLauncher
         currentColor = (Enum.TryParse(currentMatch.Groups[ProcessManager.colorGroupName].Value, out parsedColor)) ? (ConsoleColor?)parsedColor : null;
         yield return new DisplaySegment(currentColor, target.Substring(start, end));
       }
-
+            
       yield break;
 
     }
@@ -236,7 +233,7 @@ namespace GoofyFoot.PhantomLauncher
       {        
         if ((args == null ) || (args.Data == null))
         {
-          //dataRecieveCompleted.Set();
+          dataRecieveCompleted.Set();
           return;
         }
 
