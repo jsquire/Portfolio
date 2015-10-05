@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Example Test Suite</title>
+  
+    <!-- Jasmine infrastructure -->
+    <link rel="shortcut icon" type="image/png" href="../../lib/jasmine-2.3.4/jasmine_favicon.png">
+    <link rel="stylesheet" href="../../lib/jasmine-2.3.4/jasmine.css">
+    
+    <!-- 
+      PhantomJS doesn't translate relative paths for file:/// urls when they use dot references to
+      refer to higher level directories, so build the full paths and emit the script resources.
+    -->
+    <script type="text/javascript">
+      var resources = 
+      [
+        // Jasmine infrastructure
+        '../../lib/jasmine-2.3.4/jasmine.js',
+        '../../lib/jasmine-2.3.4/jasmine-html.js',
+        '../../lib/jasmine-2.3.4/boot.js',
+
+        // Source being tested
+        '../src/Player.js',
+        '../src/Song.js',
+
+        // Test Specs
+        'SpecHelper.js',
+        'PlayerSpec.js'
+      ];
+
+      var fullUrl    = unescape(window.location.href).replace(/\\/g, '/');
+      var trimLength = (fullUrl.lastIndexOf('/') + 1);
+      var baseUrl    = fullUrl.substring(0, trimLength);
+      var head       = document.getElementsByTagName('head')[0];
+      var script     = null;
+
+      for (var index = 0; index < resources.length; ++index)
+      {
+        script      = document.createElement('script');
+        script.src  = (baseUrl + resources[index]);
+        script.type = 'text/javascript';
+        head.appendChild(script);
+      }
+
+    </script>    
+  </head>
+
+  <body>
+  </body>
+</html>
