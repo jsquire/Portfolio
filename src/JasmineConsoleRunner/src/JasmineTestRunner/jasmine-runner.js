@@ -238,7 +238,7 @@
         if ((statusSource !== undefined) && (statusSource !== null))
         {
           result.exitCode = exitCodes.normal;
-          result.status   = textSource.innerText;
+          result.status   = statusSource.innerText;
         }
       }
 
