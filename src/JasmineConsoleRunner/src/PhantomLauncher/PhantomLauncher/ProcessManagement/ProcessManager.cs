@@ -9,7 +9,7 @@ using System.Threading;
 namespace GoofyFoot.PhantomLauncher
 {
   /// <summary>
-  /// Manages the child process in which PhantomJS is performing test runs.
+  ///   Manages the child process in which PhantomJS is performing test runs.
   /// </summary>
   /// 
   public static class ProcessManager

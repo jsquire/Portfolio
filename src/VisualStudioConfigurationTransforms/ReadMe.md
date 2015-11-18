@@ -1,6 +1,6 @@
 # Visual Studio Configuration Transforms #
 
-### Overview ###
+### Summary ###
 
 In a typical environment, applications must support multiple environments, such as local, development, integration, and production.  In order to ensure that the proper configuration values are present for an application to be functional in each scenario, a new build configuration is commonly created in Visual Studio for each target environment.  Rather than building using the built-in Debug or Release configurations, developers would instead choose the configuration specific to the environment that the application was to be run in.  The use of a dedicated build configuration also makes it easier for an automated build server to have a target that is consistent with what the development team uses locally.
 

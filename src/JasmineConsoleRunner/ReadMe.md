@@ -8,7 +8,7 @@
 
 While Jasmine no longer does so as part of its package, it is possible to write a small javascript shim to allow Jasmine tests to run against PhantomJS.  This enables Jasmine to more easily be integrated into build/test automation and some development work flows that are centered on the console.  
 
-My goal was to write a simple script to allow running Jasmine tests from the Windows console using PhantomJS.  In order to more easily distinguish test results at a glance, I wanted to enable the output to be colored.  Because it is platform neutral, PhantomJS does not offer any intrinsic support for setting the console output color in the Windows console.  Unlike Unix-based environments in which the color can be influenced by sending a specific control-character sequence to stdout, Windows requires specific API calls to set the console color.  To work around this limitation, I wrote a small shim for launching PhantomJS which will intercept stdout and parse the output for a control character set to influence the color.  Because my intent was to run this on Windows only, I did not adopt the Unix control characters opting, instead, for something more easily recognizable at a glance.
+My goal was to write a simple script to allow running Jasmine tests from the Windows console using PhantomJS.  In order to more easily distinguish test results at a glance, I wanted to enable the output to be colored.  Because it is platform neutral, PhantomJS does not offer any intrinsic support for setting the console output color in the Windows console.  Unlike Unix-based environments in which the color can be influenced by sending a specific control-character sequence to stdout, Windows requires specific API calls to set the console color.  To work around this limitation, I wrote a small shim for launching PhantomJS which will intercept stdout and parse the output for a control character set to influence the color.  Because my intent was to run this on Windows only, I did not adopt the Unix control characters, instead opting for something more easily recognizable at a glance.
 
 ### Structure ###
 
@@ -17,6 +17,9 @@ My goal was to write a simple script to allow running Jasmine tests from the Win
   
 * **lib**
   <br />_The container for external libraries referenced by the project._
+  
+* **example**
+  <br />_The container for a functional example of using the console runner with a Jasmine test suite._
   
 * **dist**
   <br />_The container for project build output intended for distribution.  When using the console runner as part of another project, this is where one should look for the releases._
