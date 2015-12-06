@@ -1,3 +1,0 @@
-./playground.ts 
-./tests/TypeScriptOut-Tests.ts 
---target ES5
