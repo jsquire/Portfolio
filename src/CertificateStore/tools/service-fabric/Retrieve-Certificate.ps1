@@ -26,7 +26,7 @@
         Writes the certificate to the specified file.  
   
     .EXAMPLE
-      ./retrieve-certificate "Mimeo Dev" "Dev-KeyVault" "Localhost-SSL" ".\local.pfx"    
+      ./retrieve-certificate "Example Dev" "Example-KeyVault" "Localhost-SSL" ".\local.pfx"    
 #>
 
 [CmdletBinding()]
