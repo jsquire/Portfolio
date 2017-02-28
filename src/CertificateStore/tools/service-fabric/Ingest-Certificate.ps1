@@ -28,7 +28,7 @@
         Writes the details of the key vault entry into the certificate to the standard output stream.  
   
     .EXAMPLE
-      ./ingest-certificate "ProdTech-Dev" "Dev-KeyVault" "abc1234" ".\local.pfx" "local.pfx.json" "local.pfx.json.new"     
+      ./ingest-certificate "Example-Dev" "Example-KeyVault" "abc1234" ".\local.pfx" "local.pfx.json" "local.pfx.json.new"     
 #>
 
 [CmdletBinding()]
