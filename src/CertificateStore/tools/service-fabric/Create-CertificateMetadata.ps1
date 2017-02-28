@@ -18,7 +18,7 @@
         Writes the certificate metadatea to the requesed file.  
   
     .EXAMPLE
-      ./create-certificatemetadata "Mimeo Dev Cluster" "Allows for communication between Service Fabric nodes" "cluster.pfx.json"     
+      ./create-certificatemetadata "GoofyFoot Cluster" "Allows for communication between Service Fabric nodes" "cluster.pfx.json"     
 #>
 
 [CmdletBinding()]
