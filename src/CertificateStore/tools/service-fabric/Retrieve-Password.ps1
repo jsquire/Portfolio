@@ -23,7 +23,7 @@
         Writes the password to the output stream in plain text.  
   
     .EXAMPLE
-      ./retrieve-password "Mimeo Dev" "Dev-KeyVault" "Localhost-SSL" 
+      ./retrieve-password "Example Dev" "Example-KeyVault" "Localhost-SSL" 
 #>
 
 [CmdletBinding()]
