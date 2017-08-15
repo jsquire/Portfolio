@@ -64,7 +64,7 @@ param
 
 # Translate the subscription name into it's Id.
 
-$subscriptionId = (Get-AzureRmSubscription | where { $_.SubscriptionName -eq $SubscriptionName }).SubscriptionId
+Set-AzureRmContext -SubscriptionName $SubscriptionName | Out-Null
 
 # Read the certificate information.
 
@@ -85,6 +85,13 @@ $keyVaultData.password = $CertificatePassword
 $contentbytes = [System.Text.Encoding]::UTF8.GetBytes(($keyVaultData | ConvertTo-Json))
 $content      = [System.Convert]::ToBase64String($contentbytes)
 $secretValue  = ConvertTo-SecureString -String $content -AsPlainText -Force
+
+# If we captured the leading dot in the file extension, strip it.
+
+if ($keyVaultData.dataType.StartsWith("."))
+{
+    $keyVaultData.dataType = $keyVaultData.dataType.SubString(1)
+}
 
 # Add the certificate to KeyVault
 
