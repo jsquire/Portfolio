@@ -71,14 +71,12 @@ if (-not [String]::IsNullOrEmpty($UseMetadata))
 
 # Set the Azure subscription context.
 
-$subscriptionId = (Get-AzureRmSubscription | where { $_.SubscriptionName -eq $SubscriptionName }).SubscriptionId
+$subscription = (Set-AzureRmContext -SubscriptionName $SubscriptionName)
 
-if ($subscriptionId -eq $null)
+if ($subscription -eq $null)
 {
     throw "Subscription [$($SubscriptionName)] was not found"
 }
-
-Set-AzureRmContext -SubscriptionId $subscriptionId | Out-Null
 
 # Retrieve and decode the certficate information structure
 
