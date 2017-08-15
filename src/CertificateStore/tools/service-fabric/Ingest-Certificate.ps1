@@ -62,9 +62,16 @@ param
 # == Script Actions ==
 # ====================
 
-# Translate the subscription name into it's Id.
+# Set the Azure subscription context.
 
-Set-AzureRmContext -SubscriptionName $SubscriptionName | Out-Null
+$subscriptionId = (Get-AzureRmSubscription | where { $_.SubscriptionName -eq $SubscriptionName }).SubscriptionId
+
+if ($subscriptionId -eq $null)
+{
+    throw "Subscription [$($SubscriptionName)] was not found"
+}
+
+Set-AzureRmContext -SubscriptionId $subscriptionId | Out-Null
 
 # Read the certificate information.
 
