@@ -13,7 +13,7 @@ The game is intended for two local players, each holding one side of the interne
 - _**Right button:**_ Pings the LED back at your opponent when it is on your side and moving toward your scoring area  
 
 ### Structure ###
-* ####```/src```
+- ####```/src```
   _This is the source folder that contains the firmware files for the game project. It should *not* be renamed.
 Anything that is in this folder when compliling will be sent to our Particle cloud service and compiled into a firmware binary for the Particle device that is currently have targeted._
 
