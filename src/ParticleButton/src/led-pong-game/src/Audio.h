@@ -12,6 +12,8 @@ class Audio
 {
 private:
     BetterPhotonButton* button;
+    bool                stopRequested;
+    int                 winToneCurrent;
 
 public:
     /**
@@ -24,18 +26,24 @@ public:
     /**
     * Plays the sound effect for when the LED is "pinged" back in the other
     * direction.
+    *
+    * @returns { bool } true if there are more notes to play; otherwise, false.
     */
-    void playPingEffect();
+    bool playPingEffect();
 
     /**
     * Plays the sound effect for when the game is lost.
+    *
+    * @returns { bool } true if there are more notes to play; otherwise, false.
     */
-    void playLossEffect();
+    bool playLossEffect();
 
     /**
     * Plays the sound effect for when the game is won.
+    *
+    * @returns { bool } true if there are more notes to play; otherwise, false.
     */
-    void playWinEffect();
+    bool playWinEffect();
 
     /**
     * Stops playing any and all sound effects.

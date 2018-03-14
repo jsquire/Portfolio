@@ -4,6 +4,10 @@
 #include "Display.h"
 #include "Audio.h"
 
+// Constants
+
+#define LOOP_DELAY 15
+
 // Type definitions
 
 enum ButtonPosition
@@ -30,15 +34,11 @@ struct GameState
     int      ticksPerLossNotification;
 };
 
-// Constants
-
-static const int LOOP_DELAY = 15;
-
 // Globals
 
 auto internetButton = BetterPhotonButton();
-auto display        = new Display(&internetButton);
-auto audio          = new Audio(&internetButton);
+auto display        = Display(&internetButton);
+auto audio          = Audio(&internetButton);
 auto gameState      = GameState { Activity::Idle, 0, 10, 25 };
 
 // Function signatures
@@ -53,7 +53,7 @@ void setup()
 {
     internetButton.setup();
     internetButton.setReleasedHandler(&buttonHandler);
-    display->clearLeds();
+    display.clearLeds();
 
     Serial.begin();
 }
@@ -76,19 +76,19 @@ void loop()
                 // If the LED animiation cannot advance, then it "hit" the limit and the player for that
                 // side loses a LED position.
 
-                if (!display->tickLedAdvance())
+                if (!display.tickLedAdvance())
                 {
                     // If we can no longer reduce the number of available LEDs, then the current player has lost the
                     // game.  Advance the game state to showing the loss notification.
 
-                    if (!display->reduceAvailableLeds())
+                    if (!display.reduceAvailableLeds())
                     {
                         gameState.activity          = Activity::LossNotification;
                         gameState.activityTickCount = 0;
                     }
                     else
                     {
-                        display->reverseLedDirection();
+                        display.reverseLedDirection();
                     }
                 }
             }
@@ -101,7 +101,7 @@ void loop()
 
             if (gameState.activityTickCount)
             {
-                audio->playLossEffect();
+                audio.playLossEffect();
             }
 
             // If there are ticks remaining on the loss notification, display it;  otherwise,
@@ -109,8 +109,8 @@ void loop()
 
             if (++gameState.activityTickCount <= gameState.ticksPerLossNotification)
             {
-                auto side = display->determineLedSide(display->getLedState());
-                display->tickLossDisplayAnimation(side, gameState.activityTickCount);
+                auto side = display.determineLedSide(display.getLedState());
+                display.tickLossDisplayAnimation(side, gameState.activityTickCount);
             }
             else
             {
@@ -129,20 +129,22 @@ void loop()
                 // reduce the LEDs - in other words the losing side.  This needs to be reversed to identify
                 // the winner.
 
-                auto side = display->determineLedSide(display->getLedState());
+                auto side = display.determineLedSide(display.getLedState());
                 side = (side == LedSide::Minimum) ? LedSide::Maximum : LedSide::Minimum;
 
                 ++gameState.activityTickCount;
-                display->activateWinDisplay(side);
-
+                display.activateWinDisplay(side);
             }
             else if (gameState.activityTickCount == 1)
             {
                 // The audio needs an extra tick to ensure that the loss effect has cleared.
-                // Run the win effect on a tick count of 1 to be sure.
-                
-                ++gameState.activityTickCount;
-                audio->playWinEffect();
+                // Run the win effect on a tick count of 1 to be sure.  Do not advance the
+                // tick count until the effect has completed playing.
+
+                if (!audio.playWinEffect())
+                {
+                    ++gameState.activityTickCount;
+                }
             }
 
             break;
@@ -155,7 +157,7 @@ void loop()
             //
             // ¯\_(ツ)_/¯
             //
-            display->clearLeds();
+            display.clearLeds();
             break;
     }
 
@@ -183,16 +185,16 @@ void buttonHandler(int  button,
 
             if (gameState.activity == Activity::Interactive)
             {
-                audio->stopAll();
-                display->reset();
+                audio.stopAll();
+                display.reset();
             }
 
             return;
 
         case ButtonPosition::Bottom:
             gameState.activity =  Activity::Idle;
-            audio->stopAll();
-            display->clearLeds();
+            audio.stopAll();
+            display.clearLeds();
             return;
 
     }
@@ -201,13 +203,13 @@ void buttonHandler(int  button,
     // proper hemisphere and moving in the proper direction for the button that was pressed.  If so, then consider it
     // a ping and reverse the LED direction.
 
-    auto state = display->getLedState();
-    auto side  = display->determineLedSide(state);
+    auto state = display.getLedState();
+    auto side  = display.determineLedSide(state);
 
     if (((button == ButtonPosition::Right) && (side == LedSide::Minimum) && (state.activeDirection == Direction::Backward)) ||
         ((button == ButtonPosition::Left)  && (side == LedSide::Maximum) && (state.activeDirection == Direction::Forward)))
     {
-        audio->playPingEffect();
-        display->reverseLedDirection();
+        audio.playPingEffect();
+        display.reverseLedDirection();
     }
 }

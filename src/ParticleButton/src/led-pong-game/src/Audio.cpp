@@ -1,5 +1,20 @@
 #include "BetterPhotonButton.h"
 #include "Audio.h"
+#include <application.h>
+
+// Constants
+
+static const int WIN_EFFECT_NOTES [] =
+{
+    0,
+    50,
+    100,
+    200,
+    400,
+    800
+};
+
+static const int WIN_EFFECT_NOTES_LENGTH = (sizeof(WIN_EFFECT_NOTES) / sizeof(*WIN_EFFECT_NOTES));
 
 /**
 * Initializes a new intance of the Display class.
@@ -8,43 +23,62 @@
 */
 Audio::Audio(BetterPhotonButton* button)
 {
-    this->button = button;
+    this->button         = button;
+    this->stopRequested  = false;
+    this->winToneCurrent = 0;
 }
 
 /**
 * Plays the sound effect for when the LED is "pinged" back in the other
 * direction.
 */
-void Audio::playPingEffect()
+bool Audio::playPingEffect()
 {
     // The API offered by the button library makes is difficult to do a short tone,
     // so drop to the Partcle firmware for direct access.
 
+    this->stopRequested = false;
     tone(BUZZER_PHOTON_PIN, 254, 15);
+
+    return false;
 }
 
 /**
 * Plays the sound effect for when the game is lost.
 */
-void Audio::playLossEffect()
+bool Audio::playLossEffect()
 {
     // The API offered by the button library makes is difficult to do a short tone,
     // so drop to the Partcle firmware for direct access.
 
+    this->stopRequested = false;
     tone(BUZZER_PHOTON_PIN, 54, 50);
+
+    return false;
 }
 
 /**
 * Plays the sound effect for when the game is won.
 */
-void Audio::playWinEffect()
+bool Audio::playWinEffect()
 {
-    // Notes for the winnning music gratefully borrowed from:
-    //    https://www.reddit.com/r/arduino/comments/10l2pk/question_about_creating_a_melody_with_a_small/
+    if (this->winToneCurrent == 0)
+    {
+        this->stopRequested = false;
+    }
 
-    this->button->stopPlayingNotes();
-    this->button->playNotes("");
-    this->button->playNotes("d=4,o=6,b=125:2c5,d_5,2g5,d_5,2f5");
+    if ((!this->stopRequested) && (this->winToneCurrent < (WIN_EFFECT_NOTES_LENGTH * 4)))
+    {
+        tone(BUZZER_PHOTON_PIN, WIN_EFFECT_NOTES[(this->winToneCurrent % WIN_EFFECT_NOTES_LENGTH)], 50);
+        ++(this->winToneCurrent);
+
+        return true;
+    }
+
+    this->stopRequested  = false;
+    this->winToneCurrent = 0;
+
+    return false;
 }
 
 /**
@@ -52,5 +86,5 @@ void Audio::playWinEffect()
 */
 void Audio::stopAll()
 {
-    this->button->stopPlayingNotes();
+    this->stopRequested = true;
 }
