@@ -21,3 +21,7 @@ With built-in WiFi and the ability to interact with the outside world using web 
 
 [1]: https://docs.particle.io/datasheets/photon-(wifi)/photon-datasheet
 
+
+### Disclaimer ###
+
+I am not well-skilled or current in C++.  The code herein is not likely to conform to best practices for the language and may contian inefficiencies to outright mistakes.  Feedback for improvement is welcome.  
