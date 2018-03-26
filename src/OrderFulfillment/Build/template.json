@@ -1,0 +1,536 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "type": "string"
+        },
+        "applicationInsightsAlertRulesFailureAnomaliesName": {
+            "type": "string"
+        },
+        "serviceBusName": {
+            "type": "string"
+        },
+        "serviceBusSubmitOrderQueueName": {
+            "type": "string"
+        },
+        "serviceBusProcessOrderQueueName": {
+            "type": "string"
+        },
+        "serviceBusFulfillmentFailureNotificationQueueName": {
+            "type": "string"
+        },
+        "serviceBusFulfillmentEventsTopicName": {
+            "type": "string"
+        },
+        "serviceBusAuthorizationRulesName": {
+            "type": "string"
+        },
+        "checkoutAppName": {
+            "type": "string"
+        },
+        "appServicePlanPricingTier": {
+            "type": "string"
+        },
+        "appServicePlanInstanceSize": {
+            "type": "string"
+        },
+        "storageAccountPerformance": {
+            "type": "string"
+        },
+        "serviceBusPerformance": {
+            "type": "string"
+        },
+        "deploymentEnvironmentName": {
+            "type": "string"
+        },
+        "keyVaultName": {
+            "type": "string"
+        },
+        "sslCertificateName": {
+            "type": "string"
+        },
+        "fulfillmentSslKeyVaultSecret": {
+            "type": "string"
+        },
+        "eCommerceApiHostNames": {
+            "type": "array"
+        },
+        "ecommerceCheckoutHostNames": {
+            "type": "array"
+        },
+        "fulfillmentApiHostNames": {
+            "type": "array"
+        },
+        "sslEnabled": {
+            "type": "bool"
+        },
+        "sslCertificateThumbprint": {
+            "type": "string"
+        },
+        "sslHostType": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "resourcePrefix": "[concat(resourceGroup().name, '-')]",
+        "appServicePlanName": "[resourceGroup().name]",
+        "applicationInsightsName": "[resourceGroup().name]",
+        "eCommerceCheckoutName": "[concat(variables('resourcePrefix'), parameters('checkoutAppName'))]",
+        "eCommerceApiName": "[concat(variables('resourcePrefix'), 'ecommerce-api')]",
+        "fulfillmentApiName": "[concat(variables('resourcePrefix'), 'fulfillment-api')]",
+        "ecommerceTestAppName": "[concat(variables('resourcePrefix'), 'ecommerce-test')]",
+        "applicationInsightsAlertRulesFailureAnomaliesFullName": "[concat(parameters('applicationInsightsAlertRulesFailureAnomaliesName'), resourceGroup().name)]",
+        "keyVaultId": "[concat(subscription().id, '/resourceGroups/mis-resources/providers/Microsoft.KeyVault/vaults/', parameters('keyVaultName'))]",        
+        "sslState": "[if(equals(parameters('sslEnabled'), 'true'), 'SniEnabled', 'Disabled')]",
+        "ecommerceCheckoutHostNameSslStates": [
+            {
+                "name": "eCommerce Checkout",
+                "sslState": "[variables('sslState')]",
+                "thumbprint": "[parameters('sslCertificateThumbprint')]",
+                "hostType": "[parameters('sslHostType')]"
+            }
+        ],
+        "ecommerceApiHostNameSslStates": [
+            {
+                "name": "eCommerce API",
+                "sslState": "[variables('sslState')]",
+                "thumbprint": "[parameters('sslCertificateThumbprint')]",
+                "hostType": "[parameters('sslHostType')]"
+            }
+        ],
+        "fulfillmentApiHostNameSslStates": [
+            {
+                "name": "Fulfillment API",
+                "sslState": "[variables('sslState')]",
+                "thumbprint": "[parameters('sslCertificateThumbprint')]",
+                "hostType": "[parameters('sslHostType')]"
+            }
+        ]
+    },
+    "resources": [
+        {
+            "comments": " App Service Plan",
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "[parameters('appServicePlanInstanceSize')]",
+                "tier": "[parameters('appServicePlanPricingTier')]",
+                "size": "[parameters('appServicePlanInstanceSize')]",
+                "family": "S",
+                "capacity": 1
+            },
+            "kind": "app",
+            "name": "[variables('appServicePlanName')]",
+            "apiVersion": "2016-09-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "name": "[variables('appServicePlanName')]",
+                "perSiteScaling": false,
+                "reserved": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            },
+            "dependsOn": []
+        },
+        {
+            "comments": "eCommerce Checkout Application",
+            "type": "Microsoft.Web/sites",
+            "kind": "app",
+            "name": "[variables('eCommerceCheckoutName')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Business": "Ordering"
+            },
+            "scale": null,
+            "properties": {
+                "enabled": true,
+                "enabledHostNames": "[parameters('ecommerceCheckoutHostNames')]",
+                "hostNameSslStates": "[variables('ecommerceCheckoutHostNameSslStates')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "reserved": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Web/certificates', parameters('sslCertificateName'))]"
+            ]
+        },
+        {
+            "comments": "eCommerce Checkout Host Name Binding",
+            "condition": "[equals(parameters('deploymentEnvironmentName'), 'PROD')]",
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "name": "[concat(variables('eCommerceCheckoutName'), '/', 'checkout.ecommerce.squire.com')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "siteName": "[variables('eCommerceCheckoutName')]",
+                "hostNameType": "Verified",
+                "sslState": "[variables('ecommerceCheckoutHostNameSslStates')]",
+                "thumbprint": "[parameters('sslCertificateThumbprint')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('eCommerceCheckoutName'))]"
+            ]
+        },
+        {
+            "comments": "eCommerce Api Application",
+            "type": "Microsoft.Web/sites",
+            "kind": "app",
+            "name": "[variables('eCommerceApiName')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Business": "Ordering"
+            },
+            "scale": null,
+            "properties": {
+                "enabled": true,
+                "enabledHostNames": "[parameters('eCommerceApiHostNames')]",
+                "hostNameSslStates": "[variables('eCommerceApiHostNameSslStates')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "reserved": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Web/certificates', parameters('sslCertificateName'))]"
+            ]
+        },
+        {
+            "comments": "eCommerce Api Host Name Binding",
+            "condition": "[equals(parameters('deploymentEnvironmentName'), 'PROD')]",
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "name": "[concat(variables('eCommerceApiName'), '/', 'api.ecommerce.squire.com')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "siteName": "[variables('eCommerceApiName')]",
+                "hostNameType": "Verified",
+                "sslState": "[variables('ecommerceApiHostNameSslStates')]",
+                "thumbprint": "[parameters('sslCertificateThumbprint')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('eCommerceApiName'))]"
+            ]
+        },
+        {
+            "comments": "Fulfillment Application",
+            "type": "Microsoft.Web/sites",
+            "kind": "app",
+            "name": "[variables('fulfillmentApiName')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Business": "Ordering"
+            },
+            "scale": null,
+            "properties": {
+                "enabled": true,
+                "enabledHostNames": "[parameters('fulfillmentApiHostNames')]",
+                "hostNameSslStates": "[variables('fulfillmentApiHostNameSslStates')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "reserved": false,
+                "scmSiteAlsoStopped": false,
+                "hostingEnvironmentProfile": null,
+                "clientAffinityEnabled": false,
+                "clientCertEnabled": true,
+                "hostNamesDisabled": false, 
+                "siteConfig": { 
+                    "alwaysOn": true, 
+                    "webSocketsEnabled" : true 
+                },
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Web/certificates', parameters('sslCertificateName'))]"
+            ]
+        },
+        {
+            "comments": "Fulfillment Host Name Binding",
+            "condition": "[equals(parameters('deploymentEnvironmentName'), 'PROD')]",
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "name": "[concat(variables('fulfillmentApiName'), '/', 'fulfillment.squire.com')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "siteName": "[variables('fulfillmentApiName')]",
+                "hostNameType": "Verified",
+                "sslState": "[variables('fulfillmentApiHostNameSslStates')]",
+                "thumbprint": "[parameters('sslCertificateThumbprint')]"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('fulfillmentApiName'))]"
+            ]
+        },
+        {
+            "comments": "eCommerce Test Application",
+            "type": "Microsoft.Web/sites",
+            "kind": "app",
+            "name": "[variables('ecommerceTestAppName')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Business": "Ordering"
+            },
+            "scale": null,
+            "properties": {
+                "enabled": true,
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "reserved": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]",
+                "[resourceId('Microsoft.Web/certificates', parameters('sslCertificateName'))]"
+            ]
+        },
+        {
+            "comments": "Fulfillment Storage Account",
+            "type": "Microsoft.Storage/storageAccounts",
+            "sku": {
+                "name": "Standard_RAGRS",
+                "tier": "[parameters('storageAccountPerformance')]"
+            },
+            "kind": "Storage",
+            "name": "[parameters('storageAccountName')]",
+            "apiVersion": "2016-01-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Business": "Ordering"
+            },
+            "scale": null
+        },
+        {
+            "comments": "Fulfillment Application Insights",
+            "type": "microsoft.insights/components",
+            "kind": "web",
+            "name": "[variables('applicationInsightsName')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Business": "Ordering"
+            },
+            "scale": null,
+            "properties": {
+                "ApplicationId": "[variables('applicationInsightsName')]"
+            }
+        },
+        {
+            "comments": "Application Insights Failure Anomalies Alert Rule",
+            "type": "microsoft.insights/alertrules",
+            "name": "[variables('applicationInsightsAlertRulesFailureAnomaliesFullName')]",
+            "apiVersion": "2014-04-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:', resourceId('Microsoft.Insights/components', variables('applicationInsightsName')))]": "Resource",
+                "Business": "Ordering"
+            },
+            "scale": null,
+            "properties": {
+                "name": "[variables('applicationInsightsAlertRulesFailureAnomaliesFullName')]",
+                "description": "",
+                "isEnabled": true,
+                "condition": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.ThresholdRuleCondition",
+                    "dataSource": {
+                        "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleMetricDataSource",
+                        "resourceUri": "[resourceId('microsoft.insights/components', variables('applicationInsightsName'))]",
+                        "metricNamespace": "WindowsAzure.Availability",
+                        "metricName": "advanced::A3108E3D-5E26-44CF-B232-783F5E20EF10::ewAiAEgAeQBwAGUAcgBpAG8AbgBBAHAAcABsAGkAYwBhAHQAaQBvAG4AUwBpAGQAIgA6AG4AdQBsAGwALAAiAEgAeQBwAGUAcgBpAG8AbgBTAHUAYgBqAGUAYwB0AFMAaQBkACIAOgBuAHUAbABsACwAIgBIAHkAcABlAHIAaQBvAG4ATwBiAHMAZQByAHYAZQByAFMAaQBkACIAOgBuAHUAbABsACwAIgBDAHUAcwB0AG8AbQBlAHIAQQBjAGMAbwB1AG4AdABJAGQAIgA6ACIAMAAwADAAMAAwADAAMAAwAC0AMAAwADAAMAAtADAAMAAwADAALQAwADAAMAAwAC0AMAAwADAAMAAwADAAMAAwADAAMAAwADAAIgAsACIAQQBwAHAAbABpAGMAYQB0AGkAbwBuAE4AYQBtAGUAIgA6AG4AdQBsAGwALAAiAEEAcABwAGwAaQBjAGEAdABpAG8AbgBJAGQAIgA6AG4AdQBsAGwALAAiAFAAcgBvAGYAaQBsAGUASQBkACIAOgAwACwAIgBXAGkAbgBkAG8AdwBTAGkAegBlAEkAbgBNAGkAbgB1AHQAZQBzACIAOgA2ADAALAAiAE0AZQB0AHIAaQBjAE4AYQBtAGUAIgA6ACIAIgAsACIAVABoAHIAZQBzAGgAbwBsAGQAIgA6ADIALgAwACwAIgBBAGwAZQByAHQAVABlAG0AcABsAGEAdABlAEkAZAAiADoAIgAiACwAIgBSAHUAbABlAEkAZAAiADoAIgAiACwAIgBSAHUAbABlAE4AYQBtAGUAIgA6ACIAIgAsACIAUgB1AGwAZQBEAGUAcwBjAHIAaQBwAHQAaQBvAG4AIgA6ACIAIgAsACIAUgBlAHMAbwB1AHIAYwBlAEkAZAAiADoAbgB1AGwAbAAsACIAUwB1AGIAcwBjAHIAaQBwAHQAaQBvAG4ASQBkACIAOgBuAHUAbABsACwAIgBBAGcAZwByAGUAZwBhAHQAZQBGAHUAbgBjAHQAaQBvAG4AIgA6ACIAIgAsACIAQwBvAG0AcABhAHIAaQBzAG8AbgBPAHAAZQByAGEAdABvAHIAIgA6ACIAewBcACIAQgBhAHMAZQBsAGkAbgBlAFQAaQBtAGUAcwBwAGEAbgBcACIAOgBcACIAMAAwADoANAAwADoAMAAwAFwAIgAsAFwAIgBJAG4AcwBpAGcAaAB0AHMAUwBlAHIAdgBpAGMAZQBMAGEAZwBcACIAOgBcACIAMAAwADoAMAAwADoAMAAwAFwAIgAsAFwAIgBCAHUAZgBmAGUAcgBUAGkAbQBlAFwAIgA6AFwAIgAwADAAOgAwADEAOgAwADAAXAAiACwAXAAiAEIAbABvAGIAUwB0AG8AcgBhAGcAZQBMAG8AZwBnAGkAbgBnAEUAbgBhAGIAbABlAGQAXAAiADoAZgBhAGwAcwBlACwAXAAiAFUAcwBlAHIAUwB1AHAAcAByAGUAcwBzAGkAbwBuAHMAXAAiADoAbgB1AGwAbAAsAFwAIgBQAHIAbwBmAGkAbABlAEkAZABcACIAOgAwACwAXAAiAEUAbQBhAGkAbABUAHkAcABlAFwAIgA6ADAALABcACIAUgBkAGQARgBhAGkAbAB1AHIAZQBzAFMAcABpAGsAZQBUAGgAcgBlAHMAaABvAGwAZABcACIAOgAzAC4AMAAsAFwAIgBSAGEAdwBQAHIAbwBhAGMAdABpAHYAZQBSAHUAbABlAEMAbwBuAGYAaQBnAFwAIgA6AG4AdQBsAGwAfQAiACwAIgBFAG4AYQBiAGwAZQBTAGUAbgBkAEUAbQBhAGkAbABUAG8AQwB1AHMAdABvAG0AIgA6AGYAYQBsAHMAZQAsACIAQwB1AHMAdABvAG0ARQBtAGEAaQBsAHMARQBuAGMAbwBkAGUAZAAiADoAIgAiACwAIgBFAG4AYQBiAGwAZQBTAGUAbgBkAEUAbQBhAGkAbABUAG8ATwB3AG4AZQByAHMAIgA6AGYAYQBsAHMAZQB9AA=="
+                    },
+                    "operator": "GreaterThan",
+                    "threshold": 2,
+                    "windowSize": "PT1H"
+                },
+                "action": {
+                    "odata.type": "Microsoft.Azure.Management.Insights.Models.RuleEmailAction",
+                    "sendToServiceOwners": true,
+                    "customEmails": []
+                }
+            },
+            "dependsOn": [
+                "[resourceId('microsoft.insights/components', variables('applicationInsightsName'))]"
+            ]
+        },
+        {
+            "comments": "Fulfillment Service Bus",
+            "type": "Microsoft.ServiceBus/namespaces",
+            "sku": {
+                "name": "Standard",
+                "tier": "[parameters('serviceBusPerformance')]",
+                "capacity": 1
+            },
+            "kind": "Messaging",
+            "name": "[parameters('serviceBusName')]",
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "Business": "Ordering"
+            },
+            "scale": null,
+            "properties": {
+                "provisioningState": "Succeeded",
+                "status": "Active",
+                "createdAt": "2017-08-07T16:23:26.89Z",
+                "serviceBusEndpoint": "[concat('https://', parameters('serviceBusName'),'.servicebus.windows.net:443/')]",
+                "enabled": true,
+                "updatedAt": "2017-08-07T16:23:50.707Z"
+            }
+        },
+        {
+            "comments": "Fulfillment Serive Bus Authorization Rules",
+            "type": "Microsoft.ServiceBus/namespaces/AuthorizationRules",
+            "name": "[concat(parameters('serviceBusName'), '/', parameters('serviceBusAuthorizationRulesName'))]",
+            "apiVersion": "2015-08-01",
+            "scale": null,
+            "properties": {
+                "rights": [
+                    "Manage",
+                    "Listen",
+                    "Send"
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
+            ]
+        },
+        {
+            "comments": "Fulfillment process-order Queue",
+            "type": "Microsoft.ServiceBus/namespaces/queues",
+            "name": "[concat(parameters('serviceBusName'), '/', parameters('serviceBusProcessOrderQueueName'))]",
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "requiresDuplicateDetection": false,
+                "requiresSession": false,
+                "defaultMessageTimeToLive": "10675199.02:48:05.4775807",
+                "deadLetteringOnMessageExpiration": true,
+                "enableBatchedOperations": true,
+                "isAnonymousAccessible": false,
+                "status": "Active",
+                "supportOrdering": false,
+                "autoDeleteOnIdle": "10675199.02:48:05.4775807",
+                "enablePartitioning": true,
+                "enableExpress": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
+            ]
+        },
+        {
+            "comments": "Fulfillment submit-order Queue",
+            "type": "Microsoft.ServiceBus/namespaces/queues",
+            "name": "[concat(parameters('serviceBusName'), '/', parameters('serviceBusSubmitOrderQueueName'))]",
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "requiresDuplicateDetection": false,
+                "requiresSession": false,
+                "defaultMessageTimeToLive": "10675199.02:48:05.4775807",
+                "deadLetteringOnMessageExpiration": true,
+                "enableBatchedOperations": true,
+                "isAnonymousAccessible": false,
+                "status": "Active",
+                "supportOrdering": false,
+                "autoDeleteOnIdle": "10675199.02:48:05.4775807",
+                "enablePartitioning": true,
+                "enableExpress": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
+            ]
+        },
+        {
+            "comments": "Fulfillment notify-fulfillment-failure Queue",
+            "type": "Microsoft.ServiceBus/namespaces/queues",
+            "name": "[concat(parameters('serviceBusName'), '/', parameters('serviceBusFulfillmentFailureNotificationQueueName'))]",
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "requiresDuplicateDetection": false,
+                "requiresSession": false,
+                "defaultMessageTimeToLive": "10675199.02:48:05.4775807",
+                "deadLetteringOnMessageExpiration": true,
+                "enableBatchedOperations": true,
+                "isAnonymousAccessible": false,
+                "status": "Active",
+                "supportOrdering": false,
+                "autoDeleteOnIdle": "10675199.02:48:05.4775807",
+                "enablePartitioning": true,
+                "enableExpress": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
+            ]
+        },
+        {
+            "comments": "Fulfillment fulfillment-events Topic",
+            "type": "Microsoft.ServiceBus/namespaces/topics",
+            "name": "[concat(parameters('serviceBusName'), '/', parameters('serviceBusFulfillmentEventsTopicName'))]",
+            "apiVersion": "2015-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "defaultMessageTimeToLive": "10675199.02:48:05.4775807",
+                "requiresDuplicateDetection": false,
+                "enableBatchedOperations": true,
+                "sizeInBytes": 0,
+                "filteringMessagesBeforePublishing": false,
+                "isAnonymousAccessible": false,
+                "status": "Active",
+                "supportOrdering": false,
+                "subscriptionCount": 0,
+                "autoDeleteOnIdle": "10675199.02:48:05.4775807",
+                "enablePartitioning": true,
+                "isExpress": false,
+                "enableSubscriptionPartitioning": false,
+                "enableExpress": false
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.ServiceBus/namespaces', parameters('serviceBusName'))]"
+            ]
+        },
+        {
+            "comments": "SSL Wildcard Cert",
+            "condition": "[greater(length(parameters('fulfillmentSslKeyVaultSecret')), 0)]",
+            "type": "Microsoft.Web/certificates",
+            "name": "[parameters('sslCertificateName')]",
+            "apiVersion": "2016-03-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "hostNames": [
+                    "*.fulfillment.squire.com",
+                    "ecommerce.squire.com"
+                ],
+                "keyVaultId": "[variables('keyVaultId')]",
+                "keyVaultSecretName": "[parameters('fulfillmentSslKeyVaultSecret')]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('appServicePlanName'))]"
+            }
+        }
+    ]
+}

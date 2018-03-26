@@ -1,0 +1,75 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "value": "fulfillmenttest"
+        },
+        "applicationInsightsAlertRulesFailureAnomaliesName": {
+            "value": "Failure Anomalies-"
+        },
+        "serviceBusName": {
+            "value": "fulfillment-servicebus"
+        },
+        "serviceBusSubmitOrderQueueName": {
+            "value": "submit-order"
+        },
+        "serviceBusProcessOrderQueueName": {
+            "value": "process-order"
+        },
+        "serviceBusFulfillmentFailureNotificationQueueName": {
+            "value": "notify-fulfillment-failure"
+        },
+        "serviceBusFulfillmentEventsTopicName": {
+            "value": "fulfillment-events"
+        },
+        "serviceBusAuthorizationRulesName": {
+            "value": "Fulfillment-App"
+        },
+        "appServicePlanPricingTier": {
+            "value": "Standard"
+        },
+        "appServicePlanInstanceSize": {
+            "value": "S1"
+        },
+        "storageAccountPerformance": {
+            "value": "Standard"
+        },
+        "serviceBusPerformance": {
+            "value": "Standard"
+        },
+        "checkoutAppName": {
+            "value": "ecommerce-app"
+        },
+        "deploymentEnvironmentName": {
+            "value": ""
+        },
+        "keyVaultName": {
+            "value": "fulfillment-dev-keyvault"
+        },
+        "sslCertificateName": {
+            "value": "*.filfillment.squire.com"
+        },
+        "fulfillmentSslCertKeyVaultSecret": {
+            "value": ""
+        },
+        "eCommerceApiHostNames": {
+            "value": [ "testapi.fulfillment.squire.com" ]
+        },
+        "ecommerceCheckoutHostNames": {
+            "value": [ "testcheckout.ecommerce.squire.com" ]
+        },
+        "fulfillmentApiHostNames": {
+            "value": []
+        },
+        "sslEnabled": {
+            "value": true
+        },
+        "sslCertificateThumbprint": {
+            "value": "7B925EB9E2D3907118240966046B7B3D30CBCC91"
+        },
+        "sslHostType": {
+            "value": "Standard"
+        }
+    }
+}
