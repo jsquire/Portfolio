@@ -26,7 +26,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderSubmitter.Tests", "Ord
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{E5B9D6E3-57AF-4CE8-B740-1466203F61FD}"
 	ProjectSection(SolutionItems) = preProject
+		Build\Parameters.json = Build\Parameters.json
+		Build\parameters.test.json = Build\parameters.test.json
 		Build\prepare-deployment.ps1 = Build\prepare-deployment.ps1
+		Build\template.json = Build\template.json
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Notifier", "Notifier\Notifier.csproj", "{D52E12C0-65DE-4B0B-A7EA-87A54E4B3728}"

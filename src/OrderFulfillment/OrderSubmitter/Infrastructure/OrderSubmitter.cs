@@ -28,7 +28,7 @@ namespace OrderFulfillment.OrderSubmitter.Infrastructure
         private readonly Random rng;
 
         /// <summary>The client to use for interacting with the order production service.</summary>
-        private readonly IOrdeProductionClient orderProductionClient;
+        private readonly IOrderProductionClient orderProductionClient;
 
         /// <summary>The storage to use for orders.</summary>
         private readonly IOrderStorage orderStorage;
@@ -53,7 +53,7 @@ namespace OrderFulfillment.OrderSubmitter.Infrastructure
         /// <param name="jsonSerializerSettings">The settings to use for JSON serializerion.</param>
         /// 
         public OrderSubmitter(OrderSubmitterConfiguration configuration,
-                              IOrdeProductionClient       orderProductionClient,
+                              IOrderProductionClient       orderProductionClient,
                               IOrderStorage               orderStorage, 
                               ILogger                     logger,
                               JsonSerializerSettings      jsonSerializerSettings)
@@ -404,7 +404,7 @@ namespace OrderFulfillment.OrderSubmitter.Infrastructure
         /// </remarks>
         /// 
         protected virtual async Task<OperationResult> SendOrderToProductionAsync(ILogger               log, 
-                                                                                 IOrdeProductionClient client,
+                                                                                 IOrderProductionClient client,
                                                                                  CreateOrderMessage    order,
                                                                                  string                correlationId  = null,
                                                                                  OperationResult       emulatedResult = null)

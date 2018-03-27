@@ -164,7 +164,7 @@
     <Compile Include="External\ExternalClientBase.cs" />
     <Compile Include="External\OrderProductionClient.cs" />
     <Compile Include="External\IEcommerceClient.cs" />
-    <Compile Include="External\IOrdeProductionClient.cs" />
+    <Compile Include="External\IOrderProductionClient.cs" />
     <Compile Include="Infrastructure\FailureReason.cs" />
     <Compile Include="Infrastructure\HttpHeaders.cs" />
     <Compile Include="Infrastructure\MessageBase.cs" />

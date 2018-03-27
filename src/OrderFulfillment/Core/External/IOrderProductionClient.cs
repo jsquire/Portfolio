@@ -10,7 +10,7 @@ namespace OrderFulfillment.Core.External
     ///   service.
     /// </summary>
     /// 
-    public interface IOrdeProductionClient : IDisposable
+    public interface IOrderProductionClient : IDisposable
     {
         /// <summary>
         ///    Queries the details of an order from the eCommerce system.

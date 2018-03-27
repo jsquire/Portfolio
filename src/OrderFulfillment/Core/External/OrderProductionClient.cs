@@ -17,9 +17,9 @@ namespace OrderFulfillment.Core.External
     ///   Serves as a communications client for interactions with the order production service.
     /// </summary>
     /// 
-    /// <seealso cref="IOrdeProductionClient" />
+    /// <seealso cref="IOrderProductionClient" />
     /// 
-    public class OrderProductionClient : ExternalClientBase, IOrdeProductionClient
+    public class OrderProductionClient : ExternalClientBase, IOrderProductionClient
     {
         /// <summary>The HTTP client to use for interacting with the external service.</summary>
         private readonly Lazy<HttpClient> httpClient;

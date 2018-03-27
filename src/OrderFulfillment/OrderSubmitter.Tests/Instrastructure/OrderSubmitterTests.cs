@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Moq;
-using Moq.Protected;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Serialization;
 using OrderFulfillment.Core.Exceptions;
 using OrderFulfillment.Core.External;
 using OrderFulfillment.Core.Models.External.OrderProduction;
 using OrderFulfillment.Core.Models.Operations;
 using OrderFulfillment.Core.Storage;
 using OrderFulfillment.OrderProcessor.Configuration;
+using Moq;
+using Moq.Protected;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Serilog;
 using Xunit;
+
 using UnderTest = OrderFulfillment.OrderSubmitter.Infrastructure;
 
 namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
@@ -31,7 +32,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         [Fact]
         public void ConstructorValidatesTheConfiguration()
         {
-            Action actionUnderTest = () => new UnderTest.OrderSubmitter(null, Mock.Of<IOrdeProductionClient>(), Mock.Of<IOrderStorage>(), Mock.Of<ILogger>(), new JsonSerializerSettings());
+            Action actionUnderTest = () => new UnderTest.OrderSubmitter(null, Mock.Of<IOrderProductionClient>(), Mock.Of<IOrderStorage>(), Mock.Of<ILogger>(), new JsonSerializerSettings());
             actionUnderTest.ShouldThrow<ArgumentNullException>("because theconfiguration is required");
         }
 
@@ -40,10 +41,10 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public void ConstructorValidatesTheorderProductionClient()
+        public void ConstructorValidatesTheHubClient()
         {
             Action actionUnderTest = () => new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), null, Mock.Of<IOrderStorage>(), Mock.Of<ILogger>(), new JsonSerializerSettings());
-            actionUnderTest.ShouldThrow<ArgumentNullException>("because the order production client is required");
+            actionUnderTest.ShouldThrow<ArgumentNullException>("because the Hub client is required");
         }
 
         /// <summary>
@@ -53,7 +54,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         [Fact]
         public void ConstructorValidatesTheOrderStorage()
         {
-            Action actionUnderTest = () => new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrdeProductionClient>(), null, Mock.Of<ILogger>(), new JsonSerializerSettings());
+            Action actionUnderTest = () => new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrderProductionClient>(), null, Mock.Of<ILogger>(), new JsonSerializerSettings());
             actionUnderTest.ShouldThrow<ArgumentNullException>("because the storage is required");
         }
 
@@ -64,7 +65,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         [Fact]
         public void ConstructorValidatesTheLogger()
         {
-            Action actionUnderTest = () => new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrdeProductionClient>(), Mock.Of<IOrderStorage>(), null, new JsonSerializerSettings());
+            Action actionUnderTest = () => new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrderProductionClient>(), Mock.Of<IOrderStorage>(), null, new JsonSerializerSettings());
             actionUnderTest.ShouldThrow<ArgumentNullException>("because the logger is required");
         }
 
@@ -75,7 +76,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         [Fact]
         public void ConstructorValidatesTheSerializerSettings()
         {
-            Action actionUnderTest = () => new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrdeProductionClient>(), Mock.Of<IOrderStorage>(), Mock.Of<ILogger>(), null);
+            Action actionUnderTest = () => new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrderProductionClient>(), Mock.Of<IOrderStorage>(), Mock.Of<ILogger>(), null);
             actionUnderTest.ShouldThrow<ArgumentNullException>("because the serializer settings are required");
         }
 
@@ -87,9 +88,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public void SubmitOrderAsyncValidatesThePartner(string partner)
+        public void SubmitOrderForProductionAsyncValidatesThePartner(string partner)
         {
-            var processor =  new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrdeProductionClient>(), Mock.Of<IOrderStorage>(), Mock.Of<ILogger>(), new JsonSerializerSettings());
+            var processor =  new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrderProductionClient>(), Mock.Of<IOrderStorage>(), Mock.Of<ILogger>(), new JsonSerializerSettings());
             
             Action actionUnderTest = () => processor.SubmitOrderForProductionAsync(partner, "ABC", new DependencyEmulation(), "blue").GetAwaiter().GetResult();
             actionUnderTest.ShouldThrow<ArgumentException>("because the partner is required").And.ParamName.Should().Be(nameof(partner), "because the partner was invalid");
@@ -103,9 +104,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         [Theory]
         [InlineData(null)]
         [InlineData("")]
-        public void SubmitOrderAsyncValidatesTheOrder(string orderId)
+        public void SubmitOrderForProductionAsyncValidatesTheOrder(string orderId)
         {
-            var processor =  new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrdeProductionClient>(), Mock.Of<IOrderStorage>(), Mock.Of<ILogger>(), new JsonSerializerSettings());
+            var processor =  new UnderTest.OrderSubmitter(new OrderSubmitterConfiguration(), Mock.Of<IOrderProductionClient>(), Mock.Of<IOrderStorage>(), Mock.Of<ILogger>(), new JsonSerializerSettings());
             
             Action actionUnderTest = () => processor.SubmitOrderForProductionAsync("Bob", orderId, new DependencyEmulation(), "blue").GetAwaiter().GetResult();
             actionUnderTest.ShouldThrow<ArgumentException>("because the orderId is required").And.ParamName.Should().Be(nameof(orderId), "because the orderId was invalid");
@@ -117,9 +118,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncReturnsAFailedResultIfPendingOrderRetrievalFailed()
+        public async Task SubmitOrderForProductionAsyncReturnsAFailedResultIfPendingOrderRetrievalFailed()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -152,9 +153,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncReturnsAFailedResultIfSubmissionFailed()
+        public async Task SubmitOrderForProductionAsyncReturnsAFailedResultIfSubmissionFailed()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -177,7 +178,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(expectedResult));
 
             var result = await processor.Object.SubmitOrderForProductionAsync(order.Identity.PartnerOrderId, order.Identity.PartnerOrderId);
@@ -193,9 +194,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncReturnsAFailedResultIfSavingTheCompletedOrderFailed()
+        public async Task SubmitOrderForProductionAsyncReturnsAFailedResultIfSavingTheCompletedOrderFailed()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -219,7 +220,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
 
             processor
@@ -239,9 +240,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncReturnsASuccessResultButLogsTheWarningIfPendingOrderDeletionFailed()
+        public async Task SubmitOrderForProductionAsyncReturnsASuccessResultButLogsTheWarningIfPendingOrderDeletionFailed()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -265,7 +266,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
 
             processor
@@ -295,9 +296,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncHonorsTheRetryPolicyIfPendingOrderRetrievalFailed()
+        public async Task SubmitOrderForProductionAsyncHonorsTheRetryPolicyIfPendingOrderRetrievalFailed()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -331,9 +332,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncHonorsTheRetryPolicyIfSubmissionFailed()
+        public async Task SubmitOrderForProductionAsyncHonorsTheRetryPolicyIfSubmissionFailed()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -358,7 +359,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(expectedResult))
                 .Callback( () => ++retries);
 
@@ -373,9 +374,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncHonorsTheRetryPolicyIfSavingTheCompletedOrderFailed()
+        public async Task SubmitOrderForProductionAsyncHonorsTheRetryPolicyIfSavingTheCompletedOrderFailed()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -401,7 +402,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
 
             processor
@@ -421,9 +422,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncHonorsTheRetryPolicyIfPendingOrderDeletionFailed()
+        public async Task SubmitOrderForProductionAsyncHonorsTheRetryPolicyIfPendingOrderDeletionFailed()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -449,7 +450,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
 
             processor
@@ -475,9 +476,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncRespectsAnEmulatedPendingOrderResult()
+        public async Task SubmitOrderForProductionAsyncRespectsAnEmulatedPendingOrderResult()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -496,7 +497,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
                 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
 
             processor
@@ -525,9 +526,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncRespectsAnEmulatedOrderSubmission()
+        public async Task SubmitOrderForProductionAsyncRespectsAnEmulatedOrderSubmission()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -566,9 +567,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncReturnsTheExceptionResultIfPendingOrderRetrievalThrows()
+        public async Task SubmitOrderForProductionAsyncReturnsTheExceptionResultIfPendingOrderRetrievalThrows()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -600,9 +601,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncReturnsTheExcpetionResultIfSubmissionThrows()
+        public async Task SubmitOrderForProductionAsyncReturnsTheExcpetionResultIfSubmissionThrows()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -624,7 +625,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .ThrowsAsync(new MissingFieldException());
 
             var result = await processor.Object.SubmitOrderForProductionAsync(order.Identity.PartnerOrderId, order.Identity.PartnerOrderId);
@@ -640,9 +641,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncReturnsTheExceptionResultResultIfSavingTheCompletedOrderThrows()
+        public async Task SubmitOrderForProductionAsyncReturnsTheExceptionResultResultIfSavingTheCompletedOrderThrows()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -665,7 +666,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
 
             processor
@@ -685,9 +686,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderAsyncReturnsASuccessResultButLogsTheWarningIfPendingOrderDeletionThrows()
+        public async Task SubmitOrderForProductionAsyncReturnsASuccessResultButLogsTheWarningIfPendingOrderDeletionThrows()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -711,7 +712,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
 
             processor
@@ -743,7 +744,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         [Fact]
         public async Task RetrievePendingOrderAsyncTheOrderFromPendingStorage()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -767,7 +768,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
                 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
 
             processor
@@ -794,9 +795,9 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         /// </summary>
         /// 
         [Fact]
-        public async Task SubmitOrderForProductionAsyncAttemptsOrderSubmission()
+        public async Task SendOrderToProductionAsyncAttemptsOrderSubmission()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -817,7 +818,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
             mockClient
                 .Setup(client => client.SubmitOrderForProductionAsync(It.Is<CreateOrderMessage>(value => ((value.Identity.PartnerCode == order.Identity.PartnerCode) && (order.Identity.PartnerOrderId == order.Identity.PartnerOrderId))), It.Is<string>(value => value == correlationId)))
                 .ReturnsAsync(successResult)
-                .Verifiable("The order production client should have been asked to submit the order");
+                .Verifiable("The Hub client should have been asked to submit the order");
 
             processor
                 .Protected()
@@ -850,7 +851,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         [Fact]
         public async Task StoreOrderAsCompletedAsyncSavesTheOrderAsCompleted()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -879,7 +880,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
                 
             processor
@@ -903,7 +904,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
         [Fact]
         public async Task DeletePendingOrderAsyncDeletesTheOrderFromPendingStorage()
         {
-            var mockClient         = new Mock<IOrdeProductionClient>();
+            var mockClient         = new Mock<IOrderProductionClient>();
             var mockStorage        = new Mock<IOrderStorage>();
             var mockLogger         = new Mock<ILogger>();
             var serializerSettings = new JsonSerializerSettings();
@@ -932,7 +933,7 @@ namespace OrderFulfillment.OrderSubmitter.OrderSubmitter.Tests.Instrastructure
 
             processor
                 .Protected()
-                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrdeProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
+                .Setup<Task<OperationResult>>("SendOrderToProductionAsync", ItExpr.IsAny<ILogger>(), ItExpr.IsAny<IOrderProductionClient>(), ItExpr.IsAny<CreateOrderMessage>(), ItExpr.IsAny<string>(), ItExpr.IsAny<OperationResult>())
                 .Returns(Task.FromResult(successResult));
 
             processor
