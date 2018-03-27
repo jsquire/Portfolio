@@ -14,6 +14,9 @@ In some cases, the samples may be a subset of functionality, where in others the
 * **Jasmine Console Runner**
   <br />_Many javascript unit testing libraries are able to produce color console output on Unix-based systems by using the standard escape character sequence.  These sequences do not work in the Windows console, nor is there an alternative sequence to do so. This project is a wrapper around the Jasmine unit testing library which allows test output to emit a control character sequence to the stdout stream that can influence the color that it is written with in the console output._
   
+* **Order Fulfillment**
+  <br />_An example of an asynchronous order processing workflow built on Microsoft Azure.  The workflow is triggered by a web hook API, which then performs background processing using WebJobs and passing messages via Service Bus.  One of the design goals was to offer an elevated level of resiliency by employing a multi-level back off, allowing for fast retries to combat transient failures and slow retries to deal with potential downstream system failures._
+    
 * **Scripts**
   <br />_A collection of miscellaneous small scripts in various languages.  The scripts herein are each self-contained, not part of a larger overall project or ecosystem._
   

@@ -1,0 +1,75 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "storageAccountName": {
+            "value": "#{storageAccountName}"
+        },
+        "applicationInsightsAlertRulesFailureAnomaliesName": {
+            "value": "#{applicationInsightsAlertRulesFailureAnomaliesName}"
+        },
+        "serviceBusName": {
+            "value": "#{serviceBusName}"
+        },
+        "serviceBusSubmitOrderQueueName": {
+            "value": "#{serviceBusSubmitOrderQueueName}"
+        },
+        "serviceBusProcessOrderQueueName": {
+            "value": "#{serviceBusProcessOrderQueueName}"
+        },
+        "serviceBusFulfillmentFailureNotificationQueueName": {
+            "value": "#{serviceBusFulfillmentFailureNotificationQueueName}"
+        },
+        "serviceBusFulfillmentEventsTopicName": {
+            "value": "#{serviceBusFulfillmentEventsTopicName}"
+        },
+        "serviceBusAuthorizationRulesName": {
+            "value": "#{serviceBusAuthorizationRulesName}"
+        },
+        "checkoutAppName": {
+            "value": "#{checkoutAppName}"
+        },
+        "appServicePlanPricingTier": {
+            "value": "#{appServicePlanPricingTier}"
+        },
+        "appServicePlanInstanceSize": {
+            "value": "#{appServicePlanInstanceSize}"
+        },
+        "storageAccountPerformance": {
+            "value": "#{serviceAccountPerformance}"
+        },
+        "serviceBusPerformance": {
+            "value": "#{serviceBusPerformance}"
+        },
+        "deploymentEnvironmentName": {
+            "value": "#{deploymentEnvironmentName}"
+        },
+        "keyVaultName": {
+            "value": "#{keyVaultName}"
+        },
+        "sslCertificateName": {
+            "value": "#{sslCertificateName}"
+        },
+        "fulfillmentSslCertKeyVaultSecret": {
+            "value": "#{fulfillmentSslCertKeyVaultSecret}"
+        },
+        "eCommerceApiHostNames": {
+            "value": #{eCommerceApiHostNameArray}
+        },
+        "ecommerceCheckoutHostNames": {
+            "value": #{ecommerceCheckoutHostNameArray}
+        },
+        "fulfillmentApiHostNames": {
+            "value": #{fulfillmentApiHostNameArray}
+        },
+        "sslEnabled": {
+            "value": #{sslEnabled}
+        },
+        "sslCertificateThumbprint": {
+            "value": "#{sslCertificateThumbprint}"
+        },
+        "sslHostType": {
+            "value": "#{sslHostType}"
+        },
+    }
+}

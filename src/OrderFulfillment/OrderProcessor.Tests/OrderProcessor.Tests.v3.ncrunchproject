@@ -1,0 +1,7 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <HiddenComponentWarnings>
+      <Value>AssemblyReferenceToBuildOutputDirectory</Value>
+    </HiddenComponentWarnings>
+  </Settings>
+</ProjectConfiguration>
