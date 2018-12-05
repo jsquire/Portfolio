@@ -19,7 +19,7 @@ The relevant areas of customization are:
 ### Structure ###
 
 * **src**
-  <br />_The container for project source code including the original assets from the [Azure Active Directory B2C sample application for ASP.NET Core](https://github.com/Azure-Samples/active-directory-b2c-dotnetcore-webapp) and changes made for the prototype. _
+  <br />_The container for project source code including the original assets from the [Azure Active Directory B2C sample application for ASP.NET Core](https://github.com/Azure-Samples/active-directory-b2c-dotnetcore-webapp) and changes made for the prototype._
   
 ### Details ###
 
