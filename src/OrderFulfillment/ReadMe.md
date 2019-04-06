@@ -14,5 +14,3 @@ The workflow was designed to be self-aware and self-healing, offering a high lev
 While the tests are self-contained and can be run both locally and on a build server, doing any local development or debugging does require deploying services to Azure and setting local configuration to make use of them.
 
 In addition, though the initial prototype code has been cleaned up and been mostly polished to production-level standards, there exist some areas, particularly in the data models, where formatting and commenting was left in a bit rougher state as they are but examples for illustration that don't actually correspond to any real-world system.  There seemed little benefit in creating detailed documentation for their "use" in the external systems.
-
-
