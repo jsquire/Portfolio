@@ -370,14 +370,13 @@ namespace Squire.Toolbox.Tests.Extensions
                 outerCompletion.TrySetResult(0);
             };
 
-            await Task.Factory.StartNew( () =>
+            Func<Task> actionUnderTest = async () =>
             {
-                // This needs to block until the associated action sets the completion source.
-                innerCompletion.Task.GetAwaiter().GetResult();
+                await innerCompletion.Task;
                 throw expected;
+            };
 
-            }).WithTimeout(TaskExtensionsTests.TinyDelay, null, timeoutHandler, exceptionHandler);
-
+            await actionUnderTest().WithTimeout(TaskExtensionsTests.TinyDelay, null, timeoutHandler, exceptionHandler);
 
             // The completion source will be set when either the exception handler runs, or the test operation
             // gives up on waiting for the timeout.
@@ -416,14 +415,13 @@ namespace Squire.Toolbox.Tests.Extensions
                 outerCompletion.TrySetResult(0);
             };
 
-            await Task<string>.Factory.StartNew( () =>
+            Func<Task<string>> actionUnderTest = async () =>
             {
-                // This needs to block until the associated action sets the completion source.
-                innerCompletion.Task.GetAwaiter().GetResult();
+                await innerCompletion.Task;
                 throw expected;
+            };
 
-            }).WithTimeout(TaskExtensionsTests.TinyDelay, null, timeoutHandler, exceptionHandler);
-
+            await actionUnderTest().WithTimeout(TaskExtensionsTests.TinyDelay, null, timeoutHandler, exceptionHandler);
 
             // The completion source will be set when either the exception handler runs, or the test operation
             // gives up on waiting for the timeout.
@@ -432,6 +430,52 @@ namespace Squire.Toolbox.Tests.Extensions
 
             invoked.Should().BeTrue("because the handler for unobserved exceptions should have been called");
             observed.Should().Be(expected, "because the handler should have received the exception thrown after the timeout occured");
+        }
+
+        /// <summary>
+        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  method.
+        /// </summary>
+        ///
+        [Fact]
+        [TestCategory(Category.BuildVerification)]
+        public void WithTimeoutPropagatesExceptionsForCompletedTasks()
+        {
+            var completedTask = Task.FromException(new InvalidCastException());
+
+            Func<Task> actionUnderTest = async () => await completedTask.WithTimeout(TaskExtensionsTests.LongDelay);
+            actionUnderTest.Should().Throw<InvalidCastException>("because the task was completed with an exception before requesting a timeout");
+        }
+
+        /// <summary>
+        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  method.
+        /// </summary>
+        ///
+        [Fact]
+        [TestCategory(Category.BuildVerification)]
+        public void WithTimeoutGenericIPropagatesExceptionsForCompletedTasks()
+        {
+            var completedTask = Task.FromException<string>(new DivideByZeroException());
+
+            Func<Task> actionUnderTest = async () => await completedTask.WithTimeout(TaskExtensionsTests.LongDelay);
+            actionUnderTest.Should().Throw<DivideByZeroException>("because the task was completed with an exception before requesting a timeout");
+        }
+
+        /// <summary>
+        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  method.
+        /// </summary>
+        ///
+        [Fact]
+        [TestCategory(Category.BuildVerification)]
+        public async Task WithTimeoutGenericIPropagatesResultsForCompletedTasks()
+        {
+            var expected      = "oh, hello, there.";
+            var completedTask = Task.FromResult(expected);
+            var actual        = await completedTask.WithTimeout(TaskExtensionsTests.LongDelay);
+
+            actual.Should().Be(expected, "because the task was completed with a result before requesting a timeout");
         }
     }
 }

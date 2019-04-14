@@ -90,6 +90,7 @@ namespace Squire.Toolbox.Extensions
 
             if (instance.IsCompleted || Debugger.IsAttached)
             {
+                instance.GetAwaiter().GetResult();
                 return;
             }
 
