@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Squire.Toolbox.Extensions;
 using Xunit;
 
 namespace Squire.Toolbox.Tests.Extensions

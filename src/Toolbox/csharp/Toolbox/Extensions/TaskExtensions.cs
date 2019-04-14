@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Squire.Toolbox.Extensions
+namespace Squire.Toolbox
 {
     /// <summary>
     ///   The set of extension methods for the <see cref="Task" /> class.
