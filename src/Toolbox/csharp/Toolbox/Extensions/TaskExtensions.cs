@@ -88,7 +88,13 @@ namespace Squire.Toolbox
                 throw new ArgumentNullException(nameof(instance));
             }
 
-            if (instance.IsCompleted || Debugger.IsAttached)
+            if (Debugger.IsAttached)
+            {
+                await instance;
+                return;
+            }
+
+            if (instance.IsCompleted)
             {
                 instance.GetAwaiter().GetResult();
                 return;
@@ -144,9 +150,14 @@ namespace Squire.Toolbox
                 throw new ArgumentNullException(nameof(instance));
             }
 
-            if (instance.IsCompleted || Debugger.IsAttached)
+             if (Debugger.IsAttached)
             {
                 return await instance;
+            }
+
+            if (instance.IsCompleted)
+            {
+                return instance.GetAwaiter().GetResult();
             }
 
             using (var timeoutTokenSource = new CancellationTokenSource())
