@@ -8,12 +8,12 @@ This project is intended to serve as a repository for the metadata about certifi
 
 ### Structure ###
 
-* **root**
-  <br />_The root contains the overall repository configuration files and general structure._
+* **root**  
+  _The root contains the overall repository configuration files and general structure._
   
-* **tools**
-  <br />_The container for various tools to aid in the management of certificates, organized by the area to which they're applicable._
+* **tools**  
+  _The container for various tools to aid in the management of certificates, organized by the area to which they're applicable._
 
-* **certificates**
-  <br />_The container for the certificate metadata, organized in sub-folders by project/product that they are associated with and, often, the purpose of the certificate._
+* **certificates**  
+  _The container for the certificate metadata, organized in sub-folders by project/product that they are associated with and, often, the purpose of the certificate._
   
