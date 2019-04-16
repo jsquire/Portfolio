@@ -12,15 +12,15 @@ My goal was to write a simple script to allow running Jasmine tests from the Win
 
 ### Structure ###
 
-* **src**
-  <br />_The container for project source code._
+* **src**  
+  _The container for project source code._
   
-* **lib**
-  <br />_The container for external libraries referenced by the project._
+* **lib**  
+  _The container for external libraries referenced by the project._
   
-* **example**
-  <br />_The container for a functional example of using the console runner with a Jasmine test suite._
+* **example**  
+  _The container for a functional example of using the console runner with a Jasmine test suite._
   
-* **dist**
-  <br />_The container for project build output intended for distribution.  When using the console runner as part of another project, this is where one should look for the releases._
+* **dist**  
+  _The container for project build output intended for distribution.  When using the console runner as part of another project, this is where one should look for the releases._
 
