@@ -20,7 +20,7 @@ namespace Squire.Toolbox.Tests.Extensions
         private static readonly TimeSpan TinyDelay = TimeSpan.FromMilliseconds(1);
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.FireAndForget" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.FireAndForget" />
         ///  method.
         /// </summary>
         ///
@@ -63,7 +63,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.FireAndForget" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.FireAndForget" />
         ///  method.
         /// </summary>
         ///
@@ -103,7 +103,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -118,7 +118,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -137,7 +137,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -154,7 +154,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -180,7 +180,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -195,7 +195,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -214,7 +214,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -231,7 +231,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -257,7 +257,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -276,7 +276,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -291,7 +291,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -306,7 +306,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -324,7 +324,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -343,7 +343,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -387,7 +387,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -432,7 +432,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -447,7 +447,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
@@ -462,7 +462,7 @@ namespace Squire.Toolbox.Tests.Extensions
         }
 
         /// <summary>
-        ///  Verifies functionality of the <see cref="Squire.Toolbox.Extensions.TaskExtensions.WithTimeout" />
+        ///  Verifies functionality of the <see cref="TaskExtensions.WithTimeout" />
         ///  method.
         /// </summary>
         ///
