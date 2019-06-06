@@ -18,7 +18,7 @@ Developed in early 2013, the assets herein attempt to overcome the issues that p
 
 ### Known Issues ###
 
-While the core functionality works relatively well for most cases, there are a few issues that had not been resolved when the initial development was completed.  Those issues are:
+While the core functionality works relatively well for most cases, there are a few issues that had not been resolved when the initial development was completed.  Those issues are:  
 
 * **Ads Injecting Scripts Line-by-Line** - Because of the approach used to mimic the browser's default behavior when calling `document.write` during the initial page rendering, any script content injected using a `document.write` call was evaluated immediately to ensure that it was in scope for the remaining content of the ad.  This worked well in most cases, except for when ads injected scripts in the fashion of emitting each line with a unique `document.write` call.  This results in the client-side framework attempting to evaluate incomplete, and often illegal, script fragments.  Prototyping was underway to detect and rewrite this pattern when the decision was made to move away from mAdserve.
 
