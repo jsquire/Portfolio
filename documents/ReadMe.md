@@ -12,7 +12,7 @@ Included in this section are documents of varying purpose and format, covering t
 * **development-team-guidance**  
    _These documents center around offering guidance to a development team, in terms of process, practices, or templates that can be used._
   
-* **estimates*  
+* **estimates**  
   _These serve as examples of project estimation, spanning form granular to more high-level.  As technical estimation is a critical skill for the success of any project, the goal in including them is to demonstrate an understanding of various approaches and levels of granularity._
   
 * **assorted-technical**  
