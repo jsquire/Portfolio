@@ -1,15 +1,15 @@
-# Particle Internet Button #
+# Particle Internet Button
 
-### Summary ###
+### Summary
 
 The [Particle Internet button](https://docs.particle.io/guide/tools-and-features/button/core/) is a cloud-enabled IOT device based on the [Particle Photon][1] chip set.  It comes fully assembled, which avoids the needs to build out a breadboard or perform any soldering.  
 
 With built-in WiFi and the ability to interact with the outside world using web hooks for both incoming and outgoing requests, it makes for a simple, approachable device with which to explore the IOT world.
 
-### Structure ###
+### Structure
 
-* **src**
-  <br />_The container for project source code.  Individual prototypes are further organized by subfolder._ 
+* **src**  
+  _The container for project source code.  Individual prototypes are further organized by subfolder._ 
 
   
 ### Resources ###
@@ -22,6 +22,6 @@ With built-in WiFi and the ability to interact with the outside world using web 
 [1]: https://docs.particle.io/datasheets/photon-(wifi)/photon-datasheet
 
 
-### Disclaimer ###
+### Disclaimer
 
-I am not well-skilled or current in C++.  The code herein is not likely to conform to best practices for the language and may contian inefficiencies to outright mistakes.  Feedback for improvement is welcome.  
+I am not well-skilled or current in C++.  The code herein is not likely to conform to best practices for the language and may contian inefficiencies to outright mistakes.  Feedback for improvement is welcome. 
