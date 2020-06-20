@@ -1,10 +1,10 @@
-# Documents #
+# Documents
 
-### Overview ###
+### Overview
 
 Included in this section are documents of varying purpose and format, covering topics from best practices, team processes/guidance, specifications, and other technical materials.  In an effort to organize them, they have been grouped into folders by high level category.
 
-### Structure ###
+### Structure
 
 * **specifications**  
    _These documents are a collection of various types of technical specifications, mostly concentrated around functional requirements and API technical details._
