@@ -1,10 +1,10 @@
-# Estimates #
+# Estimates
 
-### Overview ###
+### Overview
 
 Included in this section are estimates of varying complexity and in different formats.  
 
-### Items ###
+### Items
 
 * **complex-ecommerce-and-marketing-site.mpp**  
   _This document is a formal granular estimate intended to form the basis for a project plan.  This estimate is for a large and complex e-commerce and marketing website, to be integrated with the client's existing order management system and database infrastructure.  The new site is being designed by a third party firm and the client development team is responsible for the IT infrastructure.  The development is being performed using the client's source control and environment._
