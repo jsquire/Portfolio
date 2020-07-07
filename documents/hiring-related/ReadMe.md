@@ -1,16 +1,16 @@
-# Hiring Related #
+# Hiring Related
 
-### Overview ###
+### Overview
 
 Included in this section are resources related to hiring, such as job descriptions, job board postings, interview materials, and candidate reviews.  
 
-### Structure ###
+### Structure
 
-* **interviewing**
-  <br />_These documents are related to performing candidate interviews and capturing feedback for consideration afterwards._
+* **interviewing**  
+  _These documents are related to performing candidate interviews and capturing feedback for consideration afterwards._
   
-* **job-descriptions**
-  <br />_These documents are a collection of descriptions for the details and expectations for the different roles on an example development team._
+* **job-descriptions**  
+  _These documents are a collection of descriptions for the details and expectations for the different roles on an example development team._
   
 * **job-postings**
-  <br />_These documents are a collection of postings for different development-centric job openings on an example development team._
+  _These documents are a collection of postings for different development-centric job openings on an example development team._
