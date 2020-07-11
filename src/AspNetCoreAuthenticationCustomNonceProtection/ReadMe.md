@@ -1,6 +1,6 @@
-# ASP.NET Core Authentication Custom Nonce Protection #
+# ASP.NET Core Authentication Custom Nonce Protection
 
-### Summary ###
+### Summary
 
 Rarely, the OpenId Connect provider in the ASP.NET Core authentication library generates a nonce cookie containing the character sequence  '--' (two dashes), which is flagged as a potential SQL injection attack by [rule #942440](https://github.com/SpiderLabs/owasp-modsecurity-crs/blob/v3.2/dev/rules/REQUEST-942-APPLICATION-ATTACK-SQLI.conf) of the OWSAP common rule set v3.
 
@@ -16,12 +16,12 @@ The relevant areas of customization are:
 - `OpenIdConnectNonceStringDataFormatTests`
 - `Utf8ByteSerializerTests`
 
-### Structure ###
+### Structure
 
-* **src**
-  <br />_The container for project source code including the original assets from the [Azure Active Directory B2C sample application for ASP.NET Core](https://github.com/Azure-Samples/active-directory-b2c-dotnetcore-webapp) and changes made for the prototype._
+* **src**  
+  _The container for project source code including the original assets from the [Azure Active Directory B2C sample application for ASP.NET Core](https://github.com/Azure-Samples/active-directory-b2c-dotnetcore-webapp) and changes made for the prototype._
   
-### Details ###
+### Details
 
 - Base64 encoding allows for a sequence of bytes to be represented in a string format; the Base64 spec defines two legal sets of characters – one that is intended to be the primary alphabet for the encoding, and an extended set intended to allow for the use of Base64 in the context of file names and URLs.  The primary difference is replacing "+" with "-"  and replacing "/" with "_" when moving to the URL-safe set.  ([RFC 4648](https://tools.ietf.org/html/rfc4648))
 	
@@ -45,7 +45,7 @@ The relevant areas of customization are:
 	
 - The approach taken within the prototype does not make any changes to the way that a nonce is generated nor to how the data is protected; it only modifies the means by which the cookie value is encoded.   As a result, there should be no weakening of the default security model or increased risk in using this approach in production.​
 
-### Other Possible Concerns ###
+### Other Possible Concerns
 
 - While I have not inspected deeply, the other cookies within the ASP.NET Core ecosystem appear to make use of the URL-safe form of Base64 encoding for cookie values, including such artifacts as the session cookie and the anti-forgery cookie.  Each may have the same underlying concern about randomly causing failures due to being flagged by web application firewalls that implement the OWSAP CRS v3.
 
