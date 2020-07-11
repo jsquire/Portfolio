@@ -1,6 +1,6 @@
-# Jasmine Console Runner #
+# Jasmine Console Runner
 
-### Summary ###
+### Summary
 
 [Jasmine](http://jasmine.github.io/2.3/introduction.html "Jasmine") is an open source behavior-driven testing framework for javascript.  It's goal is to allow pure testing of code without reliance on browsers, the DOM, or external frameworks.  Out-of-the-box, Jasmine provides a sample stand-alone HTML page to use for the running of tests.  Because of its stand-alone nature, there is no built-in means to run Jasmine tests from the console.
 
@@ -10,7 +10,7 @@ While Jasmine no longer does so as part of its package, it is possible to write 
 
 My goal was to write a simple script to allow running Jasmine tests from the Windows console using PhantomJS.  In order to more easily distinguish test results at a glance, I wanted to enable the output to be colored.  Because it is platform neutral, PhantomJS does not offer any intrinsic support for setting the console output color in the Windows console.  Unlike Unix-based environments in which the color can be influenced by sending a specific control-character sequence to stdout, Windows requires specific API calls to set the console color.  To work around this limitation, I wrote a small shim for launching PhantomJS which will intercept stdout and parse the output for a control character set to influence the color.  Because my intent was to run this on Windows only, I did not adopt the Unix control characters, instead opting for something more easily recognizable at a glance.
 
-### Structure ###
+### Structure
 
 * **src**  
   _The container for project source code._
