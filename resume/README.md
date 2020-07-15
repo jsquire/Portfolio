@@ -1,10 +1,10 @@
-# Resume #
+# Resume
 
-### Overview ###
+### Overview
 
 Included in this section are Jesse's resume and other documents to introduce him and provide personal insight.
 
-### Items ###
+### Items
   
 * **resume-jesse-squire.docx**
   <br />_This is Jesse's current resume in Microsoft Word format._
