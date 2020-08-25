@@ -37,6 +37,7 @@ Publish
 *.Cache
 project.lock.json
 
+/.ionide
 /packages
 /TestResults
 
