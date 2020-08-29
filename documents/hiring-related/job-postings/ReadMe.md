@@ -1,10 +1,10 @@
-# Job Descriptions #
+# Job Descriptions
 
-### Overview ###
+### Overview
 
 Included in this section are a collection a collection of postings for different development-centric job openings on an example development team.  
 
-### Items ###
+### Items
   
 * **job-posting-junior-engineer.docx**
   <br />_This document describes the details and expectations for a junior-level software engineer on the team._
