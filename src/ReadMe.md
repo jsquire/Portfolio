@@ -1,12 +1,12 @@
-# Source Code #
+# Source Code
 
-### Overview ###
+### Overview
 
 Included in this section are code samples, organized by project/problem.  Each project or problem is intended to be self-contained and stand-alone.  Some are focused on a single language, while others include implementations in multiple languages.  For the latter, these will be organized with each implementation language in a dedicated sub-folder.  Each will contain a ReadMe to provide an overview and context.   
 
 In some cases, the samples may be a subset of functionality, where in others they may be a full and functional application.  Please remember that each project is intended to be a representation of my coding approach, style, habits, and thought process, not to illustrate large, complex, and complete systems.  
 
-### Structure ###
+### Structure
 
 * **ASP.NET Core Authentication Custom Nonce Protection**  
   _Authored in late 2018 to illustrate a work-around using a custom formatter for the ASP.NET Core authentication library's nonce cookie, this project extends the open source [Azure Active Directory B2C sample application for ASP.NET Core](https://github.com/Azure-Samples/active-directory-b2c-dotnetcore-webapp).  The extensions have been organized in their own classes in order to help segregate the changes from the baseline sample and include an accompanying suite of unit tests._
@@ -34,4 +34,3 @@ In some cases, the samples may be a subset of functionality, where in others the
   
 * **Visual Studio Config Transformations**  
   _Visual Studio web projects have a built-in ability to utilize a base web configuration file and then apply per-build transforms to allow configuration to vary between different environments.  This functionality was initially intended to be used only as part of web deployments run from within Visual Studio.  Because many projects of different types can benefit from defining configuration this way, this project is an early attempt to isolate the built-in transform functionality of Visual Studio Web Deployments and generalize it such that it could be used as part of a build, both local and server-based._
-  
