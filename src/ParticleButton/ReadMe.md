@@ -12,7 +12,7 @@ With built-in WiFi and the ability to interact with the outside world using web 
   _The container for project source code.  Individual prototypes are further organized by subfolder._ 
 
   
-### Resources ###
+### Resources
 
 * [The Particle Internet Button Guide](https://docs.particle.io/guide/tools-and-features/button/photon/) 
 * [The Particle Reference Documentation](https://docs.particle.io/reference/firmware/photon/) 
