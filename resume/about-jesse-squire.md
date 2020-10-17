@@ -1,4 +1,4 @@
-# ![Stoic Jesse is stoic](https://0.gravatar.com/avatar/fbe5310c4d5a64a88aeeb83676b28a81?s=100&d=mm "Stoic Jesse is Stoic") About Jesse #
+# ![Stoic Jesse is stoic](https://0.gravatar.com/avatar/fbe5310c4d5a64a88aeeb83676b28a81?s=100&d=mm "Stoic Jesse is Stoic") About Jesse
 
 My love for technology began at age 6 when I wrote my first lines of BASIC code on a TI-99/4A. From the moment that I saw my name printed across the screen, I knew what I wanted to be  when I grew up. More than twenty years of professional experience later, I still hold onto that child-like sense of wonder and feel incredibly fortunate that I've been able to build a career around something which I'm passionate about and would be doing as a hobby regardless.
 
