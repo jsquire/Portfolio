@@ -1,6 +1,6 @@
-# mAdserve #
+# mAdserve
 
-### Summary ###
+### Summary
 
 [mAdserve](http://madserve.org "mAdserve") is an open source platform for serving mobile ads.  It's goal is to allow an ad publisher to track, sell, and deliver ads to targeted locations on a host page.  The platform offers the ability to integrate with many ad networks to match advertiser stock with the publisher's locations.
 
@@ -10,13 +10,13 @@ When delivering ads, mAdServe attempts to minimize impact to the host pages by r
 
 Developed in early 2013, the assets herein attempt to overcome the issues that plagued the default mAdserve approach of serving ads asynchronously by building up a client-side framework that was able to accommodate ads intended to be rendered synchronously by shimming the default browser behaviors that they rely upon.  Once the rendering is complete, the default browser behavior is restored to ensure that the host page behaves as intended.
 
-### Items ###
+### Items
 
 * **ad.js** - This is the rewritten mAdserve client-side behavior script extended to allow for asynchronous rendering of both static and rich mobile ads.
 
 * **madserve-script-proxy.php** - This is a server-side addition to the mAdserve platform that serves as a lightweight and simple proxy to allow ad source script files to be requested from domains not belonging to the host page.
 
-### Known Issues ###
+### Known Issues
 
 While the core functionality works relatively well for most cases, there are a few issues that had not been resolved when the initial development was completed.  Those issues are:  
 
