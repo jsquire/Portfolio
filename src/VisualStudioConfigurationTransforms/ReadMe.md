@@ -1,6 +1,6 @@
-# Visual Studio Configuration Transforms #
+# Visual Studio Configuration Transforms
 
-### Summary ###
+### Summary
 
 In a typical environment, applications must support multiple environments, such as local, development, integration, and production.  In order to ensure that the proper configuration values are present for an application to be functional in each scenario, a new build configuration is commonly created in Visual Studio for each target environment.  Rather than building using the built-in Debug or Release configurations, developers would instead choose the configuration specific to the environment that the application was to be run in.  The use of a dedicated build configuration also makes it easier for an automated build server to have a target that is consistent with what the development team uses locally.
 
@@ -8,7 +8,7 @@ One of the challenges in allowing projects to target dynamic environment is mana
 
 This project was developed in 2012 for use with Visual Studio 2012 and the .NET framework v4.0.  Since the time that I wrote this, many true Visual Studio add-ons and build server extensions have been developed to perform the same tasks.  While many of them are more robust and offer better integration/functionality, I still find value in this approach as it allows a single, stand-alone set of assets that can be used for local development and automated builds and can be included with the project in source control so that no coordination is needed for common Visual Studio add-ins. 
 
-### Base Configuration and Transforms ###
+### Base Configuration and Transforms
 
 For each application, service, or job project, there exists a base configuration file which contains the settings that are required for the application to run properly.  Some of these settings will apply across business units and environments, while some need to be specific to a unique combination.  In the base configuration, the common settings should be fully defined with the appropriate values.  Those settings that are target-specific should also be defined but are initially given empty values, which allows them to be defined where they make the most sense for ensuring that the configuration is organized and readable.  The actual values will be filled in during the build.
 
@@ -16,7 +16,7 @@ When a build configuration is created in Visual Studio, a target-specific config
 
 The transform configuration files contain only those parts of the configuration which vary for the unique target.  These values are marked using transform attributes (see syntax resource below) which instruct the build how the settings should be applied to the base configuration.  These values may be organized in whatever manner best allows for readability and maintenance of the transform configuration; they do not need to appear in the same order as the base configuration.  They transformation will ensure that they are applied to the proper items regardless of any organizational differences.
 
-### Opting Into Transformations ###
+### Opting Into Transformations
 
 By default, Visual Studio performs the transformations only when a web project is published.  In order for transformations to be applied during normal builds, both within the IDE and by the build server, the project file must be configured with a post build event that triggers the transform.  For more information on assigning build events in Visual Studio please refer to the resources below.
 
@@ -43,22 +43,22 @@ There are two build actions available for triggering transforms - one batch file
     Sample application project post build command line:
       call "$(ProjectDir)..\..\..\Build\Actions\transform-config.cmd" $(ProjectDir) App App $(ProjectName).exe $(ConfigurationName)
 
-### Items ###
+### Items
 
-* **ConfigurationTransform.build**
-  <br />_An MSBuild targets file extracted from the built-in web publishing targets which allows the configuration transform functionality to be included as part of a project file._
+* **ConfigurationTransform.build**  
+ _An MSBuild targets file extracted from the built-in web publishing targets which allows the configuration transform functionality to be included as part of a project file._
   
-* **Microsoft.Web.Publishing.Tasks.dll**
-  <br />_The library used by the built-int web publishing functionality of Visual Studio in which the MSBuild tasks for configuration transform logic are defined._
+* **Microsoft.Web.Publishing.Tasks.dll**  
+  _The library used by the built-int web publishing functionality of Visual Studio in which the MSBuild tasks for configuration transform logic are defined._
   
-* **transform-config.cmd**
-  <br />_A batch file intended to be used as part of a post-build command for a non-web project, such as a desktop application,  performs the transformation against an app.config file._
+* **transform-config.cmd**  
+  _A batch file intended to be used as part of a post-build command for a non-web project, such as a desktop application,  performs the transformation against an app.config file._
   
-* **transform-web-config.cmd**
-  <br />_A batch file intended to be used as part of a post-build command for a web project, such as a desktop application,  performs the transformation against an web.config file._
+* **transform-web-config.cmd**  
+  _A batch file intended to be used as part of a post-build command for a web project, such as a desktop application,  performs the transformation against an web.config file._
   
   
-### Resources ###
+### Resources
 
 * [Configuration Transform Syntax](http://msdn.microsoft.com/en-us/library/dd465326.aspx "Configuration Transform Syntax")
 * [How to: Specify Build Events](http://msdn.microsoft.com/en-us/library/ke5z92ks(v=VS.100).aspx "How to: Specify Build Events")
