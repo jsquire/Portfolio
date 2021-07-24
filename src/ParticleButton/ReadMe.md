@@ -10,7 +10,6 @@ With built-in WiFi and the ability to interact with the outside world using web 
 
 * **src**  
   _The container for project source code.  Individual prototypes are further organized by subfolder._ 
-
   
 ### Resources
 
@@ -20,7 +19,6 @@ With built-in WiFi and the ability to interact with the outside world using web 
 * [The Particle Internet Button GitHub Repository](https://github.com/particle-iot/InternetButton) _(contains a good set of example code)_
 
 [1]: https://docs.particle.io/datasheets/photon-(wifi)/photon-datasheet
-
 
 ### Disclaimer
 
