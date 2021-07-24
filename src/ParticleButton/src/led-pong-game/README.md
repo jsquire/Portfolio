@@ -1,6 +1,7 @@
 # LED Pong
 
 ### Overview
+
 A basic game for the Particle internet button where the objective is to protect your side of the button from losing LEDs by bouncing the animation back to your opponent's side.  Each time the LED makes it past your defense, you lose a LED until there are none remaining.  
 
 ### Playing the Game
@@ -13,6 +14,7 @@ The game is intended for two local players, each holding one side of the interne
 - _**Right button:**_ Pings the LED back at your opponent when it is on your side and moving toward your scoring area  
 
 ### Structure
+
 * #### ```/src```
   _This is the source folder that contains the firmware files for the game project. It should *not* be renamed.
 Anything that is in this folder when compliling will be sent to our Particle cloud service and compiled into a firmware binary for the Particle device that is currently have targeted._
