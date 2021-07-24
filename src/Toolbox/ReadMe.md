@@ -9,5 +9,4 @@ These artifacts are considered to be an active work-in-progress.  They've been c
 ### Structure
 
 * **csharp**  
-  _The container for the set of tools written in C#.  These have been organized into a single set of projects for easier reference and mintenance, though the do not form a cohesive application._
-  
+  _The container for the set of tools written in C#.  These have been organized into a single set of projects for easier reference and mintenance, though the do not form a cohesive application._  
