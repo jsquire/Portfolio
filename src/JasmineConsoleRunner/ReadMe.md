@@ -23,4 +23,3 @@ My goal was to write a simple script to allow running Jasmine tests from the Win
   
 * **dist**  
   _The container for project build output intended for distribution.  When using the console runner as part of another project, this is where one should look for the releases._
-
