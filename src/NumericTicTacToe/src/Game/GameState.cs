@@ -17,6 +17,9 @@ public record GameState
     /// <summary>The default tokens per row in a standard 3x3 game of tic-tac-toe.</summary>
     private const int DefaultTokensPerRow = 3;
 
+    /// <summary>The token that represents an empty board space.</summary>
+    private static readonly int EmptyBoardValue = default;
+
     /// <summary>The default winning combinations for a standard 3x3 game of tic-tac-toe.</summary>
     private static readonly int[][] DefaultWinningCombinations = ComputeWinningCombinations(DefaultTokensPerRow);
 
@@ -29,6 +32,28 @@ public record GameState
     /// </summary>
     ///
     public PlayerToken CurrentTurn { get; set; }
+
+    /// <summary>
+    ///   The player who has won the game, if any.  This member is mutable and its
+    ///   value will change as the game progresses.
+    /// </summary>
+    ///
+    /// <value>
+    ///   The <see cref="PlayerToken"/> of the winner, or <c>null</c> if the game has no winner."/>
+    /// </value>
+    ///
+    public PlayerToken? Winner { get; private set; }
+
+    /// <summary>
+    ///   Indicates whether the game is over.  This member is mutable and its
+    ///   value will change as the game progresses.
+    /// </summary>
+    ///
+    /// <value>
+    ///   <c>true</c> if this game is over; otherwise, <c>false</c>.
+    /// </value>
+    ///
+    public bool IsGameOver => ((Winner is not null) || (CurrentPlayerTokens.Count == 0));
 
     /// <summary>
     ///  The number of tokens per row on the game board.
@@ -157,7 +182,7 @@ public record GameState
     ///
     public int GetBoardToken(int row,
                              int column) =>
-        Board[((row - 1) * TokensPerRow) + column - 1];
+        Board[GetBoardPositionIndexUnchecked(row, column, TokensPerRow)];
 
     /// <summary>
     ///   Sets a token at the specified position of the board
@@ -166,12 +191,36 @@ public record GameState
     ///
     /// <param name="row">The row position.</param>
     /// <param name="column">The column position.</param>
-    /// <param name="token">The token value to set.</param>
+    /// <param name="token">The token value to set.</param>M
+    ///
+    /// <remarks>
+    ///   Setting a token will mutate the game board.
+    ///
+    ///   This operation does not perform any validation.  Callers
+    ///   are responsible for ensuring the token is available to the
+    ///   player and that there is no existing token at that position.
+    /// </remarks>
     ///
     public void SetBoardToken(int row,
                               int column,
                               int token) =>
-        Board[((row - 1) * TokensPerRow) + column - 1] = token;
+        Board[GetBoardPositionIndexUnchecked(row, column, TokensPerRow)] = token;
+
+    /// <summary>
+    ///   Determines whether the specified board position is empty.
+    /// </summary>
+    ///
+    /// <param name="row">The row of the board position to check.</param>
+    /// <param name="column">The column of the board position to check.</param>
+    ///
+    /// <returns><c>true</c> if the specified position is empty; otherwise, <c>false</c>.</returns>
+    ///
+    public bool IsEmptyPosition(int row,
+                                int column)
+    {
+        AssertValidBoardPosition(row, column);
+        return Board[GetBoardPositionIndexUnchecked(row, column, TokensPerRow)] == EmptyBoardValue;
+    }
 
     /// <summary>
     ///   Applies a move to the game board and updates the game state accordingly.
@@ -179,14 +228,20 @@ public record GameState
     ///
     /// <param name="move">The move to apply.</param>
     ///
-    /// <returns>The <see cref="PlayerToken"/> of the winner, if the game has been won; otherwise, <c>null</c>.</returns>
+    /// <remarks>
+    ///   Applying a move will mutate the state of the game.  It will:
+    ///     - Update the game board
+    ///     - Remove the token from the current player's available tokens
+    ///     - Update the current player's turn, if the game has not been won
+    ///     - Update the winner, if the game has been won
+    /// </remarks>
     ///
     /// <exception cref="ArgumentNullException">Occurs when the <paramref name="move"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Occurs when the <paramref name="move.PositionIndex"/> is out of bounds for the game board.</exception>
     /// <exception cref="InvalidOperationException">Occurs when the requested token is not available for the current player.</exception>
     /// <exception cref="InvalidOperationException">The requested position for the move is already occupied.</exception>
     ///
-    public PlayerToken? ApplyMove(Move move)
+    public void ApplyMove(Move move)
     {
         ArgumentNullException.ThrowIfNull(move, nameof(move));
 
@@ -200,7 +255,7 @@ public record GameState
             throw new ArgumentOutOfRangeException(nameof(move.PositionIndex), $"The position index must be between 0 and {Board.Length - 1}, inclusive.");
         }
 
-        if (Board[move.PositionIndex] != default)
+        if (Board[move.PositionIndex] != EmptyBoardValue)
         {
             var (row, column) = GetBoardPositionFromIndex(move.PositionIndex);
             throw new InvalidOperationException($"The position at row {row}, column {column} is already occupied.");
@@ -209,10 +264,14 @@ public record GameState
         Board[move.PositionIndex] = move.Token;
         CurrentPlayerTokens.Remove(move.Token);
 
-        var winner = GetWinner();
-        AlternatePlayerTurn();
+        Winner = ScanForWinner();
 
-        return winner;
+        // Alternate the player's turn only if there is no winner.
+
+        if (Winner is null)
+        {
+            AlternatePlayerTurn();
+        }
     }
 
     /// <summary>
@@ -239,20 +298,50 @@ public record GameState
     }
 
     /// <summary>
-    /// Alternates the current player turn.
+    ///   Gets the index of the board array for the provided <paramref name="row"/> and
+    ///   <paramref name="column"/>.
     /// </summary>
-    public void AlternatePlayerTurn()
+    ///
+    /// <param name="row">The row to query the board position index for.</param>
+    /// <param name="column">The column to query the board position index for.</param>
+    ///
+    /// <returns>The index of the board position.</returns>
+    ///
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when row or column is not valid for the game board.</exception>
+    ///
+    public int GetBoardPositionIndex(int row,
+                                     int column)
     {
-        CurrentTurn = CurrentTurn == PlayerToken.Odd ? PlayerToken.Even : PlayerToken.Odd;
+        AssertValidBoardPosition(row, column);
+        return GetBoardPositionIndexUnchecked(row, column, TokensPerRow);
     }
 
     /// <summary>
-    ///   Determines if the game has been won and returns the winning player.
+    ///   Alternates the current player turn.
+    /// </summary>
+    ///
+    /// <remarks>
+    ///   Alternating the player turn will mutate the state of the game.
+    /// </remarks>
+    ///
+    public void AlternatePlayerTurn()
+    {
+        CurrentTurn = CurrentTurn switch
+        {
+            PlayerToken.Odd => PlayerToken.Even,
+            PlayerToken.Even => PlayerToken.Odd,
+            _ => throw new InvalidOperationException($"Unknown player token: {CurrentTurn}")
+        };
+    }
+
+    /// <summary>
+    ///   Determines if the game has been won and returns the winning player and, if so,
+    ///   sets the <see cref="Winner"/> property.
     /// </summary>
     ///
     /// <returns>The player token of the winner if the game has been won, null otherwise.</returns>
     ///
-    public PlayerToken? GetWinner()
+    internal PlayerToken? ScanForWinner()
     {
         foreach (var combination in _winningCombinations)
         {
@@ -265,11 +354,31 @@ public record GameState
 
             if (sum == WinningTotal)
             {
+                Winner = CurrentTurn;
                 return CurrentTurn;
             }
         }
 
         return null;
+    }
+
+    /// <summary>
+    ///   Gets the index of the board array for the provided <paramref name="row"/> and
+    ///   <paramref name="column"/> without performing any bounds checking or validation.
+    /// </summary>
+    ///
+    /// <param name="row">The row to query the board position index for.</param>
+    /// <param name="column">The column to query the board position index for.</param>
+    /// <param name="tokensPerRow">The number tokens per row in the board.</param>
+    ///
+    /// <returns>The index of the board position, assuming the input is valid.</returns>
+    ///
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static int GetBoardPositionIndexUnchecked(int row,
+                                                      int column,
+                                                      int tokensPerRow)
+    {
+        return ((row - 1) * tokensPerRow) + (column - 1);
     }
 
     /// <summary>

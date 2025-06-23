@@ -1,13 +1,14 @@
 using NUnit.Framework;
 using Squire.NumTic.Game;
 
-namespace NumTic.Tests;
+namespace Squire.NumTic.Tests;
 
 /// <summary>
 ///   Tests for the <see cref="GameState"/> class.
 /// </summary>
 ///
 [TestFixture]
+[Category("Game")]
 public class GameStateTests
 {
     /// <summary>
@@ -520,7 +521,7 @@ public class GameStateTests
     public void GetWinnerReturnsNullForNewGame()
     {
         var gameState = GameState.CreateDefault();
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.Null, "New game should not have a winner");
     }
@@ -542,7 +543,7 @@ public class GameStateTests
         };
 
         var gameState = GameState.CreateDefault() with { Board = board, CurrentTurn = PlayerToken.Even };
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.EqualTo(PlayerToken.Even), "Game should return PlayerToken.Even as winner when top row sums to 15");
     }
@@ -562,7 +563,7 @@ public class GameStateTests
     public void GetWinnerWorksForDifferentBoardSizes(int boardSize, PlayerToken? expectedResult)
     {
         var gameState = new GameState(PlayerToken.Odd, new int[boardSize], 15, [new HashSet<byte> { 1, 3, 5 }, new HashSet<byte> { 2, 4, 6 }]);
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.EqualTo(expectedResult), $"GetWinner should return {expectedResult} for {boardSize}-element board");
     }
@@ -582,7 +583,7 @@ public class GameStateTests
         };
 
         var gameState = GameState.CreateDefault() with { Board = board };
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "Game should identify diagonal victory");
     }
@@ -602,7 +603,7 @@ public class GameStateTests
         };
 
         var gameState = GameState.CreateDefault() with { Board = board };
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "Game should identify column victory");
     }
@@ -615,7 +616,7 @@ public class GameStateTests
     public void GetWinnerReturnsNullWhenNoWinner()
     {
         var gameState = GameState.CreateDefault();
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.Null, "Game with no winning combination should return null");
     }
@@ -635,7 +636,7 @@ public class GameStateTests
         };
 
         var gameState = GameState.CreateDefault() with { Board = board };
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.Null, "Partial game with no winner should return null");
     }
@@ -656,7 +657,7 @@ public class GameStateTests
                 new HashSet<byte> { 2, 4, 6, 8 }
             ]);
 
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "Should return the current turn player when multiple combinations win");
     }
@@ -677,7 +678,7 @@ public class GameStateTests
                 new HashSet<byte> { 2, 4, 6, 8 }
             ]);
 
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "1x1 board with winning total should return current player");
     }
@@ -698,7 +699,7 @@ public class GameStateTests
                 new HashSet<byte> { 2, 4, 6, 8 }
             ]);
 
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.Null, "1x1 board without winning total should return null");
     }
@@ -719,7 +720,7 @@ public class GameStateTests
                 new HashSet<byte> { 2, 4, 6, 8 }
             ]);
 
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
         Assert.That(winner, Is.EqualTo(PlayerToken.Even), "4x4 board should correctly identify winner");
     }
 
@@ -739,7 +740,7 @@ public class GameStateTests
                 new HashSet<byte> { 2, 4, 6, 8 }
             ]);
 
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
         Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "Should identify anti-diagonal victory");
     }
 
@@ -759,7 +760,7 @@ public class GameStateTests
                 new HashSet<byte> { 2, 4, 6, 8 }
             ]);
 
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
         Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "Should identify top row victory");
     }
 
@@ -779,7 +780,7 @@ public class GameStateTests
                 new HashSet<byte> { 2, 4, 6, 8 }
             ]);
 
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
         Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "Should identify main diagonal victory");
     }
 
@@ -799,7 +800,7 @@ public class GameStateTests
                 new HashSet<byte> { 2, 4, 6, 8 }
             ]);
 
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
         Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "Should identify middle column victory");
     }
 
@@ -818,7 +819,7 @@ public class GameStateTests
         };
 
         var gameState = GameState.CreateDefault() with { Board = board };
-        var winner = gameState.GetWinner();
+        var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.Null, "Board with sum close to but not equal to WinningTotal should return null");
     }
@@ -834,13 +835,13 @@ public class GameStateTests
         var initialTokenCount = gameState.CurrentPlayerTokens.Count;
         var move = new Move(PlayerToken.Odd, 0, 1, null);
 
-        var winner = gameState.ApplyMove(move);
+        gameState.ApplyMove(move);
 
         Assert.That(gameState.Board[0], Is.EqualTo(1), "Board position should contain the placed token");
         Assert.That(gameState.CurrentPlayerTokens.Count, Is.EqualTo(initialTokenCount - 1), "Current player should have one fewer token");
-        Assert.That(gameState.CurrentPlayerTokens.Contains((byte)1), Is.False, "Used token should be removed from current player's tokens");
+        Assert.That(gameState.CurrentPlayerTokens.Contains(1), Is.False, "Used token should be removed from current player's tokens");
         Assert.That(gameState.CurrentTurn, Is.EqualTo(PlayerToken.Even), "Turn should alternate to next player");
-        Assert.That(winner, Is.Null, "No winner should be detected for a single move");
+        Assert.That(gameState.Winner, Is.Null, "No winner should be detected for a single move");
     }
 
     /// <summary>
@@ -927,9 +928,9 @@ public class GameStateTests
         gameState.SetBoardToken(1, 2, 5); // Position (1,2) = index 1
 
         var winningMove = new Move(PlayerToken.Odd, 2, 9, null); // Position (1,3) = index 2
-        var winner = gameState.ApplyMove(winningMove);
+        gameState.ApplyMove(winningMove);
 
-        Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "ApplyMove should detect winning move and return the player who won");
+        Assert.That(gameState.Winner, Is.EqualTo(PlayerToken.Odd), "ApplyMove should detect winning move and set the winner");
         Assert.That(gameState.Board[2], Is.EqualTo(9), "Winning token should be placed on the board");
     }
 
@@ -950,12 +951,12 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
         var move = new Move(PlayerToken.Odd, positionIndex, 1, null);
 
-        var winner = gameState.ApplyMove(move);
+        gameState.ApplyMove(move);
 
         Assert.That(gameState.Board[positionIndex], Is.EqualTo(1), $"Token should be placed at position index {positionIndex}");
         Assert.That(gameState.GetBoardToken(expectedRow, expectedColumn), Is.EqualTo(1),
             $"Token should be accessible at row {expectedRow}, column {expectedColumn}");
-        Assert.That(winner, Is.Null, "Single move should not result in a win");
+        Assert.That(gameState.Winner, Is.Null, "Single move should not result in a win");
     }
 
     /// <summary>
@@ -998,7 +999,7 @@ public class GameStateTests
         gameState.ApplyMove(oddMove);
 
         Assert.That(oddTokens.Count, Is.EqualTo(initialOddCount - 1), "Odd player should have one fewer token");
-        Assert.That(oddTokens.Contains((byte)1), Is.False, "Token 1 should be removed from odd player tokens");
+        Assert.That(oddTokens.Contains(1), Is.False, "Token 1 should be removed from odd player tokens");
         Assert.That(evenTokens.Count, Is.EqualTo(initialEvenCount), "Even player tokens should remain unchanged");
 
         // Apply even player move
@@ -1006,7 +1007,7 @@ public class GameStateTests
         gameState.ApplyMove(evenMove);
 
         Assert.That(evenTokens.Count, Is.EqualTo(initialEvenCount - 1), "Even player should have one fewer token");
-        Assert.That(evenTokens.Contains((byte)2), Is.False, "Token 2 should be removed from even player tokens");
+        Assert.That(evenTokens.Contains(2), Is.False, "Token 2 should be removed from even player tokens");
     }
 
     /// <summary>
@@ -1026,11 +1027,11 @@ public class GameStateTests
             ]);
 
         var move = new Move(PlayerToken.Odd, 15, 1, null); // Last position on 4x4 board
-        var winner = largerGameState.ApplyMove(move);
+        largerGameState.ApplyMove(move);
 
         Assert.That(largerGameState.Board[15], Is.EqualTo(1), "Token should be placed at last position of 4x4 board");
         Assert.That(largerGameState.CurrentTurn, Is.EqualTo(PlayerToken.Even), "Turn should alternate after move");
-        Assert.That(winner, Is.Null, "Single move on larger board should not result in win");
+        Assert.That(largerGameState.Winner, Is.Null, "Single move on larger board should not result in win");
     }
 
     /// <summary>
@@ -1051,14 +1052,14 @@ public class GameStateTests
         }
 
         Assert.That(oddTokens.Count, Is.EqualTo(1), "Odd player should have exactly one token remaining");
-        Assert.That(oddTokens.Contains((byte)1), Is.True, "Odd player should have token 1 remaining");
+        Assert.That(oddTokens.Contains(1), Is.True, "Odd player should have token 1 remaining");
 
         var move = new Move(PlayerToken.Odd, 0, 1, null);
-        var winner = gameState.ApplyMove(move);
+        gameState.ApplyMove(move);
 
         Assert.That(oddTokens.Count, Is.EqualTo(0), "Odd player should have no tokens remaining after move");
         Assert.That(gameState.Board[0], Is.EqualTo(1), "Last token should be placed on board");
-        Assert.That(winner, Is.Null, "Single move should not result in win");
+        Assert.That(gameState.Winner, Is.Null, "Single move should not result in win");
     }
 
     /// <summary>
@@ -1103,26 +1104,26 @@ public class GameStateTests
         // Play a sequence of moves leading to a win
         // Odd player: positions 0, 1 with tokens 1, 5
         var move1 = new Move(PlayerToken.Odd, 0, 1, null);
-        var winner1 = gameState.ApplyMove(move1);
-        Assert.That(winner1, Is.Null, "First move should not result in win");
+        gameState.ApplyMove(move1);
+        Assert.That(gameState.Winner, Is.Null, "First move should not result in win");
 
         var move2 = new Move(PlayerToken.Even, 3, 2, null);
-        var winner2 = gameState.ApplyMove(move2);
-        Assert.That(winner2, Is.Null, "Second move should not result in win");
+        gameState.ApplyMove(move2);
+        Assert.That(gameState.Winner, Is.Null, "Second move should not result in win");
 
         var move3 = new Move(PlayerToken.Odd, 1, 5, null);
-        var winner3 = gameState.ApplyMove(move3);
-        Assert.That(winner3, Is.Null, "Third move should not result in win");
+        gameState.ApplyMove(move3);
+        Assert.That(gameState.Winner, Is.Null, "Third move should not result in win");
 
         var move4 = new Move(PlayerToken.Even, 4, 4, null);
-        var winner4 = gameState.ApplyMove(move4);
-        Assert.That(winner4, Is.Null, "Fourth move should not result in win");
+        gameState.ApplyMove(move4);
+        Assert.That(gameState.Winner, Is.Null, "Fourth move should not result in win");
 
         // Winning move: complete top row with 1 + 5 + 9 = 15
         var winningMove = new Move(PlayerToken.Odd, 2, 9, null);
-        var finalWinner = gameState.ApplyMove(winningMove);
+        gameState.ApplyMove(winningMove);
 
-        Assert.That(finalWinner, Is.EqualTo(PlayerToken.Odd), "Final move should result in Odd player winning");
+        Assert.That(gameState.Winner, Is.EqualTo(PlayerToken.Odd), "Final move should result in Odd player winning");
         Assert.That(gameState.Board[0], Is.EqualTo(1), "Position 0 should contain token 1");
         Assert.That(gameState.Board[1], Is.EqualTo(5), "Position 1 should contain token 5");
         Assert.That(gameState.Board[2], Is.EqualTo(9), "Position 2 should contain token 9");
@@ -1138,10 +1139,10 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
         var move = new Move(PlayerToken.Odd, 0, 1, null);
 
-        var winner = gameState.ApplyMove(move);
+        gameState.ApplyMove(move);
 
         Assert.That(gameState.Board[0], Is.EqualTo(1), "Token should be placed at position index 0");
-        Assert.That(winner, Is.Null, "Single move should not result in win");
+        Assert.That(gameState.Winner, Is.Null, "Single move should not result in win");
         Assert.That(gameState.CurrentTurn, Is.EqualTo(PlayerToken.Even), "Turn should alternate after move");
     }
 
@@ -1162,11 +1163,11 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
         var move = new Move(PlayerToken.Odd, 0, token, null);
 
-        var winner = gameState.ApplyMove(move);
+        gameState.ApplyMove(move);
 
         Assert.That(gameState.Board[0], Is.EqualTo(token), $"Token {token} should be placed on the board");
         Assert.That(gameState.CurrentPlayerTokens.Contains(token), Is.False, $"Token {token} should be removed from current player tokens");
-        Assert.That(winner, Is.Null, "Single token placement should not result in win");
+        Assert.That(gameState.Winner, Is.Null, "Single token placement should not result in win");
     }
 
     /// <summary>
@@ -1185,11 +1186,11 @@ public class GameStateTests
         var gameState = GameState.CreateDefault() with { CurrentTurn = PlayerToken.Even };
         var move = new Move(PlayerToken.Even, 0, token, null);
 
-        var winner = gameState.ApplyMove(move);
+        gameState.ApplyMove(move);
 
         Assert.That(gameState.Board[0], Is.EqualTo(token), $"Token {token} should be placed on the board");
         Assert.That(gameState.CurrentPlayerTokens.Contains(token), Is.False, $"Token {token} should be removed from current player tokens");
-        Assert.That(winner, Is.Null, "Single token placement should not result in win");
+        Assert.That(gameState.Winner, Is.Null, "Single token placement should not result in win");
     }
 
     /// <summary>
@@ -1207,9 +1208,9 @@ public class GameStateTests
 
         // Complete diagonal with token 9
         var winningMove = new Move(PlayerToken.Odd, 8, 9, null); // Position (3,3) = index 8
-        var winner = gameState.ApplyMove(winningMove);
+        gameState.ApplyMove(winningMove);
 
-        Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "Diagonal win should be detected");
+        Assert.That(gameState.Winner, Is.EqualTo(PlayerToken.Odd), "Diagonal win should be detected");
         Assert.That(gameState.Board[8], Is.EqualTo(9), "Winning token should be placed");
     }
 
@@ -1228,9 +1229,9 @@ public class GameStateTests
 
         // Complete column with token 9
         var winningMove = new Move(PlayerToken.Odd, 6, 9, null); // Position (3,1) = index 6
-        var winner = gameState.ApplyMove(winningMove);
+        gameState.ApplyMove(winningMove);
 
-        Assert.That(winner, Is.EqualTo(PlayerToken.Odd), "Column win should be detected");
+        Assert.That(gameState.Winner, Is.EqualTo(PlayerToken.Odd), "Column win should be detected");
         Assert.That(gameState.Board[6], Is.EqualTo(9), "Winning token should be placed");
     }
 
@@ -1277,11 +1278,10 @@ public class GameStateTests
             new Move(PlayerToken.Even, 1, 4, null)   // (1,2) = 4
         };
 
-        PlayerToken? winner = null;
         foreach (var move in moves)
         {
-            winner = gameState.ApplyMove(move);
-            Assert.That(winner, Is.Null, $"Move with token {move.Token} should not result in win");
+            gameState.ApplyMove(move);
+            Assert.That(gameState.Winner, Is.Null, $"Move with token {move.Token} should not result in win");
         }
 
         // Verify final game state
