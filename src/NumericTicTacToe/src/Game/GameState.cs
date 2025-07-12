@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace Squire.NumTic.Game;
+namespace Squire.NumTic;
 
 /// <summary>
 ///   The current state of the game.  Data is expected to mutate
@@ -14,17 +14,17 @@ namespace Squire.NumTic.Game;
 ///
 public record GameState
 {
+    /// <summary>The token that represents an empty board space.</summary>
+    public static readonly int EmptyBoardSpaceValue = default;
+
     /// <summary>The default tokens per row in a standard 3x3 game of tic-tac-toe.</summary>
     private const int DefaultTokensPerRow = 3;
-
-    /// <summary>The token that represents an empty board space.</summary>
-    private static readonly int EmptyBoardValue = default;
 
     /// <summary>The default winning combinations for a standard 3x3 game of tic-tac-toe.</summary>
     private static readonly int[][] DefaultWinningCombinations = ComputeWinningCombinations(DefaultTokensPerRow);
 
     /// <summary>The pre-computed winning combinations for the current board.</summary>
-    private readonly int[][] _winningCombinations;
+    private readonly int[][] WinningCombinations;
 
     /// <summary>
     ///   Identifies the player who is next to play a turn.  This member is mutable and its
@@ -53,7 +53,7 @@ public record GameState
     ///   <c>true</c> if this game is over; otherwise, <c>false</c>.
     /// </value>
     ///
-    public bool IsGameOver => ((Winner is not null) || (CurrentPlayerTokens.Count == 0));
+    public bool IsGameOver => ((Winner is not null) || (CurrentPlayerTokens.Count == 0) || (!AreEmptySpaces(Board)));
 
     /// <summary>
     ///  The number of tokens per row on the game board.
@@ -119,7 +119,8 @@ public record GameState
 
         if (boardLength != (expectedTokensPerRow * expectedTokensPerRow))
         {
-            throw new InvalidOperationException("Board must be a perfect square for tic-tac-toe games.");;
+            throw new InvalidOperationException("Board must be a perfect square for tic-tac-toe games.");
+            ;
         }
 
         TokensPerRow = expectedTokensPerRow;
@@ -128,7 +129,7 @@ public record GameState
         WinningTotal = winningTotal;
         Tokens = tokens;
 
-        _winningCombinations = expectedTokensPerRow switch
+        WinningCombinations = expectedTokensPerRow switch
         {
             DefaultTokensPerRow => DefaultWinningCombinations,
             _ => ComputeWinningCombinations(expectedTokensPerRow)
@@ -219,7 +220,7 @@ public record GameState
                                 int column)
     {
         AssertValidBoardPosition(row, column);
-        return Board[GetBoardPositionIndexUnchecked(row, column, TokensPerRow)] == EmptyBoardValue;
+        return Board[GetBoardPositionIndexUnchecked(row, column, TokensPerRow)] == EmptyBoardSpaceValue;
     }
 
     /// <summary>
@@ -236,15 +237,12 @@ public record GameState
     ///     - Update the winner, if the game has been won
     /// </remarks>
     ///
-    /// <exception cref="ArgumentNullException">Occurs when the <paramref name="move"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Occurs when the <paramref name="move.PositionIndex"/> is out of bounds for the game board.</exception>
     /// <exception cref="InvalidOperationException">Occurs when the requested token is not available for the current player.</exception>
     /// <exception cref="InvalidOperationException">The requested position for the move is already occupied.</exception>
     ///
     public void ApplyMove(Move move)
     {
-        ArgumentNullException.ThrowIfNull(move, nameof(move));
-
         if (!CurrentPlayerTokens.Contains(move.Token))
         {
             throw new InvalidOperationException($"The token {move.Token} is not available for the current player.");
@@ -255,13 +253,14 @@ public record GameState
             throw new ArgumentOutOfRangeException(nameof(move.PositionIndex), $"The position index must be between 0 and {Board.Length - 1}, inclusive.");
         }
 
-        if (Board[move.PositionIndex] != EmptyBoardValue)
+        if (Board[move.PositionIndex] != EmptyBoardSpaceValue)
         {
             var (row, column) = GetBoardPositionFromIndex(move.PositionIndex);
             throw new InvalidOperationException($"The position at row {row}, column {column} is already occupied.");
         }
 
         Board[move.PositionIndex] = move.Token;
+        CurrentTurn = move.Player;
         CurrentPlayerTokens.Remove(move.Token);
 
         Winner = ScanForWinner();
@@ -271,6 +270,40 @@ public record GameState
         if (Winner is null)
         {
             AlternatePlayerTurn();
+        }
+    }
+
+    /// <summary>
+    ///   Resets a previous move by the cu game board and updates the game state accordingly.
+    /// </summary>
+    ///
+    /// <param name="move">The move to revert.</param>
+    ///
+    /// <exception cref="ArgumentOutOfRangeException">Occurs when the <paramref name="move.PositionIndex"/> is out of bounds for the game board.</exception>
+    /// <exception cref="InvalidOperationException">The position is already empty.</exception>
+    ///
+    public void UndoMove(Move move)
+    {
+        if ((uint)move.PositionIndex >= (uint)Board.Length)
+        {
+            throw new ArgumentOutOfRangeException(nameof(move.PositionIndex), $"The position index must be between 0 and {Board.Length - 1}, inclusive.");
+        }
+
+        if (Board[move.PositionIndex] == EmptyBoardSpaceValue)
+        {
+            var (row, column) = GetBoardPositionFromIndex(move.PositionIndex);
+            throw new InvalidOperationException($"The position at row {row}, column {column} is already empty.");
+        }
+
+        Board[move.PositionIndex] = EmptyBoardSpaceValue;
+        CurrentTurn = move.Player;
+        CurrentPlayerTokens.Add(move.Token);
+
+        // Re-scan for winner after undoing the move.
+
+        if (Winner is not null)
+        {
+            Winner = ScanForWinner();
         }
     }
 
@@ -343,16 +376,19 @@ public record GameState
     ///
     internal PlayerToken? ScanForWinner()
     {
-        foreach (var combination in _winningCombinations)
+        foreach (var combination in WinningCombinations)
         {
             var sum = 0;
+            var populated = 0;
 
             for (var index = 0; index < combination.Length; ++index)
             {
-                sum += Board[combination[index]];
+                var value =  Board[combination[index]];
+                sum += value;
+                populated += (value != EmptyBoardSpaceValue) ? 1 : 0;
             }
 
-            if (sum == WinningTotal)
+            if ((sum == WinningTotal) && (populated == TokensPerRow))
             {
                 Winner = CurrentTurn;
                 return CurrentTurn;
@@ -360,6 +396,29 @@ public record GameState
         }
 
         return null;
+    }
+
+    /// <summary>
+    ///  Determines if there are any empty spaces left on the board.
+    /// </summary>
+    ///
+    /// <param name="board">The board to consider.</param>
+    ///
+    /// <returns><c>true</c> if at least one empty space remains on the board; otherwise, <c>false</c>.</returns>
+    ///
+    private static bool AreEmptySpaces(int[] board)
+    {
+        // Check if there are any empty spaces left on the board.
+
+        for (var index = 0; index < board.Length; ++index)
+        {
+            if (board[index] == EmptyBoardSpaceValue)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -457,13 +516,26 @@ public record GameState
     }
 
     /// <summary>
+    ///   Creates a deep copy of the current game state.
+    /// </summary>
+    ///
+    /// <returns>A new <see cref="GameState"/> instance that is a deep copy of the current state.</returns>
+    ///
+    internal GameState CreateCopy() =>
+        new GameState(
+            CurrentTurn,
+            [.. Board],
+            WinningTotal,
+            [[.. GetPlayerTokens(PlayerToken.Odd)], [.. GetPlayerTokens(PlayerToken.Even)]]);
+
+    /// <summary>
     ///   Creates a new game using the defaults of a standard
     ///   3x3 board and maximum score of 15.
     /// </summary>
     ///
     /// <returns>An instance of state representing a new game.</returns>
     ///
-    internal static GameState CreateDefault() => new (
+    internal static GameState CreateDefault() => new(
             PlayerToken.Odd,
             new int[DefaultTokensPerRow * DefaultTokensPerRow],
             15,

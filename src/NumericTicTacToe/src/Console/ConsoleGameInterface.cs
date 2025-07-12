@@ -1,5 +1,4 @@
-using Squire.NumTic.Game;
-using Squire.NumTic.Game.Contracts;
+using Squire.NumTic.Contracts;
 
 namespace Squire.NumTic.Console;
 

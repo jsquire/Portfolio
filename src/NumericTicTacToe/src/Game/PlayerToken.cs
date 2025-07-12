@@ -1,4 +1,4 @@
-namespace Squire.NumTic.Game;
+namespace Squire.NumTic;
 
 /// <summary>
 ///   The valid types of player.

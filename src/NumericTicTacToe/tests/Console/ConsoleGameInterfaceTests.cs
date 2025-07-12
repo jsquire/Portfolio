@@ -1,6 +1,6 @@
 using NUnit.Framework;
+using Squire.NumTic;
 using Squire.NumTic.Console;
-using Squire.NumTic.Game;
 
 namespace Squire.NumTic.Tests;
 
@@ -222,14 +222,23 @@ public class ConsoleGameInterfaceTests
     /// </summary>
     ///
     [Test]
-    public void ReadPlayerResponseAsyncAcceptsCallWithoutCancellation()
+    public async Task ReadPlayerResponseAsyncAcceptsCallWithoutCancellation()
     {
         var gameInterface = new ConsoleGameInterface();
 
-        // We're testing that the method signature accepts the call, not the behavior
-        // since actual execution would require console input.
+        var originalInput = System.Console.In;
+        var input = new StringReader("1\n"); // Simulate user typing "1" and pressing Enter
 
-        Assert.That(() => gameInterface.ReadPlayerResponseAsnyc(), Throws.Nothing);
+        System.Console.SetIn(input);
+
+        try
+        {
+            await Assert.ThatAsync(async () => await gameInterface.ReadPlayerResponseAsnyc(), Throws.Nothing);
+        }
+        finally
+        {
+            System.Console.SetIn(originalInput);
+        }
     }
 
     /// <summary>

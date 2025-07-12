@@ -1,6 +1,6 @@
-using Squire.NumTic.Game.Contracts;
+using Squire.NumTic.Contracts;
 
-namespace Squire.NumTic.Game;
+namespace Squire.NumTic;
 
 /// <summary>
 ///   Represents a game of numeric tic-tac-toe.
@@ -29,7 +29,7 @@ public class Game
     ///
     public Game(IPlayer oddPlayer,
                 IPlayer evenPlayer,
-                IGameInterface gameInterface) : this(evenPlayer, oddPlayer, gameInterface, GameState.CreateDefault())
+                IGameInterface gameInterface) : this(oddPlayer, evenPlayer, gameInterface, GameState.CreateDefault())
     {
     }
 

@@ -1,9 +1,8 @@
 using NSubstitute;
 using NUnit.Framework;
-using Squire.NumTic.Game;
-using Squire.NumTic.Game.Contracts;
+using Squire.NumTic.Contracts;
 
-namespace NumTic.Tests;
+namespace Squire.NumTic.Tests;
 
 /// <summary>
 ///   Tests for the <see cref="Game"/> class.
@@ -22,7 +21,7 @@ public class GameTests
     {
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         Assert.That(() => new Game(oddPlayer, evenPlayer, renderer), Throws.Nothing);
     }
@@ -45,7 +44,7 @@ public class GameTests
 
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         Assert.That(() => new Game(oddPlayer, evenPlayer, renderer, gameState), Throws.Nothing);
     }
@@ -58,7 +57,7 @@ public class GameTests
     public void ConstructorThrowsArgumentNullExceptionWhenOddPlayerIsNull()
     {
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
         var state = GameState.CreateDefault();
 
         Assert.That(() => new Game(null!, evenPlayer, renderer, state),
@@ -74,7 +73,7 @@ public class GameTests
     public void ConstructorThrowsArgumentNullExceptionWhenEvenPlayerIsNull()
     {
         var oddPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
         var state = GameState.CreateDefault();
 
         Assert.That(() => new Game(oddPlayer, null!, renderer, state),
@@ -94,7 +93,7 @@ public class GameTests
         var state = GameState.CreateDefault();
 
         Assert.That(() => new Game(oddPlayer, evenPlayer, null!, state),
-            Throws.InstanceOf<ArgumentNullException>().With.Property("ParamName").EqualTo("gameRenderer"),
+            Throws.InstanceOf<ArgumentNullException>().With.Property("ParamName").EqualTo("gameInterface"),
             "Constructor should throw ArgumentNullException for null renderer");
     }
 
@@ -107,7 +106,7 @@ public class GameTests
     {
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         Assert.That(() => new Game(oddPlayer, evenPlayer, renderer, null!),
             Throws.InstanceOf<ArgumentNullException>().With.Property("ParamName").EqualTo("state"),
@@ -124,7 +123,7 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         // Pre-set board to be one move away from win: 1 + 5 = 6, need 9 to reach 15.
 
@@ -133,7 +132,7 @@ public class GameTests
 
         // The Odd player will make the winning move.
 
-        var winningMove = new Move(PlayerToken.Odd, 2, 9, null);
+        var winningMove = new Move(PlayerToken.Odd, 2, 9);
 
         oddPlayer
             .PlayTurnAsync(Arg.Any<GameState>(), Arg.Any<CancellationToken>())
@@ -141,7 +140,8 @@ public class GameTests
 
         var game = new Game(oddPlayer, evenPlayer, renderer, gameState);
 
-        // Set up a list to capture the game states at the time of each render call
+        // Set up a list to capture the game states at the time of each render call.
+
         var renderedStates = new List<(PlayerToken? Winner, PlayerToken CurrentTurn, bool IsGameOver)>();
 
         renderer
@@ -159,15 +159,18 @@ public class GameTests
 
         await renderer.Received(2).RenderAsync(Arg.Any<GameState>(), Arg.Any<CancellationToken>());
 
-        // Verify the captured states are correct
+        // Verify the captured states are correct.
+
         Assert.That(renderedStates.Count, Is.EqualTo(2), "Should have captured exactly 2 render calls");
 
         // Verify initial render was called with no winner.
+
         Assert.That(renderedStates[0].Winner, Is.Null, "First render should have no winner");
         Assert.That(renderedStates[0].CurrentTurn, Is.EqualTo(PlayerToken.Odd), "First render should be Odd player's turn");
         Assert.That(renderedStates[0].IsGameOver, Is.False, "First render should not show game over");
 
         // Verify final render was called with winner.
+
         Assert.That(renderedStates[1].Winner, Is.EqualTo(PlayerToken.Odd), "Second render should show Odd as winner");
         Assert.That(renderedStates[1].CurrentTurn, Is.EqualTo(PlayerToken.Odd), "Second render should show Odd's turn (winner doesn't alternate)");
         Assert.That(renderedStates[1].IsGameOver, Is.True, "Second render should show game over");
@@ -183,7 +186,7 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         using var cts = new CancellationTokenSource();
         cts.Cancel();
@@ -213,7 +216,7 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         // First player throws OperationCanceledException.
 
@@ -249,15 +252,15 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         // Set up moves that will lead to a win: 1 + 5 + 9 = 15.
 
-        var move1 = new Move(PlayerToken.Odd, 0, 1, null);    // Position 0: value 1
-        var move2 = new Move(PlayerToken.Even, 3, 2, null);   // Position 3: value 2 (non-winning)
-        var move3 = new Move(PlayerToken.Odd, 1, 5, null);    // Position 1: value 5
-        var move4 = new Move(PlayerToken.Even, 4, 4, null);   // Position 4: value 4 (non-winning)
-        var winningMove = new Move(PlayerToken.Odd, 2, 9, null); // Position 2: value 9 (completes 1+5+9=15)
+        var move1 = new Move(PlayerToken.Odd, 0, 1);    // Position 0: value 1
+        var move2 = new Move(PlayerToken.Even, 3, 2);   // Position 3: value 2 (non-winning)
+        var move3 = new Move(PlayerToken.Odd, 1, 5);    // Position 1: value 5
+        var move4 = new Move(PlayerToken.Even, 4, 4);   // Position 4: value 4 (non-winning)
+        var winningMove = new Move(PlayerToken.Odd, 2, 9); // Position 2: value 9 (completes 1+5+9=15)
 
         oddPlayer
             .PlayTurnAsync(Arg.Any<GameState>(), Arg.Any<CancellationToken>())
@@ -285,17 +288,17 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         // Set up several non-winning moves, then a winning move.
 
-        var move1 = new Move(PlayerToken.Odd, 0, 1, null);     // Position 0: 1 (no win)
-        var move2 = new Move(PlayerToken.Even, 3, 2, null);    // Position 3: 2 (no win)
-        var move3 = new Move(PlayerToken.Odd, 4, 3, null);     // Position 4: 3 (no win)
-        var move4 = new Move(PlayerToken.Even, 6, 4, null);    // Position 6: 4 (no win)
-        var move5 = new Move(PlayerToken.Odd, 1, 5, null);     // Position 1: 5 (no win)
-        var move6 = new Move(PlayerToken.Even, 7, 6, null);    // Position 7: 6 (no win)
-        var winningMove = new Move(PlayerToken.Odd, 2, 9, null); // Position 2: 9, completes top row 1+5+9=15
+        var move1 = new Move(PlayerToken.Odd, 0, 1);     // Position 0: 1 (no win)
+        var move2 = new Move(PlayerToken.Even, 3, 2);    // Position 3: 2 (no win)
+        var move3 = new Move(PlayerToken.Odd, 4, 3);     // Position 4: 3 (no win)
+        var move4 = new Move(PlayerToken.Even, 6, 4);    // Position 6: 4 (no win)
+        var move5 = new Move(PlayerToken.Odd, 1, 5);     // Position 1: 5 (no win)
+        var move6 = new Move(PlayerToken.Even, 7, 6);    // Position 7: 6 (no win)
+        var winningMove = new Move(PlayerToken.Odd, 2, 9); // Position 2: 9, completes top row 1+5+9=15
 
         oddPlayer
             .PlayTurnAsync(Arg.Any<GameState>(), Arg.Any<CancellationToken>())
@@ -328,14 +331,14 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         // Set up an immediate win.
 
         gameState.SetBoardToken(1, 1, 1);
         gameState.SetBoardToken(1, 2, 5);
 
-        var winningMove = new Move(PlayerToken.Odd, 2, 9, null);
+        var winningMove = new Move(PlayerToken.Odd, 2, 9);
 
         oddPlayer
             .PlayTurnAsync(Arg.Any<GameState>(), Arg.Any<CancellationToken>())
@@ -359,7 +362,7 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         // Modify the initial state.
 
@@ -382,7 +385,7 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         var game = new Game(oddPlayer, evenPlayer, renderer, gameState);
 
@@ -406,7 +409,7 @@ public class GameTests
         var initialState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         var customState = new GameState(
             PlayerToken.Even,
@@ -433,7 +436,7 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         var game = new Game(oddPlayer, evenPlayer, renderer, gameState);
 
@@ -452,7 +455,7 @@ public class GameTests
         var initialState = GameState.CreateDefault(); // 3x3 board
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         // Create a 4x4 board state.
 
@@ -481,7 +484,7 @@ public class GameTests
         var initialState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
         var state1 = new GameState(
             PlayerToken.Odd,
@@ -524,9 +527,9 @@ public class GameTests
         var gameState = GameState.CreateDefault();
         var oddPlayer = Substitute.For<IPlayer>();
         var evenPlayer = Substitute.For<IPlayer>();
-        var renderer = Substitute.For<IRenderer>();
+        var renderer = Substitute.For<IGameInterface>();
 
-        var winningMove = new Move(PlayerToken.Odd, 2, 9, null);
+        var winningMove = new Move(PlayerToken.Odd, 2, 9);
 
         oddPlayer
             .PlayTurnAsync(Arg.Any<GameState>(), Arg.Any<CancellationToken>())
