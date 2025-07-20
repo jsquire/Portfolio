@@ -1,4 +1,4 @@
-namespace Squire.NumTic.Game;
+namespace Squire.NumTic;
 
 /// <summary>
 ///   The types of text that can be displayed in the game interface.

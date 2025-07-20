@@ -1,5 +1,6 @@
+using Squire.NumTic;
 using Squire.NumTic.Console;
-using Squire.NumTic.Game;
+using Squire.NumTic.Players;
 
 using var cancellationSource = new CancellationTokenSource();
 
@@ -20,7 +21,7 @@ Console.CancelKeyPress += (sender, eventArgs) =>
 
 var gameInterface = new ConsoleGameInterface();
 var oddPlayer = new ConsolePlayer(gameInterface);
-var evenPlayer = new ConsolePlayer(gameInterface);
+var evenPlayer = new BotPlayer(gameInterface);
 var game = new Game(oddPlayer, evenPlayer, gameInterface);
 
 try
@@ -29,5 +30,5 @@ try
 }
 catch (OperationCanceledException)
 {
-  // Expected cancellation, just exit gracefully.
+    // Expected cancellation, just exit gracefully.
 }

@@ -1,17 +1,16 @@
-using Squire.NumTic.Game;
-using Squire.NumTic.Game.Contracts;
+using Squire.NumTic.Contracts;
 
 namespace Squire.NumTic.Console;
 
 /// <summary>
-///   A console-based player implementation that prompts the user for input
-///   through a TextReader and provides output through a TextWriter.
+///   A console-based player implementation that prompts the user moves and
+///   updates the game state accordingly.
 /// </summary>
 ///
 public class ConsolePlayer : IPlayer
 {
     /// <summary>The game interface to interact with for player operations.</summary>
-    private readonly IGameInterface _interface;
+    private readonly IGameInterface Interface;
 
     /// <summary>
     ///   Initializes a new instance of the <see cref="ConsolePlayer"/> class.
@@ -20,7 +19,7 @@ public class ConsolePlayer : IPlayer
     /// <param name="gameInterface">The game interface to interact with for player operations.</param>
     ///
     public ConsolePlayer(IGameInterface gameInterface) =>
-        _interface = gameInterface ?? throw new ArgumentNullException(nameof(gameInterface));
+        Interface = gameInterface ?? throw new ArgumentNullException(nameof(gameInterface));
 
     /// <summary>
     ///   Plays a turn in the game by prompting the user for their move selection.
@@ -45,7 +44,7 @@ public class ConsolePlayer : IPlayer
 
         // Display available tokens.
 
-        await _interface.RenderPlayerTextAsync(TextType.Message, $"Available tokens: {string.Join(", ", availableTokens.OrderBy(t => t))}{Environment.NewLine}", cancellationToken);
+        await Interface.RenderPlayerTextAsync(TextType.Message, $"Available tokens: {string.Join(", ", availableTokens.OrderBy(t => t))}{Environment.NewLine}", cancellationToken);
 
         // Get token selection.
 
@@ -55,26 +54,26 @@ public class ConsolePlayer : IPlayer
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await _interface.RenderPlayerTextAsync(TextType.Prompt,"Select a token to place: ", cancellationToken);
-            var tokenInput = await _interface.ReadPlayerResponseAsnyc(cancellationToken);
+            await Interface.RenderPlayerTextAsync(TextType.Prompt, "Select a token to place: ", cancellationToken);
+            var tokenInput = await Interface.ReadPlayerResponseAsnyc(cancellationToken);
 
             if (!cancellationToken.IsCancellationRequested)
             {
                 if (string.IsNullOrWhiteSpace(tokenInput))
                 {
-                    await _interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid token number.", cancellationToken);
+                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid token number.", cancellationToken);
                     continue;
                 }
 
                 if (!byte.TryParse(tokenInput.Trim(), out selectedToken))
                 {
-                    await _interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
+                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
                     continue;
                 }
 
                 if (!availableTokens.Contains(selectedToken))
                 {
-                    await _interface.RenderPlayerTextAsync(TextType.Error, $"Token {selectedToken} is not available. Please select from: {string.Join(", ", availableTokens.OrderBy(t => t))}", cancellationToken);
+                    await Interface.RenderPlayerTextAsync(TextType.Error, $"Token {selectedToken} is not available. Please select from: {string.Join(", ", availableTokens.OrderBy(t => t))}", cancellationToken);
                     continue;
                 }
 
@@ -90,26 +89,26 @@ public class ConsolePlayer : IPlayer
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await _interface.RenderPlayerTextAsync(TextType.Prompt, $"{Environment.NewLine}Select a row (1-{gameState.TokensPerRow}): ", cancellationToken);
-            var rowInput = await _interface.ReadPlayerResponseAsnyc(cancellationToken);
+            await Interface.RenderPlayerTextAsync(TextType.Prompt, $"{Environment.NewLine}Select a row (1-{gameState.TokensPerRow}): ", cancellationToken);
+            var rowInput = await Interface.ReadPlayerResponseAsnyc(cancellationToken);
 
             if (!cancellationToken.IsCancellationRequested)
             {
                 if (string.IsNullOrWhiteSpace(rowInput))
                 {
-                    await _interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid row number.", cancellationToken);
+                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid row number.", cancellationToken);
                     continue;
                 }
 
                 if (!int.TryParse(rowInput.Trim(), out selectedRow))
                 {
-                    await _interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
+                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
                     continue;
                 }
 
                 if ((selectedRow < 1) || (selectedRow > gameState.TokensPerRow))
                 {
-                    await _interface.RenderPlayerTextAsync(TextType.Error, $"Row must be between 1 and {gameState.TokensPerRow}.", cancellationToken);
+                    await Interface.RenderPlayerTextAsync(TextType.Error, $"Row must be between 1 and {gameState.TokensPerRow}.", cancellationToken);
                     continue;
                 }
 
@@ -125,26 +124,26 @@ public class ConsolePlayer : IPlayer
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await _interface.RenderPlayerTextAsync(TextType.Prompt, $"Select a column (1-{gameState.TokensPerRow}): ", cancellationToken);
-            var columnInput = await _interface.ReadPlayerResponseAsnyc(cancellationToken);
+            await Interface.RenderPlayerTextAsync(TextType.Prompt, $"Select a column (1-{gameState.TokensPerRow}): ", cancellationToken);
+            var columnInput = await Interface.ReadPlayerResponseAsnyc(cancellationToken);
 
             if (!cancellationToken.IsCancellationRequested)
             {
                 if (string.IsNullOrWhiteSpace(columnInput))
                 {
-                    await _interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid column number.", cancellationToken);
+                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid column number.", cancellationToken);
                     continue;
                 }
 
                 if (!int.TryParse(columnInput.Trim(), out selectedColumn))
                 {
-                    await _interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
+                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
                     continue;
                 }
 
                 if ((selectedColumn < 1) || (selectedColumn > gameState.TokensPerRow))
                 {
-                    await _interface.RenderPlayerTextAsync(TextType.Error, $"Column must be between 1 and {gameState.TokensPerRow}.", cancellationToken);
+                    await Interface.RenderPlayerTextAsync(TextType.Error, $"Column must be between 1 and {gameState.TokensPerRow}.", cancellationToken);
                     continue;
                 }
 
@@ -156,14 +155,14 @@ public class ConsolePlayer : IPlayer
 
         if (!gameState.IsEmptyPosition(selectedRow, selectedColumn))
         {
-            await _interface.RenderPlayerTextAsync(TextType.Error, $"Position at row {selectedRow}, column {selectedColumn} is already occupied. Please try again.{Environment.NewLine}", cancellationToken);
+            await Interface.RenderPlayerTextAsync(TextType.Error, $"Position at row {selectedRow}, column {selectedColumn} is already occupied. Please try again.{Environment.NewLine}", cancellationToken);
 
             // Restart the position selection process.
 
             return await PlayTurnAsync(gameState, cancellationToken);
         }
 
-        await _interface.RenderPlayerTextAsync(TextType.Message, $"{Environment.NewLine}Placing token {selectedToken} at row {selectedRow}, column {selectedColumn}...{Environment.NewLine}", cancellationToken);
-        return new Move(gameState.CurrentTurn, gameState.GetBoardPositionIndex(selectedRow, selectedColumn), selectedToken, null);
+        await Interface.RenderPlayerTextAsync(TextType.Message, $"{Environment.NewLine}Placing token {selectedToken} at row {selectedRow}, column {selectedColumn}...{Environment.NewLine}", cancellationToken);
+        return new Move(gameState.CurrentTurn, gameState.GetBoardPositionIndex(selectedRow, selectedColumn), selectedToken);
     }
 }

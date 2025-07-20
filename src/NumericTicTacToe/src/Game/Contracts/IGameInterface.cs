@@ -1,4 +1,4 @@
-namespace Squire.NumTic.Game.Contracts;
+namespace Squire.NumTic.Contracts;
 
 /// <summary>
 ///   Defines the contract for an interface of the numeric tic-tac-toe game,

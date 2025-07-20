@@ -1,8 +1,8 @@
-using NUnit.Framework;
 using NSubstitute;
+using NUnit.Framework;
+using Squire.NumTic;
 using Squire.NumTic.Console;
-using Squire.NumTic.Game;
-using Squire.NumTic.Game.Contracts;
+using Squire.NumTic.Contracts;
 
 namespace Squire.NumTic.Tests;
 
@@ -95,7 +95,6 @@ public class ConsolePlayerTests
 
         var move = await player.PlayTurnAsync(gameState);
 
-        Assert.That(move, Is.Not.Null);
         Assert.That(move.Player, Is.EqualTo(gameState.CurrentTurn));
         Assert.That(move.Token, Is.EqualTo(1));
         Assert.That(move.PositionIndex, Is.EqualTo(0)); // Row 1, Column 1 = position 0
@@ -118,8 +117,6 @@ public class ConsolePlayerTests
             .Returns("99", "1", "1", "1"); // invalid token 99, then valid token 1, row 1, column 1
 
         var move = await player.PlayTurnAsync(gameState);
-
-        Assert.That(move, Is.Not.Null);
         Assert.That(move.Token, Is.EqualTo(1));
 
         // Verify error message was displayed.
@@ -149,8 +146,6 @@ public class ConsolePlayerTests
             .Returns("1", "4", "4");
 
         var move = await player.PlayTurnAsync(largeGameState);
-
-        Assert.That(move, Is.Not.Null);
         Assert.That(move.PositionIndex, Is.EqualTo(15)); // Row 4, Column 4 = position 15 in 4x4 board
     }
 
