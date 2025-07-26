@@ -20,11 +20,8 @@ public record GameState
     /// <summary>The default tokens per row in a standard 3x3 game of tic-tac-toe.</summary>
     private const int DefaultTokensPerRow = 3;
 
-    /// <summary>The default winning combinations for a standard 3x3 game of tic-tac-toe.</summary>
+    /// <summary>The default winning set of lines on a standard 3x3 game of tic-tac-toe board that need to be scanned for winning conditions.</summary>
     private static readonly int[][] DefaultWinningCombinations = ComputeWinningCombinations(DefaultTokensPerRow);
-
-    /// <summary>The pre-computed winning combinations for the current board.</summary>
-    private readonly int[][] WinningCombinations;
 
     /// <summary>
     ///   Identifies the player who is next to play a turn.  This member is mutable and its
@@ -59,7 +56,14 @@ public record GameState
     ///  The number of tokens per row on the game board.
     /// </summary>
     ///
-    public int TokensPerRow { get; private set; }
+    public int TokensPerRow { get; init; }
+
+    /// <summary>
+    ///   The pre-computed set of lines on the board that need to be scanned for winning conditions.
+    /// </summary>
+    ///
+    public int[][] WinningLines { get; init; }
+
 
     /// <summary>
     ///   The board for a game of numeric tic-tac-toe.  The underlying data
@@ -129,7 +133,7 @@ public record GameState
         WinningTotal = winningTotal;
         Tokens = tokens;
 
-        WinningCombinations = expectedTokensPerRow switch
+        WinningLines = expectedTokensPerRow switch
         {
             DefaultTokensPerRow => DefaultWinningCombinations,
             _ => ComputeWinningCombinations(expectedTokensPerRow)
@@ -145,8 +149,8 @@ public record GameState
     ///
     /// <exception cref="ArgumentOutOfRangeException">Thrown when row or column is not valid for the game board.</exception>
     ///
-    public void AssertValidBoardPosition(int row,
-                                         int column)
+    public void AssertValidBoardCoordinates(int row,
+                                            int column)
     {
         var rowAndColSize = (uint)TokensPerRow;
 
@@ -172,54 +176,18 @@ public record GameState
     public HashSet<byte> GetPlayerTokens(PlayerToken player) => Tokens[(int)player];
 
     /// <summary>
-    ///   Gets the token at the specified row and column position of the board
-    ///   without explicit bounds checking.
-    /// </summary>
-    ///
-    /// <param name="row">The row position.</param>
-    /// <param name="column">The column position.</param>
-    ///
-    /// <returns>The token value at the specified position.</returns>
-    ///
-    public int GetBoardToken(int row,
-                             int column) =>
-        Board[GetBoardPositionIndexUnchecked(row, column, TokensPerRow)];
-
-    /// <summary>
-    ///   Sets a token at the specified position of the board
-    ///   without explicit bounds checking.
-    /// </summary>
-    ///
-    /// <param name="row">The row position.</param>
-    /// <param name="column">The column position.</param>
-    /// <param name="token">The token value to set.</param>M
-    ///
-    /// <remarks>
-    ///   Setting a token will mutate the game board.
-    ///
-    ///   This operation does not perform any validation.  Callers
-    ///   are responsible for ensuring the token is available to the
-    ///   player and that there is no existing token at that position.
-    /// </remarks>
-    ///
-    public void SetBoardToken(int row,
-                              int column,
-                              int token) =>
-        Board[GetBoardPositionIndexUnchecked(row, column, TokensPerRow)] = token;
-
-    /// <summary>
     ///   Determines whether the specified board position is empty.
     /// </summary>
     ///
-    /// <param name="row">The row of the board position to check.</param>
-    /// <param name="column">The column of the board position to check.</param>
+    /// <param name="row">The row of the board coordinates to check.</param>
+    /// <param name="column">The column of the board coordinates to check.</param>
     ///
     /// <returns><c>true</c> if the specified position is empty; otherwise, <c>false</c>.</returns>
     ///
     public bool IsEmptyPosition(int row,
                                 int column)
     {
-        AssertValidBoardPosition(row, column);
+        AssertValidBoardCoordinates(row, column);
         return Board[GetBoardPositionIndexUnchecked(row, column, TokensPerRow)] == EmptyBoardSpaceValue;
     }
 
@@ -255,7 +223,7 @@ public record GameState
 
         if (Board[move.PositionIndex] != EmptyBoardSpaceValue)
         {
-            var (row, column) = GetBoardPositionFromIndex(move.PositionIndex);
+            var (row, column) = GetBoardCoordinates(move.PositionIndex);
             throw new InvalidOperationException($"The position at row {row}, column {column} is already occupied.");
         }
 
@@ -291,7 +259,7 @@ public record GameState
 
         if (Board[move.PositionIndex] == EmptyBoardSpaceValue)
         {
-            var (row, column) = GetBoardPositionFromIndex(move.PositionIndex);
+            var (row, column) = GetBoardCoordinates(move.PositionIndex);
             throw new InvalidOperationException($"The position at row {row}, column {column} is already empty.");
         }
 
@@ -308,44 +276,44 @@ public record GameState
     }
 
     /// <summary>
-    ///   Converts an array index to the corresponding row and column position.
+    ///   Converts an board position into the corresponding row and column coordinates.
     /// </summary>
     ///
-    /// <param name="index">The array index to convert.</param>
+    /// <param name="position">The board position to convert.</param>
     ///
-    /// <returns>A named tuple containing the row and column positions (1-based).</returns>
+    /// <returns>A named tuple containing the row and column coordinates (1-based).</returns>
     ///
     /// <exception cref="ArgumentNullException">Thrown when instance is <c>null</c>.</exception>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when index is not valid for the game board.</exception>
     ///
-    public (int Row, int Column) GetBoardPositionFromIndex(int index)
+    public (int Row, int Column) GetBoardCoordinates(int position)
     {
-        if ((uint)index >= (uint)Board.Length)
+        if ((uint)position >= (uint)Board.Length)
         {
-            throw new ArgumentOutOfRangeException(nameof(index), $"The index must be between 0 and {Board.Length}, inclusive.");
+            throw new ArgumentOutOfRangeException(nameof(position), $"The index must be between 0 and {Board.Length}, inclusive.");
         }
 
-        var row = (index / TokensPerRow) + 1;
-        var column = (index % TokensPerRow) + 1;
+        var row = (position / TokensPerRow) + 1;
+        var column = (position % TokensPerRow) + 1;
         return (row, column);
     }
 
     /// <summary>
-    ///   Gets the index of the board array for the provided <paramref name="row"/> and
-    ///   <paramref name="column"/>.
+    ///   Gets the position on the board that corresponds to the provided <paramref name="row"/> and
+    ///   <paramref name="column"/> coordinates.
     /// </summary>
     ///
-    /// <param name="row">The row to query the board position index for.</param>
-    /// <param name="column">The column to query the board position index for.</param>
+    /// <param name="row">The row to query the board position for.</param>
+    /// <param name="column">The column to query the board position for.</param>
     ///
-    /// <returns>The index of the board position.</returns>
+    /// <returns>The corresponding the board position.</returns>
     ///
     /// <exception cref="ArgumentOutOfRangeException">Thrown when row or column is not valid for the game board.</exception>
     ///
-    public int GetBoardPositionIndex(int row,
-                                     int column)
+    public int GetBoardPosition(int row,
+                                int column)
     {
-        AssertValidBoardPosition(row, column);
+        AssertValidBoardCoordinates(row, column);
         return GetBoardPositionIndexUnchecked(row, column, TokensPerRow);
     }
 
@@ -376,19 +344,28 @@ public record GameState
     ///
     internal PlayerToken? ScanForWinner()
     {
-        foreach (var combination in WinningCombinations)
+        foreach (var combination in WinningLines)
         {
             var sum = 0;
-            var populated = 0;
 
             for (var index = 0; index < combination.Length; ++index)
             {
                 var value =  Board[combination[index]];
+
+                // Winning requires that every board position for the combination is
+                // occupied.  If any position is empty, a win is not possible and
+                // there is no need to keep scanning this combination.
+
+                if (value == EmptyBoardSpaceValue)
+                {
+                    sum = 0;
+                    break;
+                }
+
                 sum += value;
-                populated += (value != EmptyBoardSpaceValue) ? 1 : 0;
             }
 
-            if ((sum == WinningTotal) && (populated == TokensPerRow))
+            if (sum == WinningTotal)
             {
                 Winner = CurrentTurn;
                 return CurrentTurn;
@@ -526,7 +503,10 @@ public record GameState
             CurrentTurn,
             [.. Board],
             WinningTotal,
-            [[.. GetPlayerTokens(PlayerToken.Odd)], [.. GetPlayerTokens(PlayerToken.Even)]]);
+            [[.. GetPlayerTokens(PlayerToken.Odd)], [.. GetPlayerTokens(PlayerToken.Even)]])
+        {
+           Winner = this.Winner
+        };
 
     /// <summary>
     ///   Creates a new game using the defaults of a standard

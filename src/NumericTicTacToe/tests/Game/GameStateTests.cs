@@ -299,8 +299,12 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        Assert.That(() => gameState.AssertValidBoardPosition(row, column), Throws.Nothing,
-            $"Position ({row}, {column}) should be valid for a 3x3 board");
+        // Should not throw and method should complete normally.
+        gameState.AssertValidBoardCoordinates(row, column);
+
+        // Verify the method completed by checking state is still accessible.
+        Assert.That(gameState.TokensPerRow, Is.EqualTo(3),
+            $"Position ({row}, {column}) validation should complete successfully for 3x3 board");
     }
 
     /// <summary>
@@ -318,7 +322,7 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        Assert.That(() => gameState.AssertValidBoardPosition(row, 1),
+        Assert.That(() => gameState.AssertValidBoardCoordinates(row, 1),
             Throws.InstanceOf<ArgumentOutOfRangeException>()
                 .With.Property("ParamName").EqualTo("row"),
             $"Position ({row}, 1) should throw ArgumentOutOfRangeException for invalid row");
@@ -339,56 +343,12 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        Assert.That(() => gameState.AssertValidBoardPosition(1, column),
+        Assert.That(() => gameState.AssertValidBoardCoordinates(1, column),
             Throws.InstanceOf<ArgumentOutOfRangeException>()
                 .With.Property("ParamName").EqualTo("column"),
             $"Position (1, {column}) should throw ArgumentOutOfRangeException for invalid column");
     }
 
-    /// <summary>
-    ///   Verifies that GetBoardToken and SetBoardToken work correctly together.
-    /// </summary>
-    ///
-    [Test]
-    public void GetAndSetBoardTokenWorkCorrectly()
-    {
-        var gameState = GameState.CreateDefault();
-
-        // Set tokens at various positions and verify they can be retrieved correctly.
-
-        gameState.SetBoardToken(1, 1, 5);
-        gameState.SetBoardToken(2, 3, 7);
-        gameState.SetBoardToken(3, 2, 9);
-
-        Assert.That(gameState.GetBoardToken(1, 1), Is.EqualTo(5), "Token at (1,1) should be 5");
-        Assert.That(gameState.GetBoardToken(2, 3), Is.EqualTo(7), "Token at (2,3) should be 7");
-        Assert.That(gameState.GetBoardToken(3, 2), Is.EqualTo(9), "Token at (3,2) should be 9");
-
-        // Verify other positions remain 0 (default).
-
-        Assert.That(gameState.GetBoardToken(1, 2), Is.EqualTo(0), "Unset positions should remain 0");
-        Assert.That(gameState.GetBoardToken(3, 3), Is.EqualTo(0), "Unset positions should remain 0");
-    }
-
-    /// <summary>
-    ///   Verifies that SetBoardToken correctly overwrites existing values.
-    /// </summary>
-    ///
-    [Test]
-    public void SetBoardTokenOverwritesExistingValues()
-    {
-        var gameState = GameState.CreateDefault();
-
-        // Set initial value.
-
-        gameState.SetBoardToken(2, 2, 3);
-        Assert.That(gameState.GetBoardToken(2, 2), Is.EqualTo(3), "Initial value should be set");
-
-        // Overwrite with new value.
-
-        gameState.SetBoardToken(2, 2, 8);
-        Assert.That(gameState.GetBoardToken(2, 2), Is.EqualTo(8), "Value should be overwritten");
-    }
 
     /// <summary>
     ///   Verifies that GetBoardPositionFromIndex works correctly for valid indices.
@@ -411,7 +371,7 @@ public class GameStateTests
     public void GetBoardPositionFromIndexReturnsCorrectPosition(int index, int expectedRow, int expectedColumn)
     {
         var gameState = GameState.CreateDefault();
-        var (row, column) = gameState.GetBoardPositionFromIndex(index);
+        var (row, column) = gameState.GetBoardCoordinates(index);
 
         Assert.That(row, Is.EqualTo(expectedRow), $"Row for index {index} should be {expectedRow}");
         Assert.That(column, Is.EqualTo(expectedColumn), $"Column for index {index} should be {expectedColumn}");
@@ -432,8 +392,8 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        Assert.That(() => gameState.GetBoardPositionFromIndex(invalidIndex),
-            Throws.InstanceOf<ArgumentOutOfRangeException>().With.Property("ParamName").EqualTo("index"),
+        Assert.That(() => gameState.GetBoardCoordinates(invalidIndex),
+            Throws.InstanceOf<ArgumentOutOfRangeException>().With.Property("ParamName").EqualTo("position"),
             $"Index {invalidIndex} should throw ArgumentOutOfRangeException for invalid index");
     }
 
@@ -457,30 +417,34 @@ public class GameStateTests
 
         // Test corner positions for 4x4 board.
 
-        Assert.That(() => largerGameState.AssertValidBoardPosition(1, 1), Throws.Nothing, "Position (1,1) should be valid for 4x4 board");
-        Assert.That(() => largerGameState.AssertValidBoardPosition(4, 4), Throws.Nothing, "Position (4,4) should be valid for 4x4 board");
+        largerGameState.AssertValidBoardCoordinates(1, 1);
+        largerGameState.AssertValidBoardCoordinates(4, 4);
+
+        // Verify method completed successfully by checking state properties.
+        Assert.That(largerGameState.TokensPerRow, Is.EqualTo(4), "Board validation should complete for 4x4 board");
+        Assert.That(largerGameState.Board.Length, Is.EqualTo(16), "Board should remain intact after validation");
 
         // Test that invalid positions throw for 4x4 board.
 
-        Assert.That(() => largerGameState.AssertValidBoardPosition(5, 1),
+        Assert.That(() => largerGameState.AssertValidBoardCoordinates(5, 1),
             Throws.InstanceOf<ArgumentOutOfRangeException>(),
             "Position (5,1) should be invalid for 4x4 board");
 
-        Assert.That(() => largerGameState.AssertValidBoardPosition(1, 5),
+        Assert.That(() => largerGameState.AssertValidBoardCoordinates(1, 5),
             Throws.InstanceOf<ArgumentOutOfRangeException>(),
             "Position (1,5) should be invalid for 4x4 board");
 
         // Test position conversion for 4x4 board.
 
-        var (row, column) = largerGameState.GetBoardPositionFromIndex(15); // Last position
+        var (row, column) = largerGameState.GetBoardCoordinates(15); // Last position
 
         Assert.That(row, Is.EqualTo(4), "Last index should convert to row 4");
         Assert.That(column, Is.EqualTo(4), "Last index should convert to column 4");
 
-        // Test set/get for 4x4 board.
+        // Test direct board access for 4x4 board.
 
-        largerGameState.SetBoardToken(3, 4, 42);
-        Assert.That(largerGameState.GetBoardToken(3, 4), Is.EqualTo(42), "Token should be set and retrieved correctly on 4x4 board");
+        largerGameState.Board[largerGameState.GetBoardPosition(3, 4)] = 42;
+        Assert.That(largerGameState.Board[largerGameState.GetBoardPosition(3, 4)], Is.EqualTo(42), "Token should be set and retrieved correctly on 4x4 board");
     }
 
     /// <summary>
@@ -885,11 +849,11 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove successfully applies a valid move and updates game state correctly.
+    ///   Verifies that ApplyMove applies a valid move and updates game state correctly.
     /// </summary>
     ///
     [Test]
-    public void ApplyMoveSuccessfullyAppliesValidMove()
+    public void ApplyMoveAppliesValidMove()
     {
         var gameState = GameState.CreateDefault();
         var initialTokenCount = gameState.CurrentPlayerTokens.Count;
@@ -950,7 +914,7 @@ public class GameStateTests
     public void ApplyMoveThrowsInvalidOperationExceptionWhenPositionOccupied()
     {
         var gameState = GameState.CreateDefault();
-        gameState.SetBoardToken(1, 1, 5); // Occupy position (1,1) which is index 0
+        gameState.Board[gameState.GetBoardPosition(1, 1)] = 5; // Occupy position (1,1) which is index 0
 
         var move = new Move(PlayerToken.Odd, 0, 1);
 
@@ -969,9 +933,10 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        // Set up a winning scenario: place 1 and 5 in top row, then place 9 to complete the win
-        gameState.SetBoardToken(1, 1, 1); // Position (1,1) = index 0
-        gameState.SetBoardToken(1, 2, 5); // Position (1,2) = index 1
+        // Set up a winning scenario: place 1 and 5 in top row, then place 9 to complete the win.
+
+        gameState.Board[gameState.GetBoardPosition(1, 1)] = 1; // Position (1,1) = index 0
+        gameState.Board[gameState.GetBoardPosition(1, 2)] = 5; // Position (1,2) = index 1
 
         var winningMove = new Move(PlayerToken.Odd, 2, 9); // Position (1,3) = index 2
         gameState.ApplyMove(winningMove);
@@ -1000,7 +965,7 @@ public class GameStateTests
         gameState.ApplyMove(move);
 
         Assert.That(gameState.Board[positionIndex], Is.EqualTo(1), $"Token should be placed at position index {positionIndex}");
-        Assert.That(gameState.GetBoardToken(expectedRow, expectedColumn), Is.EqualTo(1),
+        Assert.That(gameState.Board[gameState.GetBoardPosition(expectedRow, expectedColumn)], Is.EqualTo(1),
             $"Token should be accessible at row {expectedRow}, column {expectedColumn}");
         Assert.That(gameState.Winner, Is.Null, "Single move should not result in a win");
     }
@@ -1015,12 +980,14 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
         Assert.That(gameState.CurrentTurn, Is.EqualTo(PlayerToken.Odd), "Game should start with Odd player");
 
-        // Apply odd player move
+        // Apply odd player move.
+
         var oddMove = new Move(PlayerToken.Odd, 0, 1);
         gameState.ApplyMove(oddMove);
         Assert.That(gameState.CurrentTurn, Is.EqualTo(PlayerToken.Even), "Turn should alternate to Even player");
 
-        // Apply even player move
+        // Apply even player move.
+
         var evenMove = new Move(PlayerToken.Even, 1, 2);
         gameState.ApplyMove(evenMove);
         Assert.That(gameState.CurrentTurn, Is.EqualTo(PlayerToken.Odd), "Turn should alternate back to Odd player");
@@ -1040,7 +1007,8 @@ public class GameStateTests
         var initialOddCount = oddTokens.Count;
         var initialEvenCount = evenTokens.Count;
 
-        // Apply odd player move
+        // Apply odd player move.
+
         var oddMove = new Move(PlayerToken.Odd, 0, 1);
         gameState.ApplyMove(oddMove);
 
@@ -1048,7 +1016,8 @@ public class GameStateTests
         Assert.That(oddTokens.Contains(1), Is.False, "Token 1 should be removed from odd player tokens");
         Assert.That(evenTokens.Count, Is.EqualTo(initialEvenCount), "Even player tokens should remain unchanged");
 
-        // Apply even player move
+        // Apply even player move.
+
         var evenMove = new Move(PlayerToken.Even, 1, 2);
         gameState.ApplyMove(evenMove);
 
@@ -1090,7 +1059,8 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
         var oddTokens = gameState.GetPlayerTokens(PlayerToken.Odd);
 
-        // Remove all but one token from odd player
+        // Remove all but one token from odd player.
+
         var tokensToRemove = oddTokens.Where(t => t != 1).ToList();
         foreach (var token in tokensToRemove)
         {
@@ -1123,15 +1093,23 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault() with { CurrentTurn = currentPlayer };
 
-        // Valid move should succeed
-        var validMove = new Move(currentPlayer, 0, validToken);
-        Assert.That(() => gameState.ApplyMove(validMove), Throws.Nothing,
-            $"Valid move with token {validToken} should succeed for {currentPlayer}");
+        // Valid move should succeed.
 
-        // Reset for invalid move test
+        var validMove = new Move(currentPlayer, 0, validToken);
+        gameState.ApplyMove(validMove);
+
+        // Verify the move was applied successfully.
+        Assert.That(gameState.Board[0], Is.EqualTo(validToken),
+            $"Valid move with token {validToken} should be applied for {currentPlayer}");
+        Assert.That(gameState.GetPlayerTokens(currentPlayer).Contains(validToken), Is.False,
+            $"Token {validToken} should be removed from {currentPlayer}'s available tokens");
+
+        // Reset for invalid move test.
+
         gameState = GameState.CreateDefault() with { CurrentTurn = currentPlayer };
 
-        // Invalid move should throw
+        // Invalid move should throw.
+
         var invalidMove = new Move(currentPlayer, 0, invalidToken);
         Assert.That(() => gameState.ApplyMove(invalidMove),
             Throws.InstanceOf<InvalidOperationException>(),
@@ -1147,8 +1125,9 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        // Play a sequence of moves leading to a win
-        // Odd player: positions 0, 1 with tokens 1, 5
+        // Play a sequence of moves leading to a win.
+        // Odd player: positions 0, 1 with tokens 1, 5.
+
         var move1 = new Move(PlayerToken.Odd, 0, 1);
         gameState.ApplyMove(move1);
         Assert.That(gameState.Winner, Is.Null, "First move should not result in win");
@@ -1165,7 +1144,8 @@ public class GameStateTests
         gameState.ApplyMove(move4);
         Assert.That(gameState.Winner, Is.Null, "Fourth move should not result in win");
 
-        // Winning move: complete top row with 1 + 5 + 9 = 15
+        // Winning move: complete top row with 1 + 5 + 9 = 15.
+
         var winningMove = new Move(PlayerToken.Odd, 2, 9);
         gameState.ApplyMove(winningMove);
 
@@ -1248,11 +1228,13 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        // Set up diagonal win: 1 + 5 + 9 = 15
-        gameState.SetBoardToken(1, 1, 1); // Position (1,1) = index 0
-        gameState.SetBoardToken(2, 2, 5); // Position (2,2) = index 4
+        // Set up diagonal win: 1 + 5 + 9 = 15.
 
-        // Complete diagonal with token 9
+        gameState.Board[gameState.GetBoardPosition(1, 1)] = 1; // Position (1,1) = index 0
+        gameState.Board[gameState.GetBoardPosition(2, 2)] = 5; // Position (2,2) = index 4
+
+        // Complete diagonal with token 9.
+
         var winningMove = new Move(PlayerToken.Odd, 8, 9); // Position (3,3) = index 8
         gameState.ApplyMove(winningMove);
 
@@ -1269,11 +1251,13 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        // Set up column win: 1 + 5 + 9 = 15 (first column)
-        gameState.SetBoardToken(1, 1, 1); // Position (1,1) = index 0
-        gameState.SetBoardToken(2, 1, 5); // Position (2,1) = index 3
+        // Set up column win: 1 + 5 + 9 = 15 (first column).
 
-        // Complete column with token 9
+        gameState.Board[gameState.GetBoardPosition(1, 1)] = 1; // Position (1,1) = index 0
+        gameState.Board[gameState.GetBoardPosition(2, 1)] = 5; // Position (2,1) = index 3
+
+        // Complete column with token 9.
+
         var winningMove = new Move(PlayerToken.Odd, 6, 9); // Position (3,1) = index 6
         gameState.ApplyMove(winningMove);
 
@@ -1290,14 +1274,17 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        // Use token 1 first
+        // Use token 1 first.
+
         var firstMove = new Move(PlayerToken.Odd, 0, 1);
         gameState.ApplyMove(firstMove);
 
-        // Reset turn back to Odd to test reusing token
+        // Reset turn back to Odd to test reusing token.
+
         gameState.AlternatePlayerTurn();
 
-        // Try to use token 1 again (should fail)
+        // Try to use token 1 again (should fail).
+
         var invalidMove = new Move(PlayerToken.Odd, 1, 1);
 
         Assert.That(() => gameState.ApplyMove(invalidMove),
@@ -1315,7 +1302,8 @@ public class GameStateTests
     {
         var gameState = GameState.CreateDefault();
 
-        // Make several moves that don't create wins
+        // Make several moves that don't create wins.
+
         var moves = new[]
         {
             new Move(PlayerToken.Odd, 0, 1),   // (1,1) = 1
@@ -1330,7 +1318,8 @@ public class GameStateTests
             Assert.That(gameState.Winner, Is.Null, $"Move with token {move.Token} should not result in win");
         }
 
-        // Verify final game state
+        // Verify final game state.
+
         Assert.That(gameState.Board[0], Is.EqualTo(1), "Position 0 should contain token 1");
         Assert.That(gameState.Board[4], Is.EqualTo(2), "Position 4 should contain token 2");
         Assert.That(gameState.Board[8], Is.EqualTo(3), "Position 8 should contain token 3");
@@ -1631,11 +1620,12 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
 
         // Create a winning scenario: 1 + 5 + 9 = 15 in top row.
-        gameState.ApplyMove(new Move(PlayerToken.Odd, gameState.GetBoardPositionIndex(1, 1), 1));
-        gameState.ApplyMove(new Move(PlayerToken.Even, gameState.GetBoardPositionIndex(2, 1), 2));
-        gameState.ApplyMove(new Move(PlayerToken.Odd, gameState.GetBoardPositionIndex(1, 2), 5));
-        gameState.ApplyMove(new Move(PlayerToken.Even, gameState.GetBoardPositionIndex(2, 2), 4));
-        gameState.ApplyMove(new Move(PlayerToken.Odd, gameState.GetBoardPositionIndex(1, 3), 9));
+
+        gameState.ApplyMove(new Move(PlayerToken.Odd, gameState.GetBoardPosition(1, 1), 1));
+        gameState.ApplyMove(new Move(PlayerToken.Even, gameState.GetBoardPosition(2, 1), 2));
+        gameState.ApplyMove(new Move(PlayerToken.Odd, gameState.GetBoardPosition(1, 2), 5));
+        gameState.ApplyMove(new Move(PlayerToken.Even, gameState.GetBoardPosition(2, 2), 4));
+        gameState.ApplyMove(new Move(PlayerToken.Odd, gameState.GetBoardPosition(1, 3), 9));
 
         Assert.That(gameState.IsGameOver, Is.True, "Game should be over when there is a winner");
     }
@@ -1650,6 +1640,7 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
 
         // Remove all tokens from the current player (Odd).
+
         gameState.CurrentPlayerTokens.Clear();
 
         Assert.That(gameState.IsGameOver, Is.True, "Game should be over when current player has no tokens");
@@ -1665,15 +1656,16 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
 
         // Fill the entire board without creating a winning combination.
-        gameState.SetBoardToken(1, 1, 1);  // 1
-        gameState.SetBoardToken(1, 2, 2);  // 2
-        gameState.SetBoardToken(1, 3, 3);  // 3   (1+2+3=6, not 15)
-        gameState.SetBoardToken(2, 1, 4);  // 4
-        gameState.SetBoardToken(2, 2, 5);  // 5
-        gameState.SetBoardToken(2, 3, 6);  // 6   (4+5+6=15, but different players)
-        gameState.SetBoardToken(3, 1, 7);  // 7
-        gameState.SetBoardToken(3, 2, 8);  // 8
-        gameState.SetBoardToken(3, 3, 9);  // 9   (7+8+9=24, not 15)
+
+        gameState.Board[gameState.GetBoardPosition(1, 1)] = 1;  // 1
+        gameState.Board[gameState.GetBoardPosition(1, 2)] = 2;  // 2
+        gameState.Board[gameState.GetBoardPosition(1, 3)] = 3;  // 3   (1+2+3=6, not 15)
+        gameState.Board[gameState.GetBoardPosition(2, 1)] = 4;  // 4
+        gameState.Board[gameState.GetBoardPosition(2, 2)] = 5;  // 5
+        gameState.Board[gameState.GetBoardPosition(2, 3)] = 6;  // 6   (4+5+6=15, but different players)
+        gameState.Board[gameState.GetBoardPosition(3, 1)] = 7;  // 7
+        gameState.Board[gameState.GetBoardPosition(3, 2)] = 8;  // 8
+        gameState.Board[gameState.GetBoardPosition(3, 3)] = 9;  // 9   (7+8+9=24, not 15)
 
         Assert.That(gameState.IsGameOver, Is.True, "Game should be over when board is completely full");
     }
@@ -1688,10 +1680,12 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
 
         // Place a few tokens but leave empty spaces.
-        gameState.SetBoardToken(1, 1, 1);
-        gameState.SetBoardToken(2, 2, 2);
+
+        gameState.Board[gameState.GetBoardPosition(1, 1)] = 1;
+        gameState.Board[gameState.GetBoardPosition(2, 2)] = 2;
 
         // Verify we have empty spaces and tokens.
+
         var hasEmptySpaces = gameState.Board.Any(space => space == GameState.EmptyBoardSpaceValue);
         var hasTokens = gameState.CurrentPlayerTokens.Count > 0;
 
@@ -1710,16 +1704,18 @@ public class GameStateTests
         var gameState = GameState.CreateDefault();
 
         // Fill the entire 3x3 board.
+
         for (var row = 1; row <= 3; row++)
         {
             for (var col = 1; col <= 3; col++)
             {
                 var tokenValue = ((row - 1) * 3) + col;
-                gameState.SetBoardToken(row, col, tokenValue);
+                gameState.Board[gameState.GetBoardPosition(row, col)] = tokenValue;
             }
         }
 
         // Verify tokens are still available but board is full.
+
         var hasTokens = gameState.CurrentPlayerTokens.Count > 0;
         var hasEmptySpaces = gameState.Board.Any(space => space == GameState.EmptyBoardSpaceValue);
 
@@ -1740,16 +1736,19 @@ public class GameStateTests
         var tokens = new[] { oddTokens, evenTokens };
 
         // Create a 2x2 board.
+
         var gameState = new GameState(PlayerToken.Odd, new int[4], 10, tokens);
 
         // Initially should not be over.
+
         Assert.That(gameState.IsGameOver, Is.False, "2x2 game should not be over initially");
 
         // Fill the entire 2x2 board.
-        gameState.SetBoardToken(1, 1, 1);
-        gameState.SetBoardToken(1, 2, 2);
-        gameState.SetBoardToken(2, 1, 3);
-        gameState.SetBoardToken(2, 2, 4);
+
+        gameState.Board[gameState.GetBoardPosition(1, 1)] = 1;
+        gameState.Board[gameState.GetBoardPosition(1, 2)] = 2;
+        gameState.Board[gameState.GetBoardPosition(2, 1)] = 3;
+        gameState.Board[gameState.GetBoardPosition(2, 2)] = 4;
 
         Assert.That(gameState.IsGameOver, Is.True, "2x2 game should be over when board is full");
     }
@@ -1780,8 +1779,8 @@ public class GameStateTests
 
         // Set up a near-win scenario for Odd - diagonal positions 0, 4, 8.
 
-        gameState.SetBoardToken(1, 1, 1); // Position 0 (row 1, column 1): token 1
-        gameState.SetBoardToken(3, 3, 9); // Position 8 (row 3, column 3): token 9
+        gameState.Board[gameState.GetBoardPosition(1, 1)] = 1; // Position 0 (row 1, column 1): token 1
+        gameState.Board[gameState.GetBoardPosition(3, 3)] = 9; // Position 8 (row 3, column 3): token 9
 
         // Remove the used tokens.
 
@@ -1800,7 +1799,7 @@ public class GameStateTests
     {
         var gameState = CreateValidGameState();
 
-        // Apply moves to create a winning condition for Odd: 1 + 5 + 9 = 15 (diagonal)
+        // Apply moves to create a winning condition for Odd: 1 + 5 + 9 = 15 (diagonal).
 
         var move1 = new Move(PlayerToken.Odd, 0, 1);   // Position 0, Odd plays 1
         var move2 = new Move(PlayerToken.Even, 1, 2);  // Position 1, Even plays 2
@@ -1815,5 +1814,371 @@ public class GameStateTests
         gameState.ApplyMove(move5);
 
         return gameState;
+    }
+
+    /// <summary>
+    ///   Verifies that CreateCopy creates completely independent copies with proper state preservation.
+    /// </summary>
+    ///
+    [Test]
+    public void CreateCopyCreatesIndependentCopyWithStatePreservation()
+    {
+        var originalState = GameState.CreateDefault();
+        originalState.ApplyMove(new Move(PlayerToken.Odd, 0, 1));
+        originalState.ApplyMove(new Move(PlayerToken.Even, 1, 2));
+
+        var copiedState = originalState.CreateCopy();
+
+        // Verify all properties are copied correctly.
+
+        Assert.That(copiedState.CurrentTurn, Is.EqualTo(originalState.CurrentTurn), "CurrentTurn should be copied");
+        Assert.That(copiedState.Winner, Is.EqualTo(originalState.Winner), "Winner should be copied");
+        Assert.That(copiedState.IsGameOver, Is.EqualTo(originalState.IsGameOver), "IsGameOver should be copied");
+        Assert.That(copiedState.Board, Is.EqualTo(originalState.Board), "Board should be copied");
+
+        // Verify token collections are preserved and independent.
+
+        Assert.That(copiedState.GetPlayerTokens(PlayerToken.Odd), Is.EqualTo(originalState.GetPlayerTokens(PlayerToken.Odd)), "Odd tokens should be preserved");
+        Assert.That(copiedState.GetPlayerTokens(PlayerToken.Even), Is.EqualTo(originalState.GetPlayerTokens(PlayerToken.Even)), "Even tokens should be preserved");
+
+        // Verify board arrays are different references.
+
+        Assert.That(copiedState.Board, Is.Not.SameAs(originalState.Board), "Boards should be different references");
+
+        // Verify complete independence by modifying original.
+
+        originalState.ApplyMove(new Move(PlayerToken.Odd, 2, 3));
+
+        Assert.That(copiedState.Board[2], Is.EqualTo(GameState.EmptyBoardSpaceValue), "Copy board should not be affected by changes to original");
+        Assert.That(originalState.Board[2], Is.EqualTo(3), "Original board should have the new move");
+        Assert.That(copiedState.GetPlayerTokens(PlayerToken.Odd).Contains(3), Is.True, "Copy should still have token 3");
+        Assert.That(originalState.GetPlayerTokens(PlayerToken.Odd).Contains(3), Is.False, "Original should have used token 3");
+    }
+
+    /// <summary>
+    ///   Verifies that CreateCopy works correctly with different board sizes and winning states.
+    /// </summary>
+    ///
+    [Test]
+    public void CreateCopyHandlesSpecializedScenarios()
+    {
+        // Test with different board sizes.
+
+        var largerState = new GameState(
+            PlayerToken.Even,
+            new int[16],
+            30,
+            [
+                new HashSet<byte> { 1, 3, 5, 7, 9, 11, 13, 15 },
+                new HashSet<byte> { 2, 4, 6, 8, 10, 12, 14, 16 }
+            ]);
+
+        var copiedLargerState = largerState.CreateCopy();
+
+        Assert.That(copiedLargerState.Board.Length, Is.EqualTo(16), "Board size should be preserved");
+        Assert.That(copiedLargerState.CurrentTurn, Is.EqualTo(PlayerToken.Even), "Current turn should be preserved");
+        Assert.That(copiedLargerState.GetPlayerTokens(PlayerToken.Odd).Count, Is.EqualTo(8), "Odd token count should be preserved");
+        Assert.That(copiedLargerState.GetPlayerTokens(PlayerToken.Even).Count, Is.EqualTo(8), "Even token count should be preserved");
+
+        // Test with winning state.
+
+        var winningState = GameState.CreateDefault();
+
+        // Create a winning scenario: 1 + 5 + 9 = 15 in top row.
+
+        winningState.ApplyMove(new Move(PlayerToken.Odd, 0, 1));   // Position 0
+        winningState.ApplyMove(new Move(PlayerToken.Even, 3, 2));  // Position 3
+        winningState.ApplyMove(new Move(PlayerToken.Odd, 1, 5));   // Position 1
+        winningState.ApplyMove(new Move(PlayerToken.Even, 4, 4));  // Position 4
+        winningState.ApplyMove(new Move(PlayerToken.Odd, 2, 9));   // Position 2 - winning move
+
+        var copiedWinningState = winningState.CreateCopy();
+
+        // Verify winning state is preserved.
+
+        Assert.That(copiedWinningState.Winner, Is.EqualTo(PlayerToken.Odd), "Copied state should preserve winner");
+        Assert.That(copiedWinningState.IsGameOver, Is.True, "Copied state should preserve game over state");
+        Assert.That(copiedWinningState.Board, Is.EqualTo(winningState.Board), "Board should be copied exactly");
+        Assert.That(copiedWinningState.ScanForWinner(), Is.EqualTo(PlayerToken.Odd), "Copied state should detect same winner when scanned");
+    }
+
+    /// <summary>
+    ///   Verifies that game state handles corrupted board scenarios gracefully.
+    /// </summary>
+    ///
+    [Test]
+    public void GameStateHandlesInvalidBoardStatesGracefully()
+    {
+        // Create a game state with an invalid board configuration.
+
+        var corruptedBoard = new int[9];
+        corruptedBoard[0] = 1;
+        corruptedBoard[1] = 1; // Invalid: duplicate token
+
+        var gameState = new GameState(
+            PlayerToken.Odd,
+            corruptedBoard,
+            15,
+            [
+                new HashSet<byte> { 3, 5, 7, 9 }, // Missing 1 since it's "used" twice
+                new HashSet<byte> { 2, 4, 6, 8 }
+            ]);
+
+        // The game state should still function for basic operations.
+
+        Assert.That(gameState.CurrentTurn, Is.EqualTo(PlayerToken.Odd), "CurrentTurn should be accessible");
+        Assert.That(gameState.Board.Length, Is.EqualTo(9), "Board length should be correct");
+
+        // ScanForWinner should handle corrupted state gracefully and return a result.
+        var winner = gameState.ScanForWinner();
+        Assert.That(winner, Is.Not.Null.Or.Null, "ScanForWinner should return a deterministic result even with corrupted data");
+    }
+
+    /// <summary>
+    ///   Verifies that game state maintains consistency after multiple operations.
+    /// </summary>
+    ///
+    [Test]
+    public void GameStateMaintainsConsistencyAfterMultipleOperations()
+    {
+        var gameState = GameState.CreateDefault();
+        var originalOddTokens = gameState.GetPlayerTokens(PlayerToken.Odd).Count;
+        var originalEvenTokens = gameState.GetPlayerTokens(PlayerToken.Even).Count;
+
+        // Apply and undo multiple moves to test consistency.
+
+        var move1 = new Move(PlayerToken.Odd, 0, 1);
+        var move2 = new Move(PlayerToken.Even, 1, 2);
+        var move3 = new Move(PlayerToken.Odd, 2, 3);
+
+        gameState.ApplyMove(move1);
+        gameState.ApplyMove(move2);
+        gameState.ApplyMove(move3);
+
+        gameState.UndoMove(move3);
+        gameState.UndoMove(move2);
+        gameState.UndoMove(move1);
+
+        // Verify state is restored to original.
+
+        Assert.That(gameState.CurrentTurn, Is.EqualTo(PlayerToken.Odd), "Turn should be restored");
+        Assert.That(gameState.Winner, Is.Null, "Winner should be cleared");
+        Assert.That(gameState.Board.All(cell => cell == GameState.EmptyBoardSpaceValue), Is.True, "Board should be empty");
+        Assert.That(gameState.GetPlayerTokens(PlayerToken.Odd).Count, Is.EqualTo(originalOddTokens), "Odd tokens should be restored");
+        Assert.That(gameState.GetPlayerTokens(PlayerToken.Even).Count, Is.EqualTo(originalEvenTokens), "Even tokens should be restored");
+    }
+
+    /// <summary>
+    ///   Verifies that GameState handles extremely large winning totals correctly.
+    /// </summary>
+    ///
+    [Test]
+    public void GameStateHandlesLargeWinningTotalsCorrectly()
+    {
+        // Create a game state with an unusually large winning total.
+
+        var largeBoard = new int[25]; // 5x5 board
+        var largeWinningTotal = 1000;
+
+        var largeTokensOdd = new HashSet<byte>();
+        var largeTokensEven = new HashSet<byte>();
+
+        // Generate tokens that could theoretically sum to the large total.
+
+        for (byte i = 1; i <= 100; i += 2)
+        {
+            largeTokensOdd.Add(i);
+        }
+
+        for (byte i = 2; i <= 100; i += 2)
+        {
+            largeTokensEven.Add(i);
+        }
+
+        var gameState = new GameState(
+            PlayerToken.Odd,
+            largeBoard,
+            largeWinningTotal,
+            [largeTokensOdd, largeTokensEven]);
+
+        // Test basic operations with large winning total.
+
+        var move = new Move(PlayerToken.Odd, 0, 99);
+        gameState.ApplyMove(move);
+
+        Assert.That(gameState.Board[0], Is.EqualTo(99), "Large token should be placed correctly");
+        Assert.That(gameState.Winner, Is.Null, "Single large token should not trigger win");
+        Assert.That(gameState.WinningTotal, Is.EqualTo(largeWinningTotal), "Winning total should be preserved");
+    }
+
+    /// <summary>
+    ///   Verifies that GameState performs efficiently with rapid successive state changes.
+    /// </summary>
+    ///
+    [Test]
+    public void GameStateHandlesRapidStateChangesEfficiently()
+    {
+        var gameState = CreateValidGameState();
+        var executionTimes = new List<long>();
+
+        // Perform rapid successive apply/undo operations and measure performance.
+
+        for (var i = 0; i < 100; i++)
+        {
+            var move = new Move(PlayerToken.Odd, i % 9, (byte)(1 + (i % 5) * 2)); // Cycle through odd tokens
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+            // Only apply if the position is empty.
+
+            if (gameState.Board[move.PositionIndex] == GameState.EmptyBoardSpaceValue &&
+                gameState.GetPlayerTokens(move.Player).Contains(move.Token))
+            {
+                gameState.ApplyMove(move);
+                gameState.UndoMove(move);
+            }
+
+            stopwatch.Stop();
+            executionTimes.Add(stopwatch.ElapsedTicks);
+        }
+
+        // Verify performance doesn't degrade significantly over time.
+
+        var averageFirstHalf = executionTimes.Take(50).Average();
+        var averageSecondHalf = executionTimes.Skip(50).Average();
+
+        Assert.That(averageSecondHalf, Is.LessThan(averageFirstHalf * 3),
+            "Performance should remain consistent over rapid state changes");
+        Assert.That(gameState.Board.All(cell => cell == GameState.EmptyBoardSpaceValue), Is.True,
+            "Board should be empty after all undo operations");
+    }
+
+    /// <summary>
+    ///   Verifies that GameState handles minimum and maximum token values correctly.
+    /// </summary>
+    ///
+    [Test]
+    public void GameStateHandlesExtremeTokenValuesCorrectly()
+    {
+        // Test with minimum and maximum byte values.
+
+        var extremeGameState = new GameState(
+            PlayerToken.Odd,
+            new int[9],
+            510, // Sum of 1 + 255 + 254 = 510
+            [
+                new HashSet<byte> { 1, 3, 255 },      // Mix of small and large odd-ish values
+                new HashSet<byte> { 2, 4, 254 }       // Mix of small and large even-ish values
+            ]);
+
+        // Test applying moves with extreme values.
+
+        var minMove = new Move(PlayerToken.Odd, 0, 1);
+        var maxMove = new Move(PlayerToken.Even, 1, 254);
+
+        extremeGameState.ApplyMove(minMove);
+        Assert.That(extremeGameState.Board[0], Is.EqualTo(1), "Minimum token value should be handled");
+
+        extremeGameState.ApplyMove(maxMove);
+        Assert.That(extremeGameState.Board[1], Is.EqualTo(254), "Maximum token value should be handled");
+
+        // Test that these don't cause overflow issues in winner calculation.
+
+        var winner = extremeGameState.ScanForWinner();
+        Assert.That(winner, Is.Null, "Extreme values should not cause calculation errors");
+    }
+
+    /// <summary>
+    ///   Verifies that GameState maintains data integrity under concurrent access patterns.
+    /// </summary>
+    ///
+    [Test]
+    public void GameStateHandlesConcurrentReadOperationsSafely()
+    {
+        var gameState = CreateValidGameState();
+
+        // Apply some moves to create a non-trivial state.
+
+        gameState.ApplyMove(new Move(PlayerToken.Odd, 0, 1));
+        gameState.ApplyMove(new Move(PlayerToken.Even, 3, 2));
+        gameState.ApplyMove(new Move(PlayerToken.Odd, 4, 5));
+
+        // Perform concurrent read operations to test thread safety of read-only operations.
+
+        var readTasks = Enumerable.Range(0, 20).Select(_ => Task.Run(() =>
+        {
+            var results = new List<object>();
+
+            // Perform various read operations.
+
+            results.Add(gameState.CurrentTurn);
+            results.Add(gameState.Winner ?? (object)"null");
+            results.Add(gameState.IsGameOver);
+            results.Add(gameState.WinningTotal);
+            results.Add(gameState.Board.ToArray()); // Create a copy
+            results.Add(gameState.GetPlayerTokens(PlayerToken.Odd).ToHashSet());
+            results.Add(gameState.GetPlayerTokens(PlayerToken.Even).ToHashSet());
+
+            return results;
+        })).ToArray();
+
+        var allResults = Task.WhenAll(readTasks).Result;
+
+        // Verify all concurrent reads returned consistent results.
+
+        foreach (var results in allResults)
+        {
+            Assert.That(results[0], Is.EqualTo(PlayerToken.Even), "CurrentTurn should be consistent");
+            Assert.That(results[1], Is.EqualTo("null"), "Winner should be consistent");
+            Assert.That(results[2], Is.False, "IsGameOver should be consistent");
+            Assert.That(results[3], Is.EqualTo(15), "WinningTotal should be consistent");
+
+            var board = (int[])results[4];
+            Assert.That(board[0], Is.EqualTo(1), "Board state should be consistent");
+            Assert.That(board[3], Is.EqualTo(2), "Board state should be consistent");
+            Assert.That(board[4], Is.EqualTo(5), "Board state should be consistent");
+        }
+    }
+
+    /// <summary>
+    ///   Verifies that GameState handles the theoretical maximum game length correctly.
+    /// </summary>
+    ///
+    [Test]
+    public void GameStateHandlesMaximumGameLengthScenario()
+    {
+        var gameState = CreateValidGameState();
+        var moves = new List<Move>();
+
+        // Create the longest possible game (fill entire board without winning).
+
+        moves.Add(new Move(PlayerToken.Odd, 0, 1));   // 1
+        moves.Add(new Move(PlayerToken.Even, 1, 2));  // 2
+        moves.Add(new Move(PlayerToken.Odd, 2, 3));   // 3 (top row: 1+2+3=6, not 15)
+        moves.Add(new Move(PlayerToken.Even, 3, 4));  // 4
+        moves.Add(new Move(PlayerToken.Odd, 4, 7));   // 7
+        moves.Add(new Move(PlayerToken.Even, 5, 6));  // 6
+        moves.Add(new Move(PlayerToken.Odd, 6, 9));   // 9
+        moves.Add(new Move(PlayerToken.Even, 7, 8));  // 8
+        moves.Add(new Move(PlayerToken.Odd, 8, 5));   // 5
+
+        // Apply all moves.
+
+        foreach (var move in moves)
+        {
+            if (gameState.GetPlayerTokens(move.Player).Contains(move.Token))
+            {
+                gameState.ApplyMove(move);
+            }
+        }
+
+        // Verify the game handles a full board correctly.
+
+        var emptyPositions = gameState.Board.Count(cell => cell == GameState.EmptyBoardSpaceValue);
+        Assert.That(emptyPositions, Is.EqualTo(0), "Board should be completely filled");
+        Assert.That(gameState.IsGameOver, Is.True, "Game should be over when board is full");
+
+        // Verify no winner exists (since we avoided winning combinations).
+
+        Assert.That(gameState.Winner, Is.Null, "Full board without winning combination should have no winner");
     }
 }

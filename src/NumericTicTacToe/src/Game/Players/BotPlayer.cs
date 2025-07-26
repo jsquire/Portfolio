@@ -178,6 +178,7 @@ public class BotPlayer : IPlayer
                         {
                             var (currentState, currentIndex, currentToken) = ((GameState, int, byte))state!;
                             var move = new Move(currentState.CurrentTurn, currentIndex, currentToken);
+
                             return ScoreMove(move, currentState, currentState.CurrentTurn, currentDepth + 1, maxLookAhead, int.MinValue, int.MaxValue, baseScore, scoredMoves, cancellationToken);
 
                         }, (gameState.CreateCopy(), index, token), cancellationToken);
@@ -214,8 +215,7 @@ public class BotPlayer : IPlayer
         return scoredMoves
             .Where(scoredMove => scoredMove.Key.Player == gameState.CurrentTurn)
             .GroupBy(static scoredMove => scoredMove.Value)
-            .OrderByDescending(static group => group.Key)
-            .First()
+            .MaxBy(static group => group.Key)!
             .OrderBy(static _ => Random.Shared.Next())
             .First()
             .Key;
@@ -422,26 +422,62 @@ public class BotPlayer : IPlayer
     ///
     private static Move? CalculateWinningMove(GameState gameState)
     {
-        // Attempt to see if any of the current player's tokens can win the game.
-
         var board = gameState.Board;
 
-        for (var index = 0; index < board.Length; ++index)
+        // Because it will be scanned repeatedly, avoid the overhead of allocating
+        // a new enumerator for the current player's tokens for each line by copying
+        // them to a stack-allocated span.
+
+        var currentPlayerTokens = (Span<byte>)stackalloc byte[gameState.CurrentPlayerTokens.Count];
+        var index = 0;
+
+        foreach (var token in gameState.CurrentPlayerTokens)
         {
-            if (board[index] == GameState.EmptyBoardSpaceValue)
+            currentPlayerTokens[index++] = token;
+        }
+
+        // Attempt to see if any of the current player's tokens can win the game.
+
+        foreach (var line in gameState.WinningLines)
+        {
+            var emptyIndex = -1;
+            var value = 0;
+            var sum = 0;
+
+            for (index = 0; index < line.Length; ++index)
             {
-                foreach (var token in gameState.CurrentPlayerTokens)
+                value = board[line[index]];
+
+                if (value == GameState.EmptyBoardSpaceValue)
                 {
-                    gameState.Board[index] = token;
-                    var winner = gameState.ScanForWinner();
+                    // If there is already an empty space, this line cannot be a winning move.
 
-                    gameState.Board[index] = GameState.EmptyBoardSpaceValue;
-
-                    // If this turn wins the game for the current player, make the move.
-
-                    if (winner == gameState.CurrentTurn)
+                    if (emptyIndex != -1)
                     {
-                        return new Move(gameState.CurrentTurn, index, token);
+                        emptyIndex = -1;
+                        break;
+                    }
+
+                    emptyIndex = line[index];
+                }
+                else
+                {
+                    sum += value;
+                }
+            }
+
+            // If there is a single empty space, determine if one of the current player's
+            // tokens can win.
+
+            if (emptyIndex != -1)
+            {
+                foreach (var token in currentPlayerTokens)
+                {
+                    // If the sum of the line plus the token equals the winning value, this is a winning move.
+
+                    if (sum + token == gameState.WinningTotal)
+                    {
+                        return new Move(gameState.CurrentTurn, emptyIndex, token);
                     }
                 }
             }
