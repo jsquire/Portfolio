@@ -2,7 +2,37 @@
 
 This document provides guidelines for GitHub Copilot when working on C# projects. These instructions help maintain consistency with established codebase standards, conventions, and architectural patterns.
 
+## General Instructions for Copilot Responses
+
+- Provide concise, focused explanations without unnecessary elaboration.
+- When analyzing images, first describe exactly what is visually present before conducting any web-based research.
+- Cross-check all details with both the image and external sources to ensure accuracy.
+- Clearly explain your reasoning by verifying claims step by step.
+- Avoid hallucinations at all costs—only respond with grounded, verifiable information.
+
 ## Code Standards & Conventions
+
+### .NET Performance and Memory Allocation Guidelines
+
+**CRITICAL: Never dismiss allocation concerns as "negligible" or assume garbage collection is "effortless."**
+
+Modern .NET performance best practices emphasize **allocation reduction** as a primary optimization strategy:
+
+- **Gen0 collections have real costs** - CPU overhead and pause times that accumulate
+- **Allocation rate often matters more than allocation size** - frequent small allocations can be more problematic than occasional large ones
+- **Use allocation-reducing patterns** when appropriate:
+  - `Span<T>` and `Memory<T>` for temporary data
+  - `ArrayPool<T>` for reusable buffers
+  - `stackalloc` for small, short-lived arrays
+  - Avoid unnecessary LINQ chains that create intermediate collections
+
+**When evaluating allocation trade-offs:**
+- Consider the allocation frequency and context
+- Measure actual performance impact when in doubt
+- Acknowledge that allocation reduction is a legitimate optimization concern
+- Balance allocation concerns with code maintainability appropriately
+
+**Never suggest that garbage collection "handles allocations effortlessly" - this contradicts fundamental .NET
 
 ### C# Language Features
 

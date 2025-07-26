@@ -1,7 +1,4 @@
-using System;
 using System.Collections.Concurrent;
-using System.Diagnostics;
-using System.Reflection;
 using Squire.NumTic.Contracts;
 
 namespace Squire.NumTic.Players;
@@ -157,6 +154,8 @@ public class BotPlayer : IPlayer
         }
 
         var board = gameState.Board;
+        var baseScore = Math.Max(1000, maxLookAhead * 100);
+
         var firstMove = default(Move?);
         var scoredMoves = new ConcurrentDictionary<Move, int>();
         var tasks = new List<Task<int>>();
@@ -179,7 +178,7 @@ public class BotPlayer : IPlayer
                         {
                             var (currentState, currentIndex, currentToken) = ((GameState, int, byte))state!;
                             var move = new Move(currentState.CurrentTurn, currentIndex, currentToken);
-                            return ScoreMove(move, currentState, currentState.CurrentTurn, currentDepth + 1, maxLookAhead, int.MinValue, int.MaxValue, scoredMoves, cancellationToken);
+                            return ScoreMove(move, currentState, currentState.CurrentTurn, currentDepth + 1, maxLookAhead, int.MinValue, int.MaxValue, baseScore, scoredMoves, cancellationToken);
 
                         }, (gameState.CreateCopy(), index, token), cancellationToken);
 
@@ -204,6 +203,7 @@ public class BotPlayer : IPlayer
                 maxLookAhead,
                 int.MinValue,
                 int.MaxValue,
+                baseScore,
                 scoredMoves,
                 cancellationToken)));
 
@@ -212,10 +212,11 @@ public class BotPlayer : IPlayer
         _ = await Task.WhenAll(tasks).ConfigureAwait(false);
 
         return scoredMoves
-            .GroupBy(scoredMove => scoredMove.Value)
-            .OrderByDescending(group => group.Key)
+            .Where(scoredMove => scoredMove.Key.Player == gameState.CurrentTurn)
+            .GroupBy(static scoredMove => scoredMove.Value)
+            .OrderByDescending(static group => group.Key)
             .First()
-            .OrderBy(_ => Random.Shared.Next())
+            .OrderBy(static _ => Random.Shared.Next())
             .First()
             .Key;
     }
@@ -232,6 +233,7 @@ public class BotPlayer : IPlayer
     /// <param name="maxDepth">The maximum recursive depth allowed when evaluating future moves.</param>
     /// <param name="currentBestScoreForDesiredPlayer">The best score guaranteed for the desired player so far in the current search path.</param>
     /// <param name="currentWorstScoreForOpponent">The worst score the opponent will tolerate before choosing a different path.</param>
+    /// <param name="baseScore">The number to use as the basis for scoring before win/lose adjustments are applied.</param>
     /// <param name="scoredMoves">The set of moves that have been scored. This set will be mutated by this call.</param>
     /// <param name="cancellationToken">A token that can be used to signal a request for cancellation.</param>
     ///
@@ -257,6 +259,7 @@ public class BotPlayer : IPlayer
                                  int maxDepth,
                                  int currentBestScoreForDesiredPlayer,
                                  int currentWorstScoreForOpponent,
+                                 int baseScore,
                                  ConcurrentDictionary<Move, int> scoredMoves,
                                  CancellationToken cancellationToken)
     {
@@ -293,7 +296,14 @@ public class BotPlayer : IPlayer
 
             if (winningNext is not null)
             {
-                var score = winningNext.Value.Player == desiredWinner ? 1 : -1;
+                // A winning move for the desired player is more appealing the earlier it can
+                // be made.  Likewise, the earlier an opponent wins, the more important it is
+                // to avoid that branch.  Adjust the score based on the current depth in the
+                // search tree to capture that.
+
+                var score = winningNext.Value.Player == desiredWinner
+                    ? baseScore + (maxDepth - currentDepth)
+                    : -(baseScore - (maxDepth - currentDepth));
 
                 _ = scoredMoves.TryAdd(move, score);
                 return score;
@@ -311,16 +321,28 @@ public class BotPlayer : IPlayer
 
             cancellationToken.ThrowIfCancellationRequested();
 
+            // Because the game state is mutable, a copy of the current player's tokens must be made
+            // to avoid the loop iteration being impacted by state changes made by the recursive calls
+            // when evaluating moves.
+
+            var playerTokens = (Span<byte>)stackalloc byte[gameState.CurrentPlayerTokens.Count];
+            var index = 0;
+
+            foreach (var token in gameState.CurrentPlayerTokens)
+            {
+                playerTokens[index++] = token;
+            }
+
             // Evaluate the possible follow-up moves from this position.
 
             var board = gameState.Board;
             var shouldContinueSearching = true;
 
-            for (var index = 0; index < board.Length; ++index)
+            for (index = 0; index < board.Length; ++index)
             {
                 if (board[index] == GameState.EmptyBoardSpaceValue)
                 {
-                    foreach (var token in gameState.CurrentPlayerTokens)
+                    foreach (var token in playerTokens)
                     {
                         var nextMove = new Move(gameState.CurrentTurn, index, token);
 
@@ -332,6 +354,7 @@ public class BotPlayer : IPlayer
                             maxDepth,
                             currentBestScoreForDesiredPlayer,
                             currentWorstScoreForOpponent,
+                            baseScore,
                             scoredMoves,
                             cancellationToken);
 
