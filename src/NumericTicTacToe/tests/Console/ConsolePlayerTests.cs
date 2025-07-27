@@ -156,7 +156,7 @@ public class ConsolePlayerTests
     private static GameState CreateValidGameState() =>
         new GameState(
             PlayerToken.Odd,
-            new int[9],
+            new byte[9],
             15,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9 },
@@ -316,7 +316,7 @@ public class ConsolePlayerTests
     private static GameState CreateLargerGameState() =>
         new GameState(
             PlayerToken.Odd,
-            new int[16],
+            new byte[16],
             20,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9, 11, 13, 15 },

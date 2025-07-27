@@ -295,7 +295,7 @@ public class GameTests
 
         var customState = new GameState(
             PlayerToken.Even,
-            new int[9], // Empty board
+            new byte[9], // Empty board
             15,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9 }, // Odd player tokens
@@ -340,7 +340,7 @@ public class GameTests
 
         var state1 = new GameState(
             PlayerToken.Odd,
-            new int[9],
+            new byte[9],
             15,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9 },
@@ -350,7 +350,7 @@ public class GameTests
 
         var state2 = new GameState(
             PlayerToken.Even,
-            new int[9],
+            new byte[9],
             21,
             [
                 new HashSet<byte> { 9, 7, 5, 3, 1 },

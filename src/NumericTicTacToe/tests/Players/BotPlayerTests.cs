@@ -463,7 +463,7 @@ public class BotPlayerTests
     private static GameState CreateValidGameState() =>
         new GameState(
             PlayerToken.Odd,
-            new int[9],
+            new byte[9],
             15,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9 },
@@ -762,7 +762,7 @@ public class BotPlayerTests
 
         var minimalGameState = new GameState(
             PlayerToken.Odd,
-            new int[9],
+            new byte[9],
             15,
             [
                 new HashSet<byte> { 1 },  // Only one token for Odd
