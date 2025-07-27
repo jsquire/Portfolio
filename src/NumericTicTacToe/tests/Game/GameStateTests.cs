@@ -104,7 +104,7 @@ public class GameStateTests
     [Test]
     public void GameStateWithCustomValuesRetainsCorrectState()
     {
-        var customBoard = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+        var customBoard = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         var customOddTokens = new HashSet<byte> { 1, 5, 9 };
         var customEvenTokens = new HashSet<byte> { 2, 6 };
         var customTokens = new HashSet<byte>[] { customOddTokens, customEvenTokens };
@@ -156,7 +156,7 @@ public class GameStateTests
     public void GameStateHandlesEmptyTokenSetsGracefully()
     {
         var emptyTokens = new HashSet<byte>[] { new HashSet<byte>(), new HashSet<byte>() };
-        var gameState = new GameState(PlayerToken.Odd, new int[9], 15, emptyTokens);
+        var gameState = new GameState(PlayerToken.Odd, new byte[9], 15, emptyTokens);
         var currentTokens = gameState.CurrentPlayerTokens;
         var oddTokens = gameState.GetPlayerTokens(PlayerToken.Odd);
         var evenTokens = gameState.GetPlayerTokens(PlayerToken.Even);
@@ -408,7 +408,7 @@ public class GameStateTests
 
         var largerGameState = new GameState(
             PlayerToken.Odd,
-            new int[16],
+            new byte[16],
             30,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9, 11, 13, 15 },
@@ -466,7 +466,7 @@ public class GameStateTests
     {
         Assert.That(() => new GameState(
             PlayerToken.Odd,
-            new int[boardSize],
+            new byte[boardSize],
             15,
             [
                 new HashSet<byte> { 1, 3, 5 },
@@ -498,7 +498,7 @@ public class GameStateTests
     {
         // Create a board with a winning row (1 + 5 + 9 = 15).
 
-        var board = new int[]
+        var board = new byte[]
         {
             1, 5, 9,
             0, 0, 0,
@@ -525,7 +525,7 @@ public class GameStateTests
     [TestCase(16, null)]
     public void GetWinnerWorksForDifferentBoardSizes(int boardSize, PlayerToken? expectedResult)
     {
-        var gameState = new GameState(PlayerToken.Odd, new int[boardSize], 15, [new HashSet<byte> { 1, 3, 5 }, new HashSet<byte> { 2, 4, 6 }]);
+        var gameState = new GameState(PlayerToken.Odd, new byte[boardSize], 15, [new HashSet<byte> { 1, 3, 5 }, new HashSet<byte> { 2, 4, 6 }]);
         var winner = gameState.ScanForWinner();
 
         Assert.That(winner, Is.EqualTo(expectedResult), $"GetWinner should return {expectedResult} for {boardSize}-element board");
@@ -538,7 +538,7 @@ public class GameStateTests
     [Test]
     public void GetWinnerIdentifiesDiagonalVictory()
     {
-        var board = new int[]
+        var board = new byte[]
         {
             1, 0, 0,  // Main diagonal: 1 + 5 + 9 = 15.
             0, 5, 0,
@@ -558,7 +558,7 @@ public class GameStateTests
     [Test]
     public void GetWinnerIdentifiesColumnVictory()
     {
-        var board = new int[]
+        var board = new byte[]
         {
             1, 0, 0,  // First column: 1 + 5 + 9 = 15.
             5, 0, 0,
@@ -591,7 +591,7 @@ public class GameStateTests
     [Test]
     public void GetWinnerReturnsNullForPartialGameWithNoWinner()
     {
-        var board = new int[]
+        var board = new byte[]
         {
             1, 2, 0,  // Partial game, no winning combination.
             3, 0, 0,
@@ -774,7 +774,7 @@ public class GameStateTests
     [Test]
     public void GetWinnerReturnNullWhenSumIsCloseButNotEqualToWinningTotal()
     {
-        var board = new int[]
+        var board = new byte[]
         {
             1, 2, 0,  // Top row: 1 + 2 + 11 = 14 (one less than 15)
             0, 0, 0,
@@ -795,7 +795,7 @@ public class GameStateTests
     [Test]
     public void ScanForWinnerReturnNullWhenSumEqualsWinningTotalButLineIncomplete()
     {
-        var board = new int[]
+        var board = new byte[]
         {
             7, 8, 0,  // Top row: 7 + 8 + 0 = 15, but third square is empty
             0, 0, 0,
@@ -815,7 +815,7 @@ public class GameStateTests
     [Test]
     public void ScanForWinnerReturnNullForPartialDiagonalSummingTo15()
     {
-        var board = new int[]
+        var board = new byte[]
         {
             6, 0, 0,  // Main diagonal: 6 + 9 + 0 = 15, but third square is empty
             0, 9, 0,
@@ -835,7 +835,7 @@ public class GameStateTests
     [Test]
     public void ScanForWinnerReturnNullForPartialColumnSummingTo15()
     {
-        var board = new int[]
+        var board = new byte[]
         {
             4, 0, 0,  // First column: 4 + 0 + 11 = 15, but middle square is empty
             0, 0, 0,
@@ -1034,7 +1034,7 @@ public class GameStateTests
     {
         var largerGameState = new GameState(
             PlayerToken.Odd,
-            new int[16],
+            new byte[16],
             30,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9, 11, 13, 15 },
@@ -1710,7 +1710,7 @@ public class GameStateTests
             for (var col = 1; col <= 3; col++)
             {
                 var tokenValue = ((row - 1) * 3) + col;
-                gameState.Board[gameState.GetBoardPosition(row, col)] = tokenValue;
+                gameState.Board[gameState.GetBoardPosition(row, col)] = (byte)tokenValue;
             }
         }
 
@@ -1737,7 +1737,7 @@ public class GameStateTests
 
         // Create a 2x2 board.
 
-        var gameState = new GameState(PlayerToken.Odd, new int[4], 10, tokens);
+        var gameState = new GameState(PlayerToken.Odd, new byte[4], 10, tokens);
 
         // Initially should not be over.
 
@@ -1760,7 +1760,7 @@ public class GameStateTests
     private static GameState CreateValidGameState() =>
         new GameState(
             PlayerToken.Odd,
-            new int[9],
+            new byte[9],
             15,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9 },
@@ -1866,7 +1866,7 @@ public class GameStateTests
 
         var largerState = new GameState(
             PlayerToken.Even,
-            new int[16],
+            new byte[16],
             30,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9, 11, 13, 15 },
@@ -1911,7 +1911,7 @@ public class GameStateTests
     {
         // Create a game state with an invalid board configuration.
 
-        var corruptedBoard = new int[9];
+        var corruptedBoard = new byte[9];
         corruptedBoard[0] = 1;
         corruptedBoard[1] = 1; // Invalid: duplicate token
 
@@ -1977,7 +1977,7 @@ public class GameStateTests
     {
         // Create a game state with an unusually large winning total.
 
-        var largeBoard = new int[25]; // 5x5 board
+        var largeBoard = new byte[25]; // 5x5 board
         var largeWinningTotal = 1000;
 
         var largeTokensOdd = new HashSet<byte>();
@@ -2063,7 +2063,7 @@ public class GameStateTests
 
         var extremeGameState = new GameState(
             PlayerToken.Odd,
-            new int[9],
+            new byte[9],
             510, // Sum of 1 + 255 + 254 = 510
             [
                 new HashSet<byte> { 1, 3, 255 },      // Mix of small and large odd-ish values
@@ -2132,7 +2132,7 @@ public class GameStateTests
             Assert.That(results[2], Is.False, "IsGameOver should be consistent");
             Assert.That(results[3], Is.EqualTo(15), "WinningTotal should be consistent");
 
-            var board = (int[])results[4];
+            var board = (byte[])results[4];
             Assert.That(board[0], Is.EqualTo(1), "Board state should be consistent");
             Assert.That(board[3], Is.EqualTo(2), "Board state should be consistent");
             Assert.That(board[4], Is.EqualTo(5), "Board state should be consistent");

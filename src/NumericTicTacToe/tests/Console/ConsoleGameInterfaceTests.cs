@@ -158,7 +158,7 @@ public class ConsoleGameInterfaceTests
     private static GameState CreateValidGameState() =>
         new GameState(
             PlayerToken.Odd,
-            new int[9],
+            new byte[9],
             15,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9 },
@@ -171,7 +171,7 @@ public class ConsoleGameInterfaceTests
     ///
     private static GameState CreateGameStateWithMoves()
     {
-        var board = new int[9];
+        var board = new byte[9];
         board[0] = 1; // Player Odd placed 1 at position (1,1)
         board[4] = 4; // Player Even placed 4 at position (2,2)
         board[8] = 9; // Player Odd placed 9 at position (3,3)
@@ -192,7 +192,7 @@ public class ConsoleGameInterfaceTests
     ///
     private static GameState CreateWinningGameState()
     {
-        var board = new int[9];
+        var board = new byte[9];
         board[0] = 1; // (1,1)
         board[1] = 5; // (1,2)
         board[2] = 9; // (1,3) - Winning row: 1 + 5 + 9 = 15
@@ -223,7 +223,7 @@ public class ConsoleGameInterfaceTests
 
         // Create a large 10x10 board to test rendering performance and correctness.
 
-        var largeBoard = new int[100];
+        var largeBoard = new byte[100];
         var largeGameState = new GameState(
             PlayerToken.Odd,
             largeBoard,

@@ -15,13 +15,13 @@ namespace Squire.NumTic;
 public record GameState
 {
     /// <summary>The token that represents an empty board space.</summary>
-    public static readonly int EmptyBoardSpaceValue = default;
+    public static readonly byte EmptyBoardSpaceValue = default;
 
     /// <summary>The default tokens per row in a standard 3x3 game of tic-tac-toe.</summary>
     private const int DefaultTokensPerRow = 3;
 
     /// <summary>The default winning set of lines on a standard 3x3 game of tic-tac-toe board that need to be scanned for winning conditions.</summary>
-    private static readonly int[][] DefaultWinningCombinations = ComputeWinningCombinations(DefaultTokensPerRow);
+    private static readonly int[][] DefaultWinningLines = ComputeWinningLines(DefaultTokensPerRow);
 
     /// <summary>
     ///   Identifies the player who is next to play a turn.  This member is mutable and its
@@ -64,7 +64,6 @@ public record GameState
     ///
     public int[][] WinningLines { get; init; }
 
-
     /// <summary>
     ///   The board for a game of numeric tic-tac-toe.  The underlying data
     ///   is mutable and its value will change as the game progresses.
@@ -74,7 +73,7 @@ public record GameState
     ///   The game board represented as a 1-dimensional array.
     /// </value>
     ///
-    public int[] Board { get; init; }
+    public byte[] Board { get; init; }
 
     /// <summary>
     ///   The total that a winning row, column, or diagonal
@@ -111,7 +110,7 @@ public record GameState
     /// <exception cref="InvalidOperationException">Occurs when the board is not a perfect square.</exception>
     ///
     public GameState(PlayerToken startingTurn,
-                     int[] board,
+                     byte[] board,
                      int winningTotal,
                      HashSet<byte>[] tokens)
     {
@@ -135,8 +134,8 @@ public record GameState
 
         WinningLines = expectedTokensPerRow switch
         {
-            DefaultTokensPerRow => DefaultWinningCombinations,
-            _ => ComputeWinningCombinations(expectedTokensPerRow)
+            DefaultTokensPerRow => DefaultWinningLines,
+            _ => ComputeWinningLines(expectedTokensPerRow)
         };
     }
 
@@ -383,7 +382,8 @@ public record GameState
     ///
     /// <returns><c>true</c> if at least one empty space remains on the board; otherwise, <c>false</c>.</returns>
     ///
-    private static bool AreEmptySpaces(int[] board)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool AreEmptySpaces(byte[] board)
     {
         // Check if there are any empty spaces left on the board.
 
@@ -430,7 +430,7 @@ public record GameState
     ///   a square.
     /// </remarks>
     ///
-    private static int[][] ComputeWinningCombinations(int tokensPerRow)
+    private static int[][] ComputeWinningLines(int tokensPerRow)
     {
 
         // Calculate the total number of winning combinations: rows + columns + 2 diagonals.
@@ -517,7 +517,7 @@ public record GameState
     ///
     internal static GameState CreateDefault() => new(
             PlayerToken.Odd,
-            new int[DefaultTokensPerRow * DefaultTokensPerRow],
+            new byte[DefaultTokensPerRow * DefaultTokensPerRow],
             15,
             [
                 new HashSet<byte> { 1, 3, 5, 7, 9 },
