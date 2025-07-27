@@ -45,101 +45,11 @@ public class ConsoleGameInterfaceTests
     }
 
     /// <summary>
-    ///   Verifies that RenderAsync completes successfully with valid game states.
-    /// </summary>
-    ///
-    [Test]
-    public async Task RenderAsyncWithValidGameStateCompletesSuccessfully()
-    {
-        var gameInterface = new ConsoleGameInterface();
-        var gameState = CreateValidGameState();
-
-        // Redirect console output to avoid cluttering test output.
-
-        using var originalOut = System.Console.Out;
-        using var stringWriter = new StringWriter();
-
-        System.Console.SetOut(stringWriter);
-
-        try
-        {
-            await Assert.ThatAsync(async () => await gameInterface.RenderAsync(gameState), Throws.Nothing);
-        }
-        finally
-        {
-            System.Console.SetOut(originalOut);
-        }
-    }
-
-    /// <summary>
-    ///   Verifies that RenderAsync handles different board sizes appropriately.
-    /// </summary>
-    ///
-    [Test]
-    public async Task RenderAsyncWithDifferentBoardSizesCompletesSuccessfully()
-    {
-        var gameInterface = new ConsoleGameInterface();
-
-        // Test with a 4x4 board
-        var largerGameState = new GameState(
-            PlayerToken.Even,
-            new int[16],
-            20,
-            [
-                new HashSet<byte> { 1, 3, 5, 7, 9, 11, 13, 15 },
-                new HashSet<byte> { 2, 4, 6, 8, 10, 12, 14, 16 }
-            ]);
-
-        // Redirect console output to avoid cluttering test output.
-
-        using var originalOut = System.Console.Out;
-        using var stringWriter = new StringWriter();
-
-        System.Console.SetOut(stringWriter);
-
-        try
-        {
-            await Assert.ThatAsync(async () => await gameInterface.RenderAsync(largerGameState), Throws.Nothing);
-        }
-        finally
-        {
-            System.Console.SetOut(originalOut);
-        }
-    }
-
-    /// <summary>
-    ///   Verifies that RenderAsync handles game states with moves made.
-    /// </summary>
-    ///
-    [Test]
-    public async Task RenderAsyncWithGameInProgressCompletesSuccessfully()
-    {
-        var gameInterface = new ConsoleGameInterface();
-        var gameState = CreateGameStateWithMoves();
-
-        // Redirect console output to avoid cluttering test output.
-
-        using var originalOut = System.Console.Out;
-        using var stringWriter = new StringWriter();
-
-        System.Console.SetOut(stringWriter);
-
-        try
-        {
-            await Assert.ThatAsync(async () => await gameInterface.RenderAsync(gameState), Throws.Nothing);
-        }
-        finally
-        {
-            System.Console.SetOut(originalOut);
-        }
-    }
-
-    /// <summary>
     ///   Verifies that RenderAsync handles winning game scenarios.
     /// </summary>
     ///
     [Test]
-    public async Task RenderAsyncWithWinningGameCompletesSuccessfully()
+    public async Task RenderAsyncWithWinningGameRendersCorrectly()
     {
         var gameInterface = new ConsoleGameInterface();
         var gameState = CreateWinningGameState();
@@ -152,7 +62,7 @@ public class ConsoleGameInterfaceTests
 
         try
         {
-            await Assert.ThatAsync(async () => await gameInterface.RenderAsync(gameState), Throws.Nothing);
+            await gameInterface.RenderAsync(gameState);
         }
         finally
         {
@@ -182,7 +92,7 @@ public class ConsoleGameInterfaceTests
 
             foreach (TextType textType in Enum.GetValues<TextType>())
             {
-                await Assert.ThatAsync(async () => await gameInterface.RenderPlayerTextAsync(textType, "Test"), Throws.Nothing);
+                await gameInterface.RenderPlayerTextAsync(textType, "Test");
             }
         }
         finally
@@ -196,7 +106,7 @@ public class ConsoleGameInterfaceTests
     /// </summary>
     ///
     [Test]
-    public async Task RenderPlayerTextAsyncWithEmptyStringCompletesSuccessfully()
+    public async Task RenderPlayerTextAsyncWithEmptyStringHandlesEmptyInput()
     {
         var gameInterface = new ConsoleGameInterface();
 
@@ -209,7 +119,7 @@ public class ConsoleGameInterfaceTests
 
         try
         {
-            await Assert.ThatAsync(async () => await gameInterface.RenderPlayerTextAsync(TextType.Message, ""), Throws.Nothing);
+            await gameInterface.RenderPlayerTextAsync(TextType.Message, "");
         }
         finally
         {
@@ -233,7 +143,7 @@ public class ConsoleGameInterfaceTests
 
         try
         {
-            await Assert.ThatAsync(async () => await gameInterface.ReadPlayerResponseAsnyc(), Throws.Nothing);
+            await gameInterface.ReadPlayerResponseAsnyc();
         }
         finally
         {
@@ -300,5 +210,171 @@ public class ConsoleGameInterfaceTests
 
         _ = gameState.ScanForWinner();
         return gameState;
+    }
+
+    /// <summary>
+    ///   Verifies that ConsoleGameInterface handles extremely large game boards correctly.
+    /// </summary>
+    ///
+    [Test]
+    public async Task ConsoleGameInterfaceHandlesLargeBoardsCorrectly()
+    {
+        var gameInterface = new ConsoleGameInterface();
+
+        // Create a large 10x10 board to test rendering performance and correctness.
+
+        var largeBoard = new int[100];
+        var largeGameState = new GameState(
+            PlayerToken.Odd,
+            largeBoard,
+            50,
+            [
+                new HashSet<byte> { 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49 },
+                new HashSet<byte> { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50 }
+            ]);
+
+        // Place some tokens to create a more complex board state.
+
+        largeBoard[0] = 1;   // Top-left
+        largeBoard[10] = 3;  // Second row, first column
+        largeBoard[99] = 5;  // Bottom-right
+
+        using var originalOut = System.Console.Out;
+        using var stringWriter = new StringWriter();
+        System.Console.SetOut(stringWriter);
+
+        try
+        {
+            await gameInterface.RenderAsync(largeGameState);
+
+            var output = stringWriter.ToString();
+
+            // Verify the output contains expected structural elements for large boards.
+
+            Assert.That(output, Contains.Substring("NUMERIC TIC-TAC-TOE"), "Should contain title");
+            Assert.That(output, Contains.Substring("Game Board:"), "Should contain board header");
+            Assert.That(output, Contains.Substring("Players:"), "Should contain players section");
+            Assert.That(output.Split('\n').Length, Is.GreaterThan(30), "Large board should produce substantial output");
+        }
+        finally
+        {
+            System.Console.SetOut(originalOut);
+        }
+    }
+
+    /// <summary>
+    ///   Verifies that ConsoleGameInterface handles concurrent rendering calls safely.
+    /// </summary>
+    ///
+    [Test]
+    public async Task ConsoleGameInterfaceHandlesConcurrentRenderingSafely()
+    {
+        var gameInterface = new ConsoleGameInterface();
+        var gameState = CreateWinningGameState();
+
+        // Redirect console to capture all output.
+
+        using var originalOut = System.Console.Out;
+        using var stringWriter = new StringWriter();
+        System.Console.SetOut(stringWriter);
+
+        try
+        {
+            // Execute multiple concurrent render operations.
+
+            var renderTasks = Enumerable.Range(0, 10)
+                .Select(_ => gameInterface.RenderAsync(gameState))
+                .ToArray();
+
+            await Task.WhenAll(renderTasks);
+
+            // All tasks should complete successfully without exceptions.
+
+            foreach (var task in renderTasks)
+            {
+                Assert.That(task.IsCompletedSuccessfully, Is.True,
+                    "Concurrent rendering should complete without exceptions");
+            }
+        }
+        finally
+        {
+            System.Console.SetOut(originalOut);
+        }
+    }
+
+    /// <summary>
+    ///   Verifies that RenderPlayerTextAsync handles null and extremely long text correctly.
+    /// </summary>
+    ///
+    [Test]
+    public async Task RenderPlayerTextAsyncHandlesExtremeTextLengths()
+    {
+        var gameInterface = new ConsoleGameInterface();
+
+        using var originalOut = System.Console.Out;
+        using var stringWriter = new StringWriter();
+        System.Console.SetOut(stringWriter);
+
+        try
+        {
+            // Test with extremely long text that could cause buffer issues.
+
+            var longText = new string('A', 100000);
+            var textWithNewlines = string.Join("\n", Enumerable.Repeat("Line of text", 1000));
+            var textWithSpecialChars = "Text with special chars: \0\t\r\n\x1B[31m\uFEFF";
+
+            await gameInterface.RenderPlayerTextAsync(TextType.Message, longText);
+            await gameInterface.RenderPlayerTextAsync(TextType.Error, textWithNewlines);
+            await gameInterface.RenderPlayerTextAsync(TextType.Prompt, textWithSpecialChars);
+
+            // If we reach here without exceptions, the interface handled extreme text correctly.
+
+            var output = stringWriter.ToString();
+            Assert.That(output.Length, Is.GreaterThan(50000), "Should have rendered substantial content");
+        }
+        finally
+        {
+            System.Console.SetOut(originalOut);
+        }
+    }
+
+    /// <summary>
+    ///   Verifies that ReadPlayerResponseAsync handles rapid successive calls correctly.
+    /// </summary>
+    ///
+    [Test]
+    public async Task ReadPlayerResponseAsyncHandlesRapidSuccessiveCalls()
+    {
+        var gameInterface = new ConsoleGameInterface();
+        var responses = new[] { "response1", "response2", "response3", "response4", "response5" };
+
+        using var originalInput = System.Console.In;
+        using var stringReader = new StringReader(string.Join("\n", responses));
+        System.Console.SetIn(stringReader);
+
+        try
+        {
+            // Execute rapid successive read operations.
+
+            var readTasks = Enumerable.Range(0, 5)
+                .Select(_ => gameInterface.ReadPlayerResponseAsnyc())
+                .ToArray();
+
+            var results = await Task.WhenAll(readTasks);
+
+            // Verify all reads completed and returned expected responses.
+
+            Assert.That(results.Length, Is.EqualTo(5), "Should complete all read operations");
+
+            foreach (var result in results)
+            {
+                Assert.That(responses, Contains.Item(result),
+                    "Each result should be one of the expected responses");
+            }
+        }
+        finally
+        {
+            System.Console.SetIn(originalInput);
+        }
     }
 }

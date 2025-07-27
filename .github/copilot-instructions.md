@@ -240,6 +240,105 @@ await mockService.Received().ProcessDataAsync(
     Arg.Any<CancellationToken>());
 ```
 
+### ❌ **NEVER Create Tests That Only Verify "DoesNotThrow" For:**
+
+1. **Basic Object Construction**
+   - Constructor calls with valid parameters
+   - Factory method calls with valid inputs
+   - Example: `Assert.That(() => new MyClass(validParam), Throws.Nothing)`
+
+2. **Simple Method Calls with Valid Input**
+   - Methods called with expected, valid parameters
+   - Basic CRUD operations with proper data
+   - Example: `Assert.That(() => obj.SimpleMethod(validInput), Throws.Nothing)`
+
+3. **Happy Path Scenarios**
+   - Normal execution flows that should naturally work
+   - Standard use cases without edge conditions
+   - Example: `Assert.That(() => game.Reset(), Throws.Nothing)`
+
+4. **Rendering/UI Operations with Valid Data**
+   - Console output, file writing, or display operations with proper input
+   - Example: `Assert.That(() => renderer.Render(validData), Throws.Nothing)`
+
+### ✅ **ACCEPTABLE "DoesNotThrow" Tests Only When Testing:**
+
+1. **Boundary Validation Logic**
+   - Testing that validation methods correctly identify valid vs invalid boundaries
+   - Example: Position validation that must distinguish between valid coordinates (1,1) and invalid ones (0,0)
+
+2. **Complex Business Rule Validation**
+   - Testing that business logic correctly permits valid operations
+   - Example: Token ownership rules where specific tokens must be allowed for specific players
+
+3. **Error Recovery and Robustness**
+   - Testing that systems handle corrupted/invalid states gracefully without crashing
+   - Example: Methods that should not crash even when given malformed data
+
+4. **Integration with External Dependencies**
+   - Testing that code properly handles external system interactions
+   - Example: File system operations, network calls, or database interactions
+
+### 🔍 **Test Quality Guidelines:**
+
+1. **The "What Else" Test**
+   - If removing the `Throws.Nothing` assertion leaves no meaningful verification, the entire test should be removed
+   - Ask: "What specific behavior does this test verify beyond 'it doesn't crash'?"
+
+2. **Behavior Over Implementation**
+   - Tests should verify observable behavior, state changes, or side effects
+   - Focus on WHAT the code does, not just that it runs
+
+3. **Value-Add Principle**
+   - Every test assertion should provide unique value
+   - If a test only verifies that valid input doesn't throw, it adds no value over the compiler's type checking
+
+### 📝 **Replacement Test Patterns:**
+
+Instead of meaningless "DoesNotThrow" tests, create tests that verify:
+
+```csharp
+// ❌ BAD: Only tests that constructor doesn't throw
+[Test]
+public void ConstructorSucceedsWithValidInput()
+{
+    Assert.That(() => new Game(player1, player2, renderer), Throws.Nothing);
+}
+
+// ✅ GOOD: Tests that constructor creates correct initial state
+[Test] 
+public void ConstructorInitializesGameWithCorrectState()
+{
+    var game = new Game(player1, player2, renderer);
+    
+    Assert.That(game.State.CurrentTurn, Is.EqualTo(PlayerToken.Odd));
+    Assert.That(game.State.IsGameOver, Is.False);
+    Assert.That(game.State.Winner, Is.Null);
+}
+
+// ❌ BAD: Only tests that method doesn't throw
+[Test]
+public void ResetCompletesSuccessfully()
+{
+    Assert.That(() => game.Reset(), Throws.Nothing);
+}
+
+// ✅ GOOD: Tests what Reset actually does
+[Test]
+public void ResetRestoresInitialGameState()
+{
+    // Arrange: Modify game state
+    game.State.SetBoardToken(1, 1, 5);
+    game.State.CurrentTurn = PlayerToken.Even;
+    
+    // Act
+    game.Reset();
+    
+    // Assert: Verify state was restored
+    Assert.That(game.State.GetBoardToken(1, 1), Is.EqualTo(0));
+    Assert.That(game.State.CurrentTurn, Is.EqualTo(PlayerToken.Odd));
+}
+
 ## Error Handling
 
 ### Exception Conventions

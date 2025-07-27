@@ -164,6 +164,152 @@ public class ConsolePlayerTests
             ]);
 
     /// <summary>
+    ///   Verifies that PlayTurnAsync handles extremely malformed input gracefully.
+    /// </summary>
+    ///
+    [Test]
+    public async Task PlayTurnAsyncHandlesMalformedInputRobustly()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+        var player = new ConsolePlayer(mockGameInterface);
+        var gameState = CreateValidGameState();
+
+        // Setup mock to return various malformed inputs before valid ones.
+
+        mockGameInterface.ReadPlayerResponseAsnyc(Arg.Any<CancellationToken>())
+            .Returns(
+                "abc",      // Non-numeric token
+                "-5",       // Negative token
+                "999",      // Extremely large token
+                "",         // Empty string
+                "   ",      // Whitespace only
+                "1.5",      // Decimal number
+                "1e10",     // Scientific notation
+                "0x1",      // Hexadecimal
+                "null",     // String literal
+                "1",        // Valid token
+                "abc",      // Non-numeric row
+                "-1",       // Negative row
+                "0",        // Zero row (invalid)
+                "999",      // Row too large
+                "1",        // Valid row
+                "xyz",      // Non-numeric column
+                "0",        // Zero column (invalid)
+                "999",      // Column too large
+                "1"         // Valid column
+            );
+
+        var move = await player.PlayTurnAsync(gameState);
+
+        Assert.That(move.Token, Is.EqualTo(1), "Should eventually accept valid token after malformed input");
+        Assert.That(move.PositionIndex, Is.EqualTo(0), "Should eventually accept valid position after malformed input");
+
+        // Verify that error messages were displayed for malformed inputs.
+
+        await mockGameInterface
+            .Received()
+            .RenderPlayerTextAsync(
+                TextType.Error,
+                Arg.Is<string>(s => s.Contains("valid")),
+                Arg.Any<CancellationToken>());
+    }
+
+    /// <summary>
+    ///   Verifies that PlayTurnAsync handles Unicode and special characters in input.
+    /// </summary>
+    ///
+    [Test]
+    public async Task PlayTurnAsyncHandlesUnicodeAndSpecialCharacters()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+        var player = new ConsolePlayer(mockGameInterface);
+        var gameState = CreateValidGameState();
+
+        // Setup mock to return various special character inputs before valid ones.
+
+        mockGameInterface.ReadPlayerResponseAsnyc(Arg.Any<CancellationToken>())
+            .Returns(
+                "①",        // Unicode digit
+                "𝟏",        // Mathematical bold digit
+                "１",       // Fullwidth digit
+                "!@#$",     // Special characters
+                "♠♣♥♦",     // Card symbols
+                "🎮",       // Emoji
+                "\t\n\r",   // Control characters
+                "\0",       // Null character
+                "1",        // Valid token
+                "1",        // Valid row
+                "1"         // Valid column
+            );
+
+        var move = await player.PlayTurnAsync(gameState);
+
+        Assert.That(move.Token, Is.EqualTo(1), "Should handle Unicode gracefully and accept valid input");
+        Assert.That(move.PositionIndex, Is.EqualTo(0), "Should handle special characters gracefully");
+    }
+
+    /// <summary>
+    ///   Verifies that PlayTurnAsync handles extremely long input strings without crashing.
+    /// </summary>
+    ///
+    [Test]
+    public async Task PlayTurnAsyncHandlesExtremelyLongInput()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+        var player = new ConsolePlayer(mockGameInterface);
+        var gameState = CreateValidGameState();
+
+        // Create an extremely long string that could potentially cause issues.
+
+        var longString = new string('1', 10000);
+        var veryLongString = new string('a', 100000);
+
+        mockGameInterface.ReadPlayerResponseAsnyc(Arg.Any<CancellationToken>())
+            .Returns(
+                longString,      // 10k characters of '1'
+                veryLongString,  // 100k characters of 'a'
+                "1",             // Valid token
+                "1",             // Valid row
+                "1"              // Valid column
+            );
+
+        var move = await player.PlayTurnAsync(gameState);
+
+        Assert.That(move.Token, Is.EqualTo(1), "Should handle extremely long input without crashing");
+        Assert.That(move.PositionIndex, Is.EqualTo(0), "Should eventually process valid input after long strings");
+    }
+
+    /// <summary>
+    ///   Verifies that PlayTurnAsync handles input with leading and trailing whitespace correctly.
+    /// </summary>
+    ///
+    [Test]
+    public async Task PlayTurnAsyncHandlesWhitespaceVariations()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+        var player = new ConsolePlayer(mockGameInterface);
+        var gameState = CreateValidGameState();
+
+        // Setup mock to return inputs with various whitespace patterns.
+
+        mockGameInterface.ReadPlayerResponseAsnyc(Arg.Any<CancellationToken>())
+            .Returns(
+                "  1  ",     // Token with spaces
+                "\t1\t",     // Token with tabs
+                "\n1\n",     // Token with newlines
+                " \t 1 \n ", // Token with mixed whitespace
+                "   1   ",   // Row with spaces
+                "\t\t1\t\t", // Row with tabs
+                " 1 "        // Column with spaces
+            );
+
+        var move = await player.PlayTurnAsync(gameState);
+
+        Assert.That(move.Token, Is.EqualTo(1), "Should trim whitespace and accept valid token");
+        Assert.That(move.PositionIndex, Is.EqualTo(0), "Should trim whitespace and accept valid position");
+    }
+
+    /// <summary>
     ///   Creates a 4x4 game state for testing larger boards.
     /// </summary>
     ///

@@ -26,46 +26,6 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that the constructor succeeds with valid gameInterface.
-    /// </summary>
-    ///
-    [Test]
-    public void ConstructorSucceedsWithValidGameInterface()
-    {
-        var mockGameInterface = Substitute.For<IGameInterface>();
-
-        Assert.That(() => new BotPlayer(mockGameInterface), Throws.Nothing,
-            "Constructor should succeed with valid gameInterface");
-    }
-
-    /// <summary>
-    ///   Verifies that the constructor accepts custom options.
-    /// </summary>
-    ///
-    [Test]
-    public void ConstructorAcceptsCustomOptions()
-    {
-        var mockGameInterface = Substitute.For<IGameInterface>();
-        var customOptions = new BotPlayerOptions { Difficulty = Difficulty.Perfect };
-
-        Assert.That(() => new BotPlayer(mockGameInterface, customOptions), Throws.Nothing,
-            "Constructor should accept custom options");
-    }
-
-    /// <summary>
-    ///   Verifies that the constructor uses default options when none provided.
-    /// </summary>
-    ///
-    [Test]
-    public void ConstructorUsesDefaultOptionsWhenNoneProvided()
-    {
-        var mockGameInterface = Substitute.For<IGameInterface>();
-
-        Assert.That(() => new BotPlayer(mockGameInterface, null), Throws.Nothing,
-            "Constructor should use default options when null is provided");
-    }
-
-    /// <summary>
     ///   Verifies that PlayTurnAsync throws ArgumentNullException when gameState is null.
     /// </summary>
     ///
@@ -638,22 +598,31 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Creates a game state where all available moves lead to opponent wins, testing loss delay preference.
+    ///   Creates a game state where the current player faces multiple losing scenarios, testing loss delay preference.
     /// </summary>
     ///
     private static GameState CreateStateWhereAllMovesLeadToLoss()
     {
         var gameState = CreateValidGameState();
 
-        // Create a scenario where Even is threatening and Odd must choose between bad options.
-        // This tests the bot's ability to prefer delayed losses over immediate ones.
+        // Create a scenario where Even has multiple threatening positions and Odd must choose between bad options.
+        // Board state after moves:
+        // [1, 2, 3]  <- Row 0: sum=6, Even can complete with 9 (but Even doesn't have 9)
+        // [0, 4, 0]  <- Row 1: sum=4, Even can place 6 at pos 3 and needs 5 more at pos 5
+        // [0, 0, 0]  <- Row 2: Empty
+        //
+        // Even's threats: Can play 6 at position 3, forcing need for 5 at position 5 (but they have 8, not 5)
+        // This creates a scenario where Odd moves give Even tactical advantages without immediate wins.
 
         gameState.ApplyMove(new Move(PlayerToken.Odd, 0, 1));   // Odd plays 1 at position 0
         gameState.ApplyMove(new Move(PlayerToken.Even, 1, 2));  // Even plays 2 at position 1
         gameState.ApplyMove(new Move(PlayerToken.Odd, 2, 3));   // Odd plays 3 at position 2
         gameState.ApplyMove(new Move(PlayerToken.Even, 4, 4));  // Even plays 4 at position 4
 
-        // Current state creates a scenario where Even has potential winning threats.
+        // Current turn: Odd
+        // Odd remaining: {5, 7, 9}
+        // Even remaining: {6, 8}
+        // This creates tactical pressure where Even has positional advantages.
 
         return gameState;
     }
@@ -682,5 +651,186 @@ public class BotPlayerTests
         // Odd can win immediately by playing 9 at position 2 for anti-diagonal: 1+5+9=15.
 
         return gameState;
+    }
+
+    /// <summary>
+    ///   Verifies that BotPlayer handles concurrent access safely without data corruption.
+    /// </summary>
+    ///
+    [Test]
+    public async Task BotPlayerHandlesConcurrentAccessSafely()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+        var botPlayer = new BotPlayer(mockGameInterface, new BotPlayerOptions { Difficulty = Difficulty.Medium });
+
+        // Create multiple independent game states for concurrent testing.
+
+        var gameStates = Enumerable.Range(0, 10)
+            .Select(_ => CreateValidGameState())
+            .ToArray();
+
+        // Execute multiple PlayTurnAsync calls concurrently.
+
+        var tasks = gameStates.Select(async gameState =>
+        {
+            var move = await botPlayer.PlayTurnAsync(gameState);
+            return new { GameState = gameState, Move = move };
+        }).ToArray();
+
+        var results = await Task.WhenAll(tasks);
+
+        // Verify all moves are valid and no corruption occurred.
+
+        foreach (var result in results)
+        {
+            Assert.That(result.Move.Player, Is.EqualTo(result.GameState.CurrentTurn),
+                "Concurrent access should not corrupt player assignment");
+            Assert.That(result.GameState.CurrentPlayerTokens, Contains.Item(result.Move.Token),
+                "Concurrent access should not corrupt token validation");
+            Assert.That(result.GameState.Board[result.Move.PositionIndex], Is.EqualTo(GameState.EmptyBoardSpaceValue),
+                "Concurrent access should not corrupt position validation");
+        }
+
+        // Verify no duplicate moves were generated (each should be independent).
+
+        var uniqueMoves = results.Select(r => r.Move).Distinct().Count();
+        Assert.That(uniqueMoves, Is.GreaterThan(1),
+            "Concurrent operations should generate independent moves");
+    }
+
+    /// <summary>
+    ///   Verifies that BotPlayer continues to function correctly under memory pressure scenarios.
+    /// </summary>
+    ///
+    [Test]
+    public async Task BotPlayerHandlesMemoryPressureGracefully()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+        var botPlayer = new BotPlayer(mockGameInterface, new BotPlayerOptions { Difficulty = Difficulty.Hard });
+        var gameState = CreateValidGameState();
+
+        // Simulate memory pressure by creating large objects and forcing garbage collection.
+        // This tests that the bot's recursive algorithms handle memory constraints gracefully.
+
+        var largeObjects = new List<byte[]>();
+
+        try
+        {
+            // Allocate memory to create pressure (but not enough to cause OutOfMemoryException).
+
+            for (var i = 0; i < 100; i++)
+            {
+                largeObjects.Add(new byte[1024 * 1024]); // 1MB allocations
+            }
+
+            // Force garbage collection to simulate memory pressure.
+
+            GC.Collect(2, GCCollectionMode.Forced, true);
+            GC.WaitForPendingFinalizers();
+            GC.Collect(2, GCCollectionMode.Forced, true);
+
+            // The bot should still function correctly under memory pressure.
+
+            var move = await botPlayer.PlayTurnAsync(gameState);
+
+            Assert.That(move.Player, Is.EqualTo(gameState.CurrentTurn),
+                "Bot should function correctly under memory pressure");
+            Assert.That(gameState.CurrentPlayerTokens, Contains.Item(move.Token),
+                "Bot should make valid moves under memory pressure");
+            Assert.That(gameState.Board[move.PositionIndex], Is.EqualTo(GameState.EmptyBoardSpaceValue),
+                "Bot should select valid positions under memory pressure");
+        }
+        finally
+        {
+            // Clean up large objects to prevent affecting other tests.
+
+            largeObjects.Clear();
+            GC.Collect();
+        }
+    }
+
+    /// <summary>
+    ///   Verifies that BotPlayer's look-ahead calculation handles edge cases correctly.
+    /// </summary>
+    ///
+    [Test]
+    public void BotPlayerCalculatesLookAheadForEdgeCases()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+
+        // Test with minimal token sets (edge case for look-ahead calculation).
+
+        var minimalGameState = new GameState(
+            PlayerToken.Odd,
+            new int[9],
+            15,
+            [
+                new HashSet<byte> { 1 },  // Only one token for Odd
+                new HashSet<byte> { 2 }   // Only one token for Even
+            ]);
+
+        var easyBot = new BotPlayer(mockGameInterface, new BotPlayerOptions { Difficulty = Difficulty.Easy });
+        var hardBot = new BotPlayer(mockGameInterface, new BotPlayerOptions { Difficulty = Difficulty.Hard });
+        var perfectBot = new BotPlayer(mockGameInterface, new BotPlayerOptions { Difficulty = Difficulty.Perfect });
+
+        // All difficulty levels should handle minimal token scenarios without crashing.
+
+        var easyMove = easyBot.PlayTurnAsync(minimalGameState.CreateCopy()).Result;
+        var hardMove = hardBot.PlayTurnAsync(minimalGameState.CreateCopy()).Result;
+        var perfectMove = perfectBot.PlayTurnAsync(minimalGameState.CreateCopy()).Result;
+
+        Assert.That(easyMove.Token, Is.EqualTo(1), "Easy bot should handle minimal tokens");
+        Assert.That(hardMove.Token, Is.EqualTo(1), "Hard bot should handle minimal tokens");
+        Assert.That(perfectMove.Token, Is.EqualTo(1), "Perfect bot should handle minimal tokens");
+    }
+
+    /// <summary>
+    ///   Verifies that BotPlayer handles rapid successive calls without degradation.
+    /// </summary>
+    ///
+    [Test]
+    public async Task BotPlayerHandlesRapidSuccessiveCalls()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+        var botPlayer = new BotPlayer(mockGameInterface, new BotPlayerOptions { Difficulty = Difficulty.Medium });
+
+        var executionTimes = new List<long>();
+
+        // Execute multiple rapid calls and measure performance consistency.
+
+        for (var i = 0; i < 20; i++)
+        {
+            var gameState = CreateValidGameState();
+            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+
+            var move = await botPlayer.PlayTurnAsync(gameState);
+
+            stopwatch.Stop();
+            executionTimes.Add(stopwatch.ElapsedMilliseconds);
+
+            Assert.That(move.Player, Is.EqualTo(gameState.CurrentTurn),
+                $"Call {i + 1} should produce valid move");
+        }
+
+        // Verify performance doesn't degrade significantly over rapid calls.
+        // Later calls shouldn't be dramatically slower than earlier ones.
+
+        var firstHalfAverage = executionTimes.Take(10).Average();
+        var secondHalfAverage = executionTimes.Skip(10).Average();
+
+        // Only perform comparison if we have meaningful timing data.
+
+        if (firstHalfAverage > 0)
+        {
+            Assert.That(secondHalfAverage, Is.LessThan(firstHalfAverage * 3),
+                "Performance should not degrade significantly over rapid successive calls");
+        }
+        else
+        {
+            // If times are too small to measure, just verify all calls completed successfully.
+
+            Assert.That(executionTimes.Count, Is.EqualTo(20),
+                "All rapid calls should complete successfully");
+        }
     }
 }

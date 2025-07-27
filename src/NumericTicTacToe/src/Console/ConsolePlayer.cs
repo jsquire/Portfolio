@@ -163,6 +163,6 @@ public class ConsolePlayer : IPlayer
         }
 
         await Interface.RenderPlayerTextAsync(TextType.Message, $"{Environment.NewLine}Placing token {selectedToken} at row {selectedRow}, column {selectedColumn}...{Environment.NewLine}", cancellationToken);
-        return new Move(gameState.CurrentTurn, gameState.GetBoardPositionIndex(selectedRow, selectedColumn), selectedToken);
+        return new Move(gameState.CurrentTurn, gameState.GetBoardPosition(selectedRow, selectedColumn), selectedToken);
     }
 }
