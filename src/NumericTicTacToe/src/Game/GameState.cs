@@ -1,4 +1,7 @@
+using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace Squire.NumTic;
 
@@ -21,7 +24,10 @@ public record GameState
     private const int DefaultTokensPerRow = 3;
 
     /// <summary>The default winning set of lines on a standard 3x3 game of tic-tac-toe board that need to be scanned for winning conditions.</summary>
-    private static readonly int[][] DefaultWinningLines = ComputeWinningLines(DefaultTokensPerRow);
+    private static readonly int[] DefaultWinningLines = ComputeWinningLines(DefaultTokensPerRow);
+
+    /// <summary>The pre-computed set of lines on the board that need to be scanned for winning conditions.</summary>
+    private readonly int[] WinningLines;
 
     /// <summary>
     ///   Identifies the player who is next to play a turn.  This member is mutable and its
@@ -57,12 +63,6 @@ public record GameState
     /// </summary>
     ///
     public int TokensPerRow { get; init; }
-
-    /// <summary>
-    ///   The pre-computed set of lines on the board that need to be scanned for winning conditions.
-    /// </summary>
-    ///
-    public int[][] WinningLines { get; init; }
 
     /// <summary>
     ///   The board for a game of numeric tic-tac-toe.  The underlying data
@@ -335,6 +335,78 @@ public record GameState
     }
 
     /// <summary>
+    ///   Attempts to find a winning move for the specified player.
+    /// </summary>
+    ///
+    /// <param name="player">The player to consider when searching.</param>
+    ///
+    /// <returns>A <see cref="Move"/> that will win the game for the requested <paramref name="player"/>, if one exists; otherwise, <c>null</c>.</returns>
+    ///
+    /// <remarks>
+    ///   If multiple winning moves exist, there is no guarantee which one will be returned.  The search is
+    ///   stable, and calls for the same player and state will return the same result.
+    /// </remarks>
+    ///
+    public Move? FindWinningMove(PlayerToken player)
+    {
+        var tokensPerRow = TokensPerRow;
+        var winningTotal = WinningTotal;
+        var tokens = Tokens[(int)player];
+        var winningLines = WinningLines.AsSpan();
+        var board = Board.AsSpan();
+
+        // Attempt to see if any of the current player's tokens can win the game.
+
+        for (var index = 0; index < winningLines.Length; index += tokensPerRow)
+        {
+            var emptyIndex = -1;
+            var boardIndex = 0;
+            var value = 0;
+            var sum = 0;
+
+            for (var offset = 0; offset < tokensPerRow; ++offset)
+            {
+                boardIndex = winningLines[index + offset];
+                value = board[boardIndex];
+
+                if (value != EmptyBoardSpaceValue)
+                {
+                    sum += value;
+                }
+                else
+                {
+                    // If there is already an empty space, this line cannot be a winning move.
+
+                    if (emptyIndex != -1)
+                    {
+                        emptyIndex = -1;
+                        break;
+                    }
+
+                    emptyIndex = boardIndex;
+                }
+            }
+
+            // If there is a single empty space, determine if one of the current player's
+            // tokens can win.
+
+            if (emptyIndex != -1)
+            {
+                var neededToken = (byte)(winningTotal - sum);
+
+                if (tokens.Contains(neededToken))
+                {
+                    return new Move(player, emptyIndex, neededToken);
+                }
+            }
+        }
+
+        // No winning move was found.
+
+        return null;
+    }
+
+    /// <summary>
     ///   Determines if the game has been won and returns the winning player and, if so,
     ///   sets the <see cref="Winner"/> property.
     /// </summary>
@@ -343,13 +415,19 @@ public record GameState
     ///
     internal PlayerToken? ScanForWinner()
     {
-        foreach (var combination in WinningLines)
+        var tokensPerRow = TokensPerRow;
+        var winningTotal = WinningTotal;
+        var winningLines = WinningLines.AsSpan();
+        var board = Board.AsSpan();
+
+        for (var index = 0; index < winningLines.Length; index += tokensPerRow)
         {
             var sum = 0;
 
-            for (var index = 0; index < combination.Length; ++index)
+            for (var offset = 0; offset < tokensPerRow; ++offset)
             {
-                var value =  Board[combination[index]];
+
+                var value =  board[winningLines[index + offset]];
 
                 // Winning requires that every board position for the combination is
                 // occupied.  If any position is empty, a win is not possible and
@@ -364,7 +442,7 @@ public record GameState
                 sum += value;
             }
 
-            if (sum == WinningTotal)
+            if (sum == winningTotal)
             {
                 Winner = CurrentTurn;
                 return CurrentTurn;
@@ -372,6 +450,98 @@ public record GameState
         }
 
         return null;
+    }
+
+    /// <summary>
+    ///   Creates a deep copy of the current game state.
+    /// </summary>
+    ///
+    /// <returns>A new <see cref="GameState"/> instance that is a deep copy of the current state.</returns>
+    ///
+    internal GameState CreateCopy() =>
+        new GameState(
+            CurrentTurn,
+            [.. Board],
+            WinningTotal,
+            [[.. GetPlayerTokens(PlayerToken.Odd)], [.. GetPlayerTokens(PlayerToken.Even)]])
+        {
+           Winner = this.Winner
+        };
+
+    /// <summary>
+    ///   Creates a new game using the defaults of a standard
+    ///   3x3 board and maximum score of 15.
+    /// </summary>
+    ///
+    /// <returns>An instance of state representing a new game.</returns>
+    ///
+    public static GameState CreateDefault() => new(
+            PlayerToken.Odd,
+            new byte[DefaultTokensPerRow * DefaultTokensPerRow],
+            15,
+            [
+                new HashSet<byte> { 1, 3, 5, 7, 9 },
+                new HashSet<byte> { 2, 4, 6, 8 }
+            ]);
+
+    /// <summary>
+    ///   Computes the winning combinations for a given square game board..
+    /// </summary>
+    ///
+    /// <param name="tokensPerRow">The number of tokens per row in the game board.</param>
+    ///
+    /// <returns>An array of winning combinations.</returns>
+    ///
+    /// <remarks>
+    ///   It is assumed that the game board has been validated externally and represents
+    ///   a square.
+    /// </remarks>
+    ///
+    private static int[] ComputeWinningLines(int tokensPerRow)
+    {
+
+        // Calculate the total number of winning combinations:
+        // (rows + columns + 2 diagonals) * number of tokens per row.
+
+        var totalCombinations = (tokensPerRow + tokensPerRow + 2) * tokensPerRow;
+        var combinations = new int[totalCombinations];
+        var combinationIndex = 0;
+
+        // Add rows.
+
+        for (var row = 0; row < tokensPerRow; ++row)
+        {
+            for (var column = 0; column < tokensPerRow; ++column)
+            {
+                combinations[combinationIndex++] = row * tokensPerRow + column;
+            }
+        }
+
+        // Add columns.
+
+        for (var column = 0; column < tokensPerRow; ++column)
+        {
+            for (var row = 0; row < tokensPerRow; ++row)
+            {
+                combinations[combinationIndex++] = row * tokensPerRow + column;
+            }
+        }
+
+        // Add main diagonal (top-left to bottom-right).
+
+        for (var index = 0; index < tokensPerRow; ++index)
+        {
+            combinations[combinationIndex++] = index * tokensPerRow + index;
+        }
+
+        // Add anti-diagonal (top-right to bottom-left).
+
+        for (var index = 0; index < tokensPerRow; ++index)
+        {
+            combinations[combinationIndex++] = index * tokensPerRow + (tokensPerRow - 1 - index);
+        }
+
+        return combinations;
     }
 
     /// <summary>
@@ -416,111 +586,4 @@ public record GameState
     {
         return ((row - 1) * tokensPerRow) + (column - 1);
     }
-
-    /// <summary>
-    ///   Computes the winning combinations for a given square game board..
-    /// </summary>
-    ///
-    /// <param name="tokensPerRow">The number of tokens per row in the game board.</param>
-    ///
-    /// <returns>An array of winning combinations.</returns>
-    ///
-    /// <remarks>
-    ///   It is assumed that the game board has been validated externally and represents
-    ///   a square.
-    /// </remarks>
-    ///
-    private static int[][] ComputeWinningLines(int tokensPerRow)
-    {
-
-        // Calculate the total number of winning combinations: rows + columns + 2 diagonals.
-
-        var totalCombinations = (2 * tokensPerRow) + 2;
-        var combinations = new int[totalCombinations][];
-        var combinationIndex = 0;
-
-        // Add rows.
-
-        for (var row = 0; row < tokensPerRow; ++row)
-        {
-            var rowCombination = new int[tokensPerRow];
-
-            for (var column = 0; column < tokensPerRow; column++)
-            {
-                rowCombination[column] = row * tokensPerRow + column;
-            }
-
-            combinations[combinationIndex++] = rowCombination;
-        }
-
-        // Add columns.
-
-        for (var column = 0; column < tokensPerRow; ++column)
-        {
-            var colCombination = new int[tokensPerRow];
-
-            for (var row = 0; row < tokensPerRow; row++)
-            {
-                colCombination[row] = row * tokensPerRow + column;
-            }
-
-            combinations[combinationIndex++] = colCombination;
-        }
-
-        // Add main diagonal (top-left to bottom-right).
-
-        var mainDiagonal = new int[tokensPerRow];
-
-        for (var index = 0; index < tokensPerRow; index++)
-        {
-            mainDiagonal[index] = index * tokensPerRow + index;
-        }
-
-        combinations[combinationIndex++] = mainDiagonal;
-
-        // Add anti-diagonal (top-right to bottom-left).
-
-        var antiDiagonal = new int[tokensPerRow];
-
-        for (var index = 0; index < tokensPerRow; ++index)
-        {
-            antiDiagonal[index] = index * tokensPerRow + (tokensPerRow - 1 - index);
-        }
-
-        combinations[combinationIndex] = antiDiagonal;
-
-        return combinations;
-    }
-
-    /// <summary>
-    ///   Creates a deep copy of the current game state.
-    /// </summary>
-    ///
-    /// <returns>A new <see cref="GameState"/> instance that is a deep copy of the current state.</returns>
-    ///
-    internal GameState CreateCopy() =>
-        new GameState(
-            CurrentTurn,
-            [.. Board],
-            WinningTotal,
-            [[.. GetPlayerTokens(PlayerToken.Odd)], [.. GetPlayerTokens(PlayerToken.Even)]])
-        {
-           Winner = this.Winner
-        };
-
-    /// <summary>
-    ///   Creates a new game using the defaults of a standard
-    ///   3x3 board and maximum score of 15.
-    /// </summary>
-    ///
-    /// <returns>An instance of state representing a new game.</returns>
-    ///
-    internal static GameState CreateDefault() => new(
-            PlayerToken.Odd,
-            new byte[DefaultTokensPerRow * DefaultTokensPerRow],
-            15,
-            [
-                new HashSet<byte> { 1, 3, 5, 7, 9 },
-                new HashSet<byte> { 2, 4, 6, 8 }
-            ]);
 }

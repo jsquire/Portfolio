@@ -102,7 +102,8 @@ public class Game
     }
 
     /// <summary>
-    ///   Resets the game, restarting from the beginning of the game.
+    ///   Resets the game, restarting from the beginning of the game
+    ///   using the default board size and player tokens.
     /// </summary>
     ///
     public void Reset() => Reset(GameState.CreateDefault());

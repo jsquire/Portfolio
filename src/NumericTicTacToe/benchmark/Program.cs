@@ -22,12 +22,14 @@ public class Program
 
         if ((args.Length > 0) && (args[0] == "--quick-test"))
         {
-            var config = ManualConfig.Create(DefaultConfig.Instance)
+            var config = ManualConfig
+                .Create(DefaultConfig.Instance)
                 .AddJob(Job.ShortRun);
 
             BenchmarkRunner.Run<GameStateBenchmarks>(config);
             BenchmarkRunner.Run<TokenManagementBenchmarks>(config);
             BenchmarkRunner.Run<BotPlayerBenchmarks>(config);
+            BenchmarkRunner.Run<WinningLinesBenchmarks>(config);
         }
         else
         {
@@ -36,6 +38,7 @@ public class Program
             BenchmarkRunner.Run<GameStateBenchmarks>();
             BenchmarkRunner.Run<TokenManagementBenchmarks>();
             BenchmarkRunner.Run<BotPlayerBenchmarks>();
+            BenchmarkRunner.Run<WinningLinesBenchmarks>();
         }
     }
 }

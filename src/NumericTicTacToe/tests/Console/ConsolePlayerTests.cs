@@ -150,20 +150,6 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Creates a valid initial game state for testing.
-    /// </summary>
-    ///
-    private static GameState CreateValidGameState() =>
-        new GameState(
-            PlayerToken.Odd,
-            new byte[9],
-            15,
-            [
-                new HashSet<byte> { 1, 3, 5, 7, 9 },
-                new HashSet<byte> { 2, 4, 6, 8 }
-            ]);
-
-    /// <summary>
     ///   Verifies that PlayTurnAsync handles extremely malformed input gracefully.
     /// </summary>
     ///
@@ -308,6 +294,20 @@ public class ConsolePlayerTests
         Assert.That(move.Token, Is.EqualTo(1), "Should trim whitespace and accept valid token");
         Assert.That(move.PositionIndex, Is.EqualTo(0), "Should trim whitespace and accept valid position");
     }
+
+    /// <summary>
+    ///   Creates a valid initial game state for testing.
+    /// </summary>
+    ///
+    private static GameState CreateValidGameState() =>
+        new GameState(
+            PlayerToken.Odd,
+            new byte[9],
+            15,
+            [
+                new HashSet<byte> { 1, 3, 5, 7, 9 },
+                new HashSet<byte> { 2, 4, 6, 8 }
+            ]);
 
     /// <summary>
     ///   Creates a 4x4 game state for testing larger boards.
