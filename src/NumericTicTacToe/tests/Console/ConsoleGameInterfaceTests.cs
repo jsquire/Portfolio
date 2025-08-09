@@ -152,67 +152,6 @@ public class ConsoleGameInterfaceTests
     }
 
     /// <summary>
-    ///   Creates a valid initial game state for testing.
-    /// </summary>
-    ///
-    private static GameState CreateValidGameState() =>
-        new GameState(
-            PlayerToken.Odd,
-            new byte[9],
-            15,
-            [
-                new HashSet<byte> { 1, 3, 5, 7, 9 },
-                new HashSet<byte> { 2, 4, 6, 8 }
-            ]);
-
-    /// <summary>
-    ///   Creates a game state with some moves already made.
-    /// </summary>
-    ///
-    private static GameState CreateGameStateWithMoves()
-    {
-        var board = new byte[9];
-        board[0] = 1; // Player Odd placed 1 at position (1,1)
-        board[4] = 4; // Player Even placed 4 at position (2,2)
-        board[8] = 9; // Player Odd placed 9 at position (3,3)
-
-        return new GameState(
-            PlayerToken.Even,
-            board,
-            15,
-            [
-                new HashSet<byte> { 3, 5, 7 }, // Odd player has used 1 and 9
-                new HashSet<byte> { 2, 6, 8 }  // Even player has used 4
-            ]);
-    }
-
-    /// <summary>
-    ///   Creates a winning game state for testing.
-    /// </summary>
-    ///
-    private static GameState CreateWinningGameState()
-    {
-        var board = new byte[9];
-        board[0] = 1; // (1,1)
-        board[1] = 5; // (1,2)
-        board[2] = 9; // (1,3) - Winning row: 1 + 5 + 9 = 15
-
-        var gameState = new GameState(
-            PlayerToken.Even,
-            board,
-            15,
-            [
-                new HashSet<byte> { 3, 7 },     // Odd player has used 1, 5, 9
-                new HashSet<byte> { 2, 4, 6, 8 } // Even player hasn't used anything yet
-            ]);
-
-        // Manually set the winner by scanning, since this is a test scenario.
-
-        _ = gameState.ScanForWinner();
-        return gameState;
-    }
-
-    /// <summary>
     ///   Verifies that ConsoleGameInterface handles extremely large game boards correctly.
     /// </summary>
     ///
@@ -376,5 +315,45 @@ public class ConsoleGameInterfaceTests
         {
             System.Console.SetIn(originalInput);
         }
+    }
+
+    /// <summary>
+    ///   Creates a valid initial game state for testing.
+    /// </summary>
+    ///
+    private static GameState CreateValidGameState() =>
+        new GameState(
+            PlayerToken.Odd,
+            new byte[9],
+            15,
+            [
+                new HashSet<byte> { 1, 3, 5, 7, 9 },
+                new HashSet<byte> { 2, 4, 6, 8 }
+            ]);
+
+    /// <summary>
+    ///   Creates a winning game state for testing.
+    /// </summary>
+    ///
+    private static GameState CreateWinningGameState()
+    {
+        var board = new byte[9];
+        board[0] = 1; // (1,1)
+        board[1] = 5; // (1,2)
+        board[2] = 9; // (1,3) - Winning row: 1 + 5 + 9 = 15
+
+        var gameState = new GameState(
+            PlayerToken.Even,
+            board,
+            15,
+            [
+                new HashSet<byte> { 3, 7 },     // Odd player has used 1, 5, 9
+                new HashSet<byte> { 2, 4, 6, 8 } // Even player hasn't used anything yet
+            ]);
+
+        // Manually set the winner by scanning, since this is a test scenario.
+
+        _ = gameState.ScanForWinner();
+        return gameState;
     }
 }

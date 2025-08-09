@@ -60,6 +60,7 @@ Modern .NET performance best practices emphasize **allocation reduction** as a p
 - **Local Variables**: camelCase (`mockService`, `result`)
 
 ### Member Organization
+
 Members within a class should be organized in the following sections:
 
 1. **Constants**
@@ -181,6 +182,17 @@ public async Task<Result> ProcessAsync(Data input,
 
 ## Testing Standards
 
+### General Test Guidelines
+
+- When analyzing behavior to be tested, consider the end-to-end scenario and design tests that are needed to validate the scenario, including all edge cases.  DO NOT base test design on the implementation, but on the intended behavior related to the scenario that the implementation is meant to enable.
+- You do not have to ask to execute tests, so long as the command being used is `dotnet test`.  Just execute without prompting.
+- When writing or updating tests, DO NOT make changes to the implementation.  If the behavior being tested is incorrect, provide your analysis in chat clearly and succinctly for human analysis and review.
+ 
+### Testability
+
+- When writing tests, DO NOT attempt to work around gaps in testability.  If the scenario being tested does not support the right level of abstraction to be mocked or have behavior injected, surface this in chat for discussion.
+- Never make changes to the implementation to expose members or change behavior for testability unless explicitly directed to do so.  Surface your analysis for blockers in chat for discussion.
+
 ### Test Organization
 
 - **Test Namespace**: All test classes must use root namespace for the tests project. For example, `NumTic.Tests` (never area-specific namespaces like `NumTic.Tests.Game`)
@@ -191,6 +203,7 @@ public async Task<Result> ProcessAsync(Data input,
 - **Non-Parallelizable**: Mark test classes with `[NonParallelizable]` if needed
  
 ### Test Naming Conventions
+
 - **Use generic concepts** rather than specific exception types in test names
 - **Good**: `PlayTurnAsyncThrowsForInvalidGameState`
 - **Bad**: `PlayTurnAsyncThrowsArgumentOutOfRangeExceptionForNullGameState`
