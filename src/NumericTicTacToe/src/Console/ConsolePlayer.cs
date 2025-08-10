@@ -1,3 +1,4 @@
+using System.Text;
 using Squire.NumTic.Contracts;
 
 namespace Squire.NumTic.Console;
@@ -39,130 +40,137 @@ public class ConsolePlayer : IPlayer
         ArgumentNullException.ThrowIfNull(gameState, nameof(gameState));
         cancellationToken.ThrowIfCancellationRequested();
 
-        var currentPlayerName = gameState.CurrentTurn == PlayerToken.Odd ? "Odd Player" : "Even Player";
-        var availableTokens = gameState.CurrentPlayerTokens;
-
-        // Display available tokens.
-
-        await Interface.RenderPlayerTextAsync(TextType.Message, $"Available tokens: {string.Join(", ", availableTokens.OrderBy(t => t))}{Environment.NewLine}", cancellationToken);
-
         // Get token selection.
 
         byte selectedToken;
 
         while (true)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            await Interface.RenderPlayerTextAsync(TextType.Prompt, "Select a token to place: ", cancellationToken);
+            await Interface.RenderPlayerTextAsync(TextType.Prompt, "Select a token to place:", cancellationToken);
             var tokenInput = await Interface.ReadPlayerResponseAsnyc(cancellationToken);
 
-            if (!cancellationToken.IsCancellationRequested)
+            if (tokenInput is { Length: 0 })
             {
-                if (string.IsNullOrWhiteSpace(tokenInput))
-                {
-                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid token number.", cancellationToken);
-                    continue;
-                }
-
-                if (!byte.TryParse(tokenInput.Trim(), out selectedToken))
-                {
-                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
-                    continue;
-                }
-
-                if (!availableTokens.Contains(selectedToken))
-                {
-                    await Interface.RenderPlayerTextAsync(TextType.Error, $"Token {selectedToken} is not available. Please select from: {string.Join(", ", availableTokens.OrderBy(t => t))}", cancellationToken);
-                    continue;
-                }
-
-                break;
+                await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid token number.", cancellationToken);
+                continue;
             }
+
+            if (!byte.TryParse(tokenInput, out selectedToken))
+            {
+                await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
+                continue;
+            }
+
+            if (!gameState.CurrentPlayerTokens.Contains(selectedToken))
+            {
+                await Interface.RenderPlayerTextAsync(TextType.Error, $"Token {selectedToken} is not available. Please select from: {{ {FormatPlayerTokens(gameState.CurrentPlayerTokens)} }}", cancellationToken);
+                continue;
+            }
+
+            break;
         }
 
-        // Get row selection.
+        // Get position selection (1-9 for standard 3x3 board).
 
-        int selectedRow;
+        int selectedPosition;
+
+        var maxPosition = gameState.Board.Length;
+        var positionPrompt = $"Select a position (1-{gameState.Board.Length}): ";
+        var invalidPositionMessage = $"Position must be between 1 and {maxPosition}.";
 
         while (true)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            await Interface.RenderPlayerTextAsync(TextType.Prompt, positionPrompt, cancellationToken);
 
-            await Interface.RenderPlayerTextAsync(TextType.Prompt, $"{Environment.NewLine}Select a row (1-{gameState.TokensPerRow}): ", cancellationToken);
-            var rowInput = await Interface.ReadPlayerResponseAsnyc(cancellationToken);
+            var positionInput = await Interface.ReadPlayerResponseAsnyc(cancellationToken);
 
-            if (!cancellationToken.IsCancellationRequested)
+            if (string.IsNullOrWhiteSpace(positionInput))
             {
-                if (string.IsNullOrWhiteSpace(rowInput))
-                {
-                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid row number.", cancellationToken);
-                    continue;
-                }
-
-                if (!int.TryParse(rowInput.Trim(), out selectedRow))
-                {
-                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
-                    continue;
-                }
-
-                if ((selectedRow < 1) || (selectedRow > gameState.TokensPerRow))
-                {
-                    await Interface.RenderPlayerTextAsync(TextType.Error, $"Row must be between 1 and {gameState.TokensPerRow}.", cancellationToken);
-                    continue;
-                }
-
-                break;
+                await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid position number.", cancellationToken);
+                continue;
             }
-        }
 
-        // Get column selection.
-
-        int selectedColumn;
-
-        while (true)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            await Interface.RenderPlayerTextAsync(TextType.Prompt, $"Select a column (1-{gameState.TokensPerRow}): ", cancellationToken);
-            var columnInput = await Interface.ReadPlayerResponseAsnyc(cancellationToken);
-
-            if (!cancellationToken.IsCancellationRequested)
+            if (!int.TryParse(positionInput, out selectedPosition))
             {
-                if (string.IsNullOrWhiteSpace(columnInput))
-                {
-                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid column number.", cancellationToken);
-                    continue;
-                }
-
-                if (!int.TryParse(columnInput.Trim(), out selectedColumn))
-                {
-                    await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
-                    continue;
-                }
-
-                if ((selectedColumn < 1) || (selectedColumn > gameState.TokensPerRow))
-                {
-                    await Interface.RenderPlayerTextAsync(TextType.Error, $"Column must be between 1 and {gameState.TokensPerRow}.", cancellationToken);
-                    continue;
-                }
-
-                break;
+                await Interface.RenderPlayerTextAsync(TextType.Error, "Please enter a valid number.", cancellationToken);
+                continue;
             }
+
+            if ((selectedPosition < 1) || (selectedPosition > maxPosition))
+            {
+                await Interface.RenderPlayerTextAsync(TextType.Error, invalidPositionMessage, cancellationToken);
+                continue;
+            }
+
+            // Convert to 0-based board index.
+
+            var boardIndex = selectedPosition - 1;
+
+            // Check if the selected position is occupied.
+
+            if (gameState.Board[boardIndex] != GameState.EmptyBoardSpaceValue)
+            {
+                await Interface.RenderPlayerTextAsync(TextType.Error, $"Position {selectedPosition} is already occupied. Please try again.", cancellationToken);
+                continue;
+            }
+
+            break;
         }
 
-        // Check if the selected position is occupied.
+        // Convert position to board index (1-based to 0-based).
 
-        if (!gameState.IsEmptyPosition(selectedRow, selectedColumn))
+        return new Move(gameState.CurrentTurn, (selectedPosition - 1), selectedToken);
+    }
+
+    /// <summary>
+    ///   Formats the set of player tokens for display.
+    /// </summary>
+    ///
+    /// <param name="tokens">The set of player tokens to consider.</param>
+    ///
+    /// <returns>The set of tokens, formatted for display.</returns>
+    ///
+    private static string FormatPlayerTokens(HashSet<byte> tokens)
+    {
+        if (tokens.Count == 0)
         {
-            await Interface.RenderPlayerTextAsync(TextType.Error, $"Position at row {selectedRow}, column {selectedColumn} is already occupied. Please try again.{Environment.NewLine}", cancellationToken);
-
-            // Restart the position selection process.
-
-            return await PlayTurnAsync(gameState, cancellationToken);
+            return "None";
         }
 
-        await Interface.RenderPlayerTextAsync(TextType.Message, $"{Environment.NewLine}Placing token {selectedToken} at row {selectedRow}, column {selectedColumn}...{Environment.NewLine}", cancellationToken);
-        return new Move(gameState.CurrentTurn, gameState.GetBoardPosition(selectedRow, selectedColumn), selectedToken);
+        // We know the set of available tokens will be a reasonable size, so
+        // sort using a stack allocated array to avoid the allocation needed for
+        // IOrderedEnumerable<T> when doing a direct `Order` sort on the hash set.
+
+        var sortedTokens = (Span<byte>)stackalloc byte[tokens.Count];
+        var index = 0;
+
+        foreach (var token in tokens)
+        {
+            sortedTokens[index++] = token;
+        }
+
+        sortedTokens.Sort();
+
+        // Pre-calculate capacity to avoid StringBuilder reallocations.  Account for
+        // the number of tokens, commas, spaces, and surrounding braces.
+
+        var capacity = 4 + (sortedTokens.Length * 3);
+        var builder = new StringBuilder(capacity);
+
+        builder.Append("{ ");
+
+        for (index = 0; index < sortedTokens.Length; ++index)
+        {
+            if (index > 0)
+            {
+                builder.Append(", ");
+            }
+
+            builder.Append(sortedTokens[index]);
+        }
+
+        builder.Append(" }");
+
+        return builder.ToString();
     }
 }

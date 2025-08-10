@@ -1,6 +1,7 @@
-using BenchmarkDotNet.Running;
+using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Jobs;
+using BenchmarkDotNet.Running;
 
 namespace Squire.NumTic.Benchmark;
 
@@ -11,16 +12,16 @@ namespace Squire.NumTic.Benchmark;
 public class Program
 {
     /// <summary>
-    ///   Runs the benchmark suite with optional quick-test mode.
+    ///   Runs the benchmark suite with optional quick-test mode or filtering support.
     /// </summary>
     ///
-    /// <param name="args">Command line arguments. Use "--quick-test" for faster execution.</param>
+    /// <param name="args">Command line arguments. Use "--quick-test" for faster execution, or standard BenchmarkDotNet args for filtering.</param>
     ///
     public static void Main(string[] args)
     {
         // For testing, run a quick verification of all benchmark suites.
 
-        if ((args.Length > 0) && (args[0] == "--quick-test"))
+        if (args.Length > 0 && args[0] == "--quick-test")
         {
             var config = ManualConfig
                 .Create(DefaultConfig.Instance)
@@ -30,15 +31,17 @@ public class Program
             BenchmarkRunner.Run<TokenManagementBenchmarks>(config);
             BenchmarkRunner.Run<BotPlayerBenchmarks>(config);
             BenchmarkRunner.Run<WinningLinesBenchmarks>(config);
+            BenchmarkRunner.Run<BoardRenderingBenchmarks>(config);
+            BenchmarkRunner.Run<BoardBuildingBenchmarks>(config);
+            BenchmarkRunner.Run<TokenFormattingBenchmarks>(config);
         }
         else
         {
-            // Full benchmark suite.
+            // Use BenchmarkSwitcher to enable filtering and other BenchmarkDotNet features.
 
-            BenchmarkRunner.Run<GameStateBenchmarks>();
-            BenchmarkRunner.Run<TokenManagementBenchmarks>();
-            BenchmarkRunner.Run<BotPlayerBenchmarks>();
-            BenchmarkRunner.Run<WinningLinesBenchmarks>();
+            BenchmarkSwitcher
+                .FromAssembly(Assembly.GetExecutingAssembly())
+                .Run(args);
         }
     }
 }

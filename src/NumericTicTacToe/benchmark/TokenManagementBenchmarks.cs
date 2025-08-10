@@ -61,7 +61,7 @@ public class TokenManagementBenchmarks
     {
         // Simulate the optimization we implemented.
 
-        Span<byte> playerTokens = stackalloc byte[_gameState.CurrentPlayerTokens.Count];
+        var playerTokens = (Span<byte>)stackalloc byte[_gameState.CurrentPlayerTokens.Count];
         var index = 0;
 
         foreach (var token in _gameState.CurrentPlayerTokens)
@@ -99,6 +99,7 @@ public class TokenManagementBenchmarks
     public void AddRemoveToken()
     {
         var tokens = new HashSet<byte>(_gameState.CurrentPlayerTokens);
+
         tokens.Remove(5);
         tokens.Add(5);
     }

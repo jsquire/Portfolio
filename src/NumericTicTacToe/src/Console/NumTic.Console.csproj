@@ -12,6 +12,12 @@
     <Folder Include="Properties\" />
   </ItemGroup>
 
+  <!-- Package References -->
+  <ItemGroup>
+    <PackageReference Include="Spectre.Console" />
+  </ItemGroup>
+
+  <!-- Project References -->
   <ItemGroup>
     <ProjectReference Include="..\Game\NumTic.Game.csproj" />
   </ItemGroup>

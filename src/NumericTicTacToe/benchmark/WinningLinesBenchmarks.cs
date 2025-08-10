@@ -60,7 +60,7 @@ public class WinningLinesBenchmarks
                 new HashSet<byte> { 3, 7, 9 },      // Odd tokens available (1,5 used)
                 new HashSet<byte> { 6, 8 }          // Even tokens available (2,4 used)
             ]);
-        // Odd can play 9 at position 2 for 1+5+9=15 win (top row)
+        // Odd can play 9 at position 2 for 1+5+9=15 win (top row).
 
         // Competitive state - both players have winning opportunities.
 
@@ -72,7 +72,7 @@ public class WinningLinesBenchmarks
                 new HashSet<byte> { 3, 7, 9 },      // Odd tokens available (1,5 used)
                 new HashSet<byte> { 4, 6 }          // Even tokens available (2,8 used)
             ]);
-        // Odd can win with 9 at position 8: 1+5+9=15 (diagonal)
+        // Odd can win with 9 at position 8: 1+5+9=15 (diagonal).
 
         // Full board state - only leave a few spots empty.
 
@@ -84,7 +84,7 @@ public class WinningLinesBenchmarks
                 new HashSet<byte> { 9 },            // Odd tokens available (1,3,5,7 used)
                 new HashSet<byte> { 8 }             // Even tokens available (2,4,6 used)
             ]);
-        // Leave positions 7 and 8 empty for testing
+        // Leave positions 7 and 8 empty for testing.
     }
 
     /// <summary>

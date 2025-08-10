@@ -6,7 +6,7 @@ Numeric Tic-Tac-Toe is a strategic variant of the classic Tic-Tac-Toe game that 
 
 The game originated as an educational tool to help students practice basic arithmetic while engaging in strategic thinking. Unlike traditional Tic-Tac-Toe where the objective is simply to get three symbols in a row, Numeric Tic-Tac-Toe introduces mathematical constraints that require players to think several moves ahead while considering numerical relationships.
 
-Jesse was introduced to this variant in 1998 as part of a college assignment and wrote a version in the Ada programming language.  The C# version was originally authored in 2025 for fun and as an experiment with allowing extensible rendering and opponent implementation.
+Jesse was introduced to this variant in 1998 as part of a college assignment and wrote a version in the Ada programming language.  The C# version was originally authored in 2025 for fun and as an experiment with allowing extensible rendering and opponent implementation.  
 
 ### Rules
 
@@ -28,11 +28,32 @@ This numerical approach transforms the simple strategy of traditional Tic-Tac-To
 
 ### Structure
 
-- **src**
- _The container for the project implementation._
+- **src**  
+_The container for the project implementation._
 
-- **tests**
-  _The container for the project tests._
+- **tests**  
+ _The container for the project tests._
 
-- **NumericTicTacToe.sln**
-  _The Visual Studio solution file for the project._
+- **NumericTicTacToe.sln**  
+ _The Visual Studio solution file for the project._
+
+### Experiments and Exploration
+
+Beyond the game itself, this project also serves as a playground for trying out new ideas and stretching into areas that Jesse doesn’t always get to explore in day-to-day work.  It provides a platform to test concepts, benchmark patterns, and have a bit of fun exploring:
+
+- **Efficiency Patterns in .NET**  
+  Experimenting with modern low-allocation techniques and performance-oriented coding.  Even when the practical gains are small, it is rewarding to explore how far efficiency can be pushed while still balancing clarity and maintainability.
+
+- **Benchmarking Design Patterns**  
+  Comparing design approaches through benchmarks to see how they hold up in practice.  The focus is less on squeezing out every last microsecond and more on understanding where different patterns are most effective.
+
+- **AI-Assisted Development**  
+  Using AI tools as a partner in the process. Most of the code is still handwritten, but AI has been helpful as a "rubber duck," for brainstorming ideas, identifying potential improvements, and generating much of the test coverage.  It has also been a chance to explore instruction-tuning and automation files.
+
+- **AI Agent Players**  
+  Trying out AI services as autonomous game players, more for curiosity than competitive edge.  This creates an opportunity to see how well agent-driven decision making compares to traditional algorithmic strategies.
+
+- **Exploring UI Platforms**  
+  After several years of SDK library work, this has been a chance to experiment with frameworks like Spectre.Console, .NET MAUI, and Godot to see how the same game feels across different environments.
+
+This combination of efficiency work, pattern exploration, AI experimentation, and UI tinkering makes the project both a professional exercise and an enjoyable space for creative engineering.
