@@ -1,5 +1,6 @@
 using Squire.NumTic;
 using Squire.NumTic.Console;
+using Squire.NumTic.Contracts;
 using Squire.NumTic.Players;
 
 using var cancellationSource = new CancellationTokenSource();
@@ -16,13 +17,41 @@ Console.CancelKeyPress += (sender, eventArgs) =>
     eventArgs.Cancel = true;
 };
 
+// Show splash screen and get player preferences.
 
-// Create a game with two console players and the default game board.
+var (selectedPlayerToken, selectedDifficulty) = SplashScreen.Show();
 
-var gameInterface = new ConsoleGameInterface();
-var oddPlayer = new ConsolePlayer(gameInterface);
-var evenPlayer = new BotPlayer(gameInterface);
-var game = new Game(oddPlayer, evenPlayer, gameInterface);
+// Create game interface and players based on user choices.
+
+var gameState = GameState.CreateDefault();
+var gameInterface = new ConsoleGameInterface(gameState);
+var humanPlayer = new ConsolePlayer(gameInterface);
+var botOptions = new BotPlayerOptions { Difficulty = selectedDifficulty };
+var botPlayer = new BotPlayer(gameInterface, botOptions);
+
+// Assign players based on token selection.
+
+IPlayer oddPlayer;
+IPlayer evenPlayer;
+
+switch (selectedPlayerToken)
+{
+    case PlayerToken.Odd:
+        oddPlayer = humanPlayer;
+        evenPlayer = botPlayer;
+        break;
+
+    case PlayerToken.Even:
+        oddPlayer = botPlayer;
+        evenPlayer = humanPlayer;
+        break;
+
+    default:
+        throw new ArgumentOutOfRangeException(nameof(selectedPlayerToken), "Invalid player token selected.");
+};
+
+
+var game = new Game(oddPlayer, evenPlayer, gameInterface, gameState);
 
 try
 {

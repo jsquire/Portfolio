@@ -4,6 +4,11 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
+  <!-- General Dependencies -->
+  <ItemGroup>
+    <PackageVersion Include="Spectre.Console" Version="0.50.0" />
+  </ItemGroup>
+
   <!-- Test-Only Dependencies -->
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
     <PackageVersion Include="BenchmarkDotNet" Version="0.15.2" />
@@ -12,5 +17,6 @@
     <PackageVersion Include="NUnit" Version="4.2.2" />
     <PackageVersion Include="NUnit.Analyzers" Version="4.4.0" />
     <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
+    <PackageVersion Include="Spectre.Console.Testing" Version="0.50.0" />
   </ItemGroup>
 </Project>

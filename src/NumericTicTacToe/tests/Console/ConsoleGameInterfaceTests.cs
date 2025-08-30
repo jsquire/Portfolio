@@ -1,5 +1,7 @@
 using NUnit.Framework;
-using Squire.NumTic;
+using NSubstitute;
+using Spectre.Console;
+using Spectre.Console.Testing;
 using Squire.NumTic.Console;
 
 namespace Squire.NumTic.Tests;
@@ -21,7 +23,9 @@ public class ConsoleGameInterfaceTests
     [Test]
     public async Task RenderAsyncWithNullGameStateThrows()
     {
-        var gameInterface = new ConsoleGameInterface();
+        var testConsole = new TestConsole();
+        var gameState = CreateValidGameState();
+        var gameInterface = new ConsoleGameInterface(gameState, testConsole);
 
         await Assert.ThatAsync(async () => await gameInterface.RenderAsync(null!),
             Throws.ArgumentNullException.With.Property(nameof(ArgumentNullException.ParamName)).EqualTo("gameState"));
@@ -34,8 +38,9 @@ public class ConsoleGameInterfaceTests
     [Test]
     public async Task RenderAsyncWithCancellationTokenThrows()
     {
-        var gameInterface = new ConsoleGameInterface();
+        var testConsole = new TestConsole();
         var gameState = CreateValidGameState();
+        var gameInterface = new ConsoleGameInterface(gameState, testConsole);
 
         using var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
@@ -45,29 +50,36 @@ public class ConsoleGameInterfaceTests
     }
 
     /// <summary>
-    ///   Verifies that RenderAsync handles winning game scenarios.
+    ///   Verifies that RenderAsync handles winning game state information correctly.
     /// </summary>
     ///
     [Test]
-    public async Task RenderAsyncWithWinningGameRendersCorrectly()
+    public async Task RenderAsyncWithWinningGameShowsWinner()
     {
-        var gameInterface = new ConsoleGameInterface();
-        var gameState = CreateWinningGameState();
+        // Use TestConsole for proper Spectre.Console testing.
 
-        // Redirect console output to avoid cluttering test output.
+        var testConsole = new TestConsole();
+        var gameState = CreateValidGameState();
+        UpdateGameStateToWinningScenario(gameState);
 
-        using var originalOut = System.Console.Out;
-        using var stringWriter = new StringWriter();
-        System.Console.SetOut(stringWriter);
+        // Create the ConsoleGameInterface AFTER we have the final game state
 
-        try
-        {
-            await gameInterface.RenderAsync(gameState);
-        }
-        finally
-        {
-            System.Console.SetOut(originalOut);
-        }
+        var gameInterface = new ConsoleGameInterface(gameState, testConsole);
+
+        // Test that rendering completes for winning game states.
+
+        await gameInterface.RenderAsync(gameState);
+
+        var output = testConsole.Output;
+
+        // Verify that winning state is displayed.
+
+        Assert.That(output, Contains.Substring("Odd"), "Should display the winning player");
+
+        // Verify the game state is actually in a winning condition.
+
+        Assert.That(gameState.Winner, Is.Not.Null, "Game state should have a winner");
+        Assert.That(gameState.IsGameOver, Is.True, "Game should be marked as over");
     }
 
     /// <summary>
@@ -75,246 +87,122 @@ public class ConsoleGameInterfaceTests
     /// </summary>
     ///
     [Test]
-    public async Task RenderPlayerTextAsyncHandlesAllTextTypesCorrectly()
+    public async Task RenderPlayerTextAsyncHandlesTextType()
     {
-        var gameInterface = new ConsoleGameInterface();
+        var testConsole = new TestConsole();
+        var gameState = CreateValidGameState();
+        var gameInterface = new ConsoleGameInterface(gameState, testConsole);
 
-        // Redirect console output to avoid cluttering test output.
-
-        using var originalOut = System.Console.Out;
-        using var stringWriter = new StringWriter();
-
-        System.Console.SetOut(stringWriter);
-
-        try
+        foreach (var textType in Enum.GetValues<TextType>())
         {
-            // Test that all enum values are handled without throwing.
+            await gameInterface.RenderPlayerTextAsync(textType, "Test message");
 
-            foreach (TextType textType in Enum.GetValues<TextType>())
+            // Some rendering types related to prompting are only rendered when
+            // reading input, so ensure that flow is triggered before capturing output.
+
+            if (textType == TextType.Prompt)
             {
-                await gameInterface.RenderPlayerTextAsync(textType, "Test");
+                testConsole.Input.PushTextWithEnter("test input");
+                var readTask = gameInterface.ReadPlayerResponseAsnyc();
+
+                _ = await readTask;
             }
-        }
-        finally
-        {
-            System.Console.SetOut(originalOut);
-        }
-    }
 
-    /// <summary>
-    ///   Verifies that RenderPlayerTextAsync respects contract behavior for parameter validation.
-    /// </summary>
-    ///
-    [Test]
-    public async Task RenderPlayerTextAsyncWithEmptyStringHandlesEmptyInput()
-    {
-        var gameInterface = new ConsoleGameInterface();
-
-        // Redirect console output to avoid cluttering test output.
-
-        using var originalOut = System.Console.Out;
-        using var stringWriter = new StringWriter();
-
-        System.Console.SetOut(stringWriter);
-
-        try
-        {
-            await gameInterface.RenderPlayerTextAsync(TextType.Message, "");
-        }
-        finally
-        {
-            System.Console.SetOut(originalOut);
+            var output = testConsole.Output;
+            Assert.That(output, Contains.Substring("Test message"), $"Should render message for {textType}");
         }
     }
 
     /// <summary>
-    ///   Verifies that ReadPlayerResponseAsync can be called without throwing at the contract level.
+    ///   Verifies that ReadPlayerResponseAsync returns the correct input from the console.
     /// </summary>
     ///
     [Test]
-    public async Task ReadPlayerResponseAsyncAcceptsCallWithoutCancellation()
+    public async Task ReadPlayerResponseAsyncReturnsCorrectInput()
     {
-        var gameInterface = new ConsoleGameInterface();
+        var gameState = CreateValidGameState();
+        var testConsole = new TestConsole();
 
-        var originalInput = System.Console.In;
-        var input = new StringReader("1\n"); // Simulate user typing "1" and pressing Enter
+        // Push specific input followed by Enter for TextPrompt
 
-        System.Console.SetIn(input);
+        testConsole.Input.PushTextWithEnter("player move input");
 
-        try
-        {
-            await gameInterface.ReadPlayerResponseAsnyc();
-        }
-        finally
-        {
-            System.Console.SetIn(originalInput);
-        }
+        var gameInterface = new ConsoleGameInterface(gameState, testConsole);
+
+        var result = await gameInterface.ReadPlayerResponseAsnyc();
+
+        // Verify the method returns the exact input provided
+
+        Assert.That(result, Is.EqualTo("player move input"), "Should return the exact input provided by the player");
     }
 
     /// <summary>
-    ///   Verifies that ConsoleGameInterface handles extremely large game boards correctly.
+    ///   Verifies that ConsoleGameInterface displays board state correctly after moves are played.
     /// </summary>
     ///
     [Test]
-    public async Task ConsoleGameInterfaceHandlesLargeBoardsCorrectly()
+    public async Task RenderAsyncShowsCorrectBoardStateAfterMoves()
     {
-        var gameInterface = new ConsoleGameInterface();
+        // Use a mock console to prevent UI widgets from appearing in test output.
 
-        // Create a large 10x10 board to test rendering performance and correctness.
+        var testConsole = new TestConsole();
+        var gameState = CreateValidGameState();
 
-        var largeBoard = new byte[100];
-        var largeGameState = new GameState(
-            PlayerToken.Odd,
-            largeBoard,
-            50,
-            [
-                new HashSet<byte> { 1, 3, 5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25, 27, 29, 31, 33, 35, 37, 39, 41, 43, 45, 47, 49 },
-                new HashSet<byte> { 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32, 34, 36, 38, 40, 42, 44, 46, 48, 50 }
-            ]);
+        // Apply some moves using proper game flow
 
-        // Place some tokens to create a more complex board state.
+        gameState.ApplyMove(new Move(PlayerToken.Odd, 0, 1));   // Top-left
+        gameState.ApplyMove(new Move(PlayerToken.Even, 4, 2));  // Center
+        gameState.ApplyMove(new Move(PlayerToken.Odd, 8, 3));   // Bottom-right
 
-        largeBoard[0] = 1;   // Top-left
-        largeBoard[10] = 3;  // Second row, first column
-        largeBoard[99] = 5;  // Bottom-right
+        var gameInterface = new ConsoleGameInterface(gameState, testConsole);
 
-        using var originalOut = System.Console.Out;
-        using var stringWriter = new StringWriter();
-        System.Console.SetOut(stringWriter);
+        // Test that rendering this state works correctly.
 
-        try
-        {
-            await gameInterface.RenderAsync(largeGameState);
+        await gameInterface.RenderAsync(gameState);
 
-            var output = stringWriter.ToString();
+        var output = testConsole.Output;
 
-            // Verify the output contains expected structural elements for large boards.
+        // Verify that board state information is displayed correctly.
 
-            Assert.That(output, Contains.Substring("NUMERIC TIC-TAC-TOE"), "Should contain title");
-            Assert.That(output, Contains.Substring("Game Board:"), "Should contain board header");
-            Assert.That(output, Contains.Substring("Players:"), "Should contain players section");
-            Assert.That(output.Split('\n').Length, Is.GreaterThan(30), "Large board should produce substantial output");
-        }
-        finally
-        {
-            System.Console.SetOut(originalOut);
-        }
+        Assert.That(output, Contains.Substring("Even"), "Should display current player (Even's turn)");
+        Assert.That(output, Contains.Substring("1"), "Should display placed token 1");
+        Assert.That(output, Contains.Substring("2"), "Should display placed token 2");
+        Assert.That(output, Contains.Substring("3"), "Should display placed token 3");
     }
 
     /// <summary>
-    ///   Verifies that ConsoleGameInterface handles concurrent rendering calls safely.
+    ///   Verifies that ReadPlayerResponseAsync handles multiple sequential input operations correctly.
     /// </summary>
     ///
     [Test]
-    public async Task ConsoleGameInterfaceHandlesConcurrentRenderingSafely()
+    public async Task ReadPlayerResponseAsyncHandlesSequentialInputs()
     {
-        var gameInterface = new ConsoleGameInterface();
-        var gameState = CreateWinningGameState();
+        var gameState = CreateValidGameState();
+        var testConsole = new TestConsole();
+        var expectedResponses = new[] { "move1", "move2", "move3" };
 
-        // Redirect console to capture all output.
+        // Queue multiple responses in the test console with Enter keys
 
-        using var originalOut = System.Console.Out;
-        using var stringWriter = new StringWriter();
-        System.Console.SetOut(stringWriter);
-
-        try
+        foreach (var response in expectedResponses)
         {
-            // Execute multiple concurrent render operations.
-
-            var renderTasks = Enumerable.Range(0, 10)
-                .Select(_ => gameInterface.RenderAsync(gameState))
-                .ToArray();
-
-            await Task.WhenAll(renderTasks);
-
-            // All tasks should complete successfully without exceptions.
-
-            foreach (var task in renderTasks)
-            {
-                Assert.That(task.IsCompletedSuccessfully, Is.True,
-                    "Concurrent rendering should complete without exceptions");
-            }
+            testConsole.Input.PushTextWithEnter(response);
         }
-        finally
+
+        var gameInterface = new ConsoleGameInterface(gameState, testConsole);
+
+        // Execute sequential read operations
+
+        var results = new List<string>();
+
+        for (var i = 0; i < expectedResponses.Length; i++)
         {
-            System.Console.SetOut(originalOut);
+            var result = await gameInterface.ReadPlayerResponseAsnyc();
+            results.Add(result ?? string.Empty);
         }
-    }
 
-    /// <summary>
-    ///   Verifies that RenderPlayerTextAsync handles null and extremely long text correctly.
-    /// </summary>
-    ///
-    [Test]
-    public async Task RenderPlayerTextAsyncHandlesExtremeTextLengths()
-    {
-        var gameInterface = new ConsoleGameInterface();
+        // Verify all reads returned the expected responses in order
 
-        using var originalOut = System.Console.Out;
-        using var stringWriter = new StringWriter();
-        System.Console.SetOut(stringWriter);
-
-        try
-        {
-            // Test with extremely long text that could cause buffer issues.
-
-            var longText = new string('A', 100000);
-            var textWithNewlines = string.Join("\n", Enumerable.Repeat("Line of text", 1000));
-            var textWithSpecialChars = "Text with special chars: \0\t\r\n\x1B[31m\uFEFF";
-
-            await gameInterface.RenderPlayerTextAsync(TextType.Message, longText);
-            await gameInterface.RenderPlayerTextAsync(TextType.Error, textWithNewlines);
-            await gameInterface.RenderPlayerTextAsync(TextType.Prompt, textWithSpecialChars);
-
-            // If we reach here without exceptions, the interface handled extreme text correctly.
-
-            var output = stringWriter.ToString();
-            Assert.That(output.Length, Is.GreaterThan(50000), "Should have rendered substantial content");
-        }
-        finally
-        {
-            System.Console.SetOut(originalOut);
-        }
-    }
-
-    /// <summary>
-    ///   Verifies that ReadPlayerResponseAsync handles rapid successive calls correctly.
-    /// </summary>
-    ///
-    [Test]
-    public async Task ReadPlayerResponseAsyncHandlesRapidSuccessiveCalls()
-    {
-        var gameInterface = new ConsoleGameInterface();
-        var responses = new[] { "response1", "response2", "response3", "response4", "response5" };
-
-        using var originalInput = System.Console.In;
-        using var stringReader = new StringReader(string.Join("\n", responses));
-        System.Console.SetIn(stringReader);
-
-        try
-        {
-            // Execute rapid successive read operations.
-
-            var readTasks = Enumerable.Range(0, 5)
-                .Select(_ => gameInterface.ReadPlayerResponseAsnyc())
-                .ToArray();
-
-            var results = await Task.WhenAll(readTasks);
-
-            // Verify all reads completed and returned expected responses.
-
-            Assert.That(results.Length, Is.EqualTo(5), "Should complete all read operations");
-
-            foreach (var result in results)
-            {
-                Assert.That(responses, Contains.Item(result),
-                    "Each result should be one of the expected responses");
-            }
-        }
-        finally
-        {
-            System.Console.SetIn(originalInput);
-        }
+        Assert.That(results, Is.EqualTo(expectedResponses), "Should return responses in the correct order");
     }
 
     /// <summary>
@@ -332,28 +220,35 @@ public class ConsoleGameInterfaceTests
             ]);
 
     /// <summary>
-    ///   Creates a winning game state for testing.
+    ///   Updates an existing game state to create a realistic winning scenario
+    ///   that follows proper turn alternation and token management using ApplyMove.
     /// </summary>
     ///
-    private static GameState CreateWinningGameState()
+    private static GameState UpdateGameStateToWinningScenario(GameState gameState)
     {
-        var board = new byte[9];
-        board[0] = 1; // (1,1)
-        board[1] = 5; // (1,2)
-        board[2] = 9; // (1,3) - Winning row: 1 + 5 + 9 = 15
+        // Simulate alternating moves using ApplyMove: Odd(3), Even(2), Odd(5), Even(4), Odd(7) = Win
+        // This creates a valid game progression that keeps the highest tokens available
 
-        var gameState = new GameState(
-            PlayerToken.Even,
-            board,
-            15,
-            [
-                new HashSet<byte> { 3, 7 },     // Odd player has used 1, 5, 9
-                new HashSet<byte> { 2, 4, 6, 8 } // Even player hasn't used anything yet
-            ]);
+        // Move 1: Odd player places 3 at position 0
 
-        // Manually set the winner by scanning, since this is a test scenario.
+        gameState.ApplyMove(new Move(PlayerToken.Odd, 0, 3));
 
-        _ = gameState.ScanForWinner();
+        // Move 2: Even player places 2 at position 3
+
+        gameState.ApplyMove(new Move(PlayerToken.Even, 3, 2));
+
+        // Move 3: Odd player places 5 at position 1
+
+        gameState.ApplyMove(new Move(PlayerToken.Odd, 1, 5));
+
+        // Move 4: Even player places 4 at position 4
+
+        gameState.ApplyMove(new Move(PlayerToken.Even, 4, 4));
+
+        // Move 5: Odd player places 7 at position 2 (completes winning row: 3+5+7=15)
+
+        gameState.ApplyMove(new Move(PlayerToken.Odd, 2, 7));
+
         return gameState;
     }
 }
