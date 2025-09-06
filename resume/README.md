@@ -9,7 +9,7 @@ Included in this section are Jesse's resume and other documents to introduce him
 * **resume-jesse-squire.docx**  
   _This is Jesse's current resume in Microsoft Word format._
 
-**resume-jesse-squire.md**  
+* **resume-jesse-squire.md**  
   _This is Jesse's current resume in Markdown format._
 
 * **about-jesse-squire.md**  
