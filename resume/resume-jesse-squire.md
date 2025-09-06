@@ -6,9 +6,9 @@
   <sup> &nbsp; • &nbsp; </sup>
   <img src="https://www.freepnglogos.com/uploads/email-logo-png-21.png" alt="email logo" width="20"/><sup> jesse [dot] squire [at] gmail [dot] com </sup>
   <sup> &nbsp; • &nbsp; </sup>
-  <img src="https://img.icons8.com/?size=100&id=Qfh1PDlzLB72&format=png&color=228BE6" alt="LinkedIn logo" width="20"/><sup> <a href=https://www.linkedin.com/in/jessesquire">LinkedIn</a></sup>
+  <img src="https://img.icons8.com/?size=100&id=Qfh1PDlzLB72&format=png&color=228BE6" alt="LinkedIn logo" width="20"/><sup> <a href="https://www.linkedin.com/in/jessesquire">LinkedIn</a></sup>
   <sup> &nbsp; • &nbsp; </sup>
-  <img src="https://img.icons8.com/?size=100&id=4Z2nCrz5iPY2&format=png&color=228BE6" alt="GitHub logo" width="20"/><sup> <a href=https://github.com/jsquire">GitHub</a></sup>
+  <img src="https://img.icons8.com/?size=100&id=4Z2nCrz5iPY2&format=png&color=228BE6" alt="GitHub logo" width="20"/><sup> <a href="https://github.com/jsquire">GitHub</a></sup>
 </p>
 
 ## Summary
