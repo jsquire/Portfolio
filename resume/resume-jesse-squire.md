@@ -151,15 +151,15 @@ Software engineering, architecture, and leadership roles across small to mid-siz
 ## Awards and Recognition
 
 **Title Credits:** 
-  - Halo 5: Guardians
-  - Halo 5: Forge
-  - Halo: The Master Chief Collection
-  - Halo: Spartan Strike
-  - Halo Channel
+- Halo 5: Guardians
+- Halo 5: Forge
+- Halo: The Master Chief Collection
+- Halo: Spartan Strike
+- Halo Channel
   
 **Special Thanks:**  
-  - Gears of War: Ultimate Edition _(343 Industries Services Team)_
-  - Gears of War 4 _(as 343 Section 3 Services Team)_
+- Gears of War: Ultimate Edition _(343 Industries Services Team)_
+- Gears of War 4 _(as 343 Section 3 Services Team)_
 
 ## Education
 
