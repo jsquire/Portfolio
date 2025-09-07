@@ -134,17 +134,17 @@ Software engineering, architecture, and leadership roles across small to mid-siz
 ## Projects
 
 **Microsoft Azure SDK**  
-  _(2019 – Present)_ · [GitHub](https://github.com/Azure/azure-sdk-for-net)  
+  _2019 – Present_ · [GitHub](https://github.com/Azure/azure-sdk-for-net)  
 
   The Microsoft Azure software development kit (SDK) is a set of open-source libraries and tools for developers to build applications on the Azure platform. Their goal is to provide a development experience that is intuitive, approachable, and which has been designed around real-world scenarios. Use of an SDK will look and feel consistent with the language and technology stack that an application is built on and the API should clearly express the intent of the developer with minimal ceremony and boilerplate code. A common design is maintained across the SDKs, so that those using multiple languages or technology stacks can leverage the Azure SDK in a familiar way.  
 
 **OpenAI .NET SDK**  
-  _(2025 – Present)_ · [GitHub](https://github.com/openai/openai-dotnet)  
+  _2025 – Present_ · [GitHub](https://github.com/openai/openai-dotnet)  
 
   The OpenAI .NET SDK is the official client library for developers building applications on the OpenAI platform using .NET. It provides a first-class, idiomatic .NET experience for interacting with OpenAI services, including models for natural language processing, code generation, and image generation. The SDK emphasizes clarity, consistency, and ease of use, allowing developers to quickly integrate OpenAI capabilities into applications with minimal ceremony or boilerplate. As the development lead, I own end-to-end strategy, implementation, and community engagement for the SDK.  
 
 **Numeric Tic-Tac-Toe**  
-  _(2025 – Present)_ · [GitHub](https://github.com/jsquire/Portfolio/tree/main/src/NumericTicTacToe)  
+  _2025 – Present_ · [GitHub](https://github.com/jsquire/Portfolio/tree/main/src/NumericTicTacToe)  
   
   Numeric Tic-Tac-Toe is a strategic variant of the classic Tic-Tac-Toe game that replaces traditional X's and O's with numbers. Beyond the game itself, this project serves as a playground for trying out new ideas and stretching into areas that I don’t always get to explore in day-to-day work such as low-level optimizations in .NET, applying modern language features efficiently, AI-assisted development, and different UI flow and patterns.
 
