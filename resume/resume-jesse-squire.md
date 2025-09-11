@@ -163,4 +163,5 @@ Software engineering, architecture, and leadership roles across small to mid-siz
 
 ## Education
 
-**Stockton University** — B.S. Computer Science
+**Stockton University**  
+_B.S. Computer Science_
