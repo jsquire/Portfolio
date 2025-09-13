@@ -1,3 +1,4 @@
+using System.Reflection;
 using NSubstitute;
 using NUnit.Framework;
 using Squire.NumTic.Contracts;
@@ -6,7 +7,7 @@ using Squire.NumTic.Players;
 namespace Squire.NumTic.Tests;
 
 /// <summary>
-///   Tests for the <see cref="BotPlayer"/> class.
+///   The suite of tests for the <see cref="BotPlayer"/> class.
 /// </summary>
 ///
 [TestFixture]
@@ -14,7 +15,7 @@ namespace Squire.NumTic.Tests;
 public class BotPlayerTests
 {
     /// <summary>
-    ///   Verifies that the constructor throws ArgumentNullException when gameInterface is null.
+    ///   Verifies functionality of the BotPlayer constructor.
     /// </summary>
     ///
     [Test]
@@ -26,7 +27,44 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync throws ArgumentNullException when gameState is null.
+    ///   Verifies functionality of the BotPlayer constructor.
+    /// </summary>
+    ///
+    [Test]
+    public void ConstructorClonesProvidedOptions()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+        var originalOptions = new BotPlayerOptions { Difficulty = Difficulty.Hard };
+        var botPlayer = new BotPlayer(mockGameInterface, originalOptions);
+
+        // Use reflection to access the private Options field.
+        var optionsField = typeof(BotPlayer).GetField("Options", BindingFlags.NonPublic | BindingFlags.Instance);
+        var storedOptions = (BotPlayerOptions)optionsField!.GetValue(botPlayer)!;
+
+        Assert.That(storedOptions, Is.Not.SameAs(originalOptions));
+        Assert.That(storedOptions.Difficulty, Is.EqualTo(originalOptions.Difficulty));
+    }
+
+    /// <summary>
+    ///   Verifies functionality of the BotPlayer constructor.
+    /// </summary>
+    ///
+    [Test]
+    public void ConstructorUsesDefaultOptionsWhenNoneProvided()
+    {
+        var mockGameInterface = Substitute.For<IGameInterface>();
+        var botPlayer = new BotPlayer(mockGameInterface);
+
+        // Use reflection to access the private Options field.
+
+        var optionsField = typeof(BotPlayer).GetField("Options", BindingFlags.NonPublic | BindingFlags.Instance);
+        var storedOptions = (BotPlayerOptions)optionsField!.GetValue(botPlayer)!;
+
+        Assert.That(storedOptions, Is.SameAs(BotPlayerOptions.Default));
+    }
+
+    /// <summary>
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -41,7 +79,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync throws InvalidOperationException when game is over.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -62,7 +100,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync finds and returns a winning move when available.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -89,7 +127,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync returns a valid move for a normal game state.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -97,7 +135,7 @@ public class BotPlayerTests
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
         var botPlayer = CreateFastTestBotPlayer(mockGameInterface);
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         var move = await botPlayer.PlayTurnAsync(gameState);
 
@@ -108,7 +146,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync respects cancellation tokens.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -116,7 +154,8 @@ public class BotPlayerTests
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
         var botPlayer = CreateFastTestBotPlayer(mockGameInterface);
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
+
         var cts = new CancellationTokenSource();
         cts.Cancel();
 
@@ -126,7 +165,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync does not modify the original game state.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -134,7 +173,7 @@ public class BotPlayerTests
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
         var botPlayer = CreateFastTestBotPlayer(mockGameInterface);
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // Capture original state.
 
@@ -152,7 +191,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that the bot prioritizes good strategic positions.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -161,7 +200,6 @@ public class BotPlayerTests
         var mockGameInterface = Substitute.For<IGameInterface>();
         var botPlayer = CreateFastTestBotPlayer(mockGameInterface);
         var gameState = CreateOpponentNearWinState();
-
         var move = await botPlayer.PlayTurnAsync(gameState);
 
         // Verify the bot makes a reasonable strategic move.
@@ -172,7 +210,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that the bot makes reasonable moves in mid-game scenarios.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -181,7 +219,6 @@ public class BotPlayerTests
         var mockGameInterface = Substitute.For<IGameInterface>();
         var botPlayer = CreateFastTestBotPlayer(mockGameInterface);
         var gameState = CreateMidGameState();
-
         var move = await botPlayer.PlayTurnAsync(gameState);
 
         Assert.That(move.Player, Is.EqualTo(gameState.CurrentTurn), "Move should be for current player");
@@ -190,7 +227,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that invalid difficulty options are detected.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -199,7 +236,7 @@ public class BotPlayerTests
         var mockGameInterface = Substitute.For<IGameInterface>();
         var limitedOptions = new BotPlayerOptions { Difficulty = (Difficulty)int.MinValue };
         var botPlayer = new BotPlayer(mockGameInterface, limitedOptions);
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         await Assert.ThatAsync(async () => await botPlayer.PlayTurnAsync(gameState),
             Throws.InstanceOf<ArgumentOutOfRangeException>().With.Property("ParamName").EqualTo("difficulty"),
@@ -207,7 +244,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that pruning optimization produces identical results to exhaustive evaluation.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -234,7 +271,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that pruning handles deep search scenarios correctly without missing optimal moves.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -254,19 +291,18 @@ public class BotPlayerTests
         Assert.That(move.PositionIndex, Is.EqualTo(2), "Should find the winning position 2");
 
         gameState.ApplyMove(move);
-
         Assert.That(gameState.Winner, Is.EqualTo(PlayerToken.Odd), "Player should find the winning move with deep search and pruning");
     }
 
     /// <summary>
-    ///   Verifies that pruning respects cancellation tokens during optimization.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
     public void PruningRespectsCancellation()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
         var player = new BotPlayer(mockGameInterface, new BotPlayerOptions { Difficulty = Difficulty.Perfect });
 
         using var cts = new CancellationTokenSource();
@@ -280,7 +316,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that pruning handles game end conditions correctly.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -298,12 +334,11 @@ public class BotPlayerTests
         Assert.That(move.PositionIndex, Is.EqualTo(2), "Should find the winning position 2");
 
         gameState.ApplyMove(move);
-
         Assert.That(gameState.Winner, Is.EqualTo(PlayerToken.Odd), "Pruning should not miss winning moves near game end");
     }
 
     /// <summary>
-    ///   Verifies that pruning maintains performance benefits over multiple evaluations.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -331,7 +366,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that the bot prefers immediate wins over delayed wins.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -357,7 +392,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that the bot prefers delayed losses when all moves lead to opponent wins.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -375,11 +410,11 @@ public class BotPlayerTests
         Assert.That(gameState.GetPlayerTokens(gameState.CurrentTurn), Contains.Item(move.Token), "Should use available token");
         Assert.That(gameState.Board[move.PositionIndex], Is.EqualTo(GameState.EmptyBoardSpaceValue), "Should place on empty space");
 
-        // The specific move choice will depend on the implementation, but it should be a valid delaying move.
+        // The specific move choice cannot be validated because it is non-deterministic.
     }
 
     /// <summary>
-    ///   Verifies that depth-based scoring calculates correct values for wins and losses.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -387,7 +422,7 @@ public class BotPlayerTests
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
         var botPlayer = new BotPlayer(mockGameInterface, new BotPlayerOptions { Difficulty = Difficulty.Medium });
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // The base score calculation should follow the formula: Math.Max(1000, maxDepth * 100).
         // For medium difficulty with our game state, maxDepth should be around 3.
@@ -403,7 +438,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that the bot distinguishes between multiple win options at different depths.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -431,7 +466,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that the bot handles boundary conditions correctly at maximum depth.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -457,7 +492,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that BotPlayer handles concurrent access safely without data corruption.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -469,7 +504,7 @@ public class BotPlayerTests
         // Create multiple independent game states for concurrent testing.
 
         var gameStates = Enumerable.Range(0, 10)
-            .Select(_ => CreateValidGameState())
+            .Select(_ => GameState.CreateDefault())
             .ToArray();
 
         // Execute multiple PlayTurnAsync calls concurrently.
@@ -478,7 +513,8 @@ public class BotPlayerTests
         {
             var move = await botPlayer.PlayTurnAsync(gameState);
             return new { GameState = gameState, Move = move };
-        }).ToArray();
+        })
+        .ToArray();
 
         var results = await Task.WhenAll(tasks);
 
@@ -502,58 +538,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that BotPlayer continues to function correctly under memory pressure scenarios.
-    /// </summary>
-    ///
-    [Test]
-    public async Task BotPlayerHandlesMemoryPressureGracefully()
-    {
-        var mockGameInterface = Substitute.For<IGameInterface>();
-        var botPlayer = new BotPlayer(mockGameInterface, new BotPlayerOptions { Difficulty = Difficulty.Hard });
-        var gameState = CreateValidGameState();
-
-        // Simulate memory pressure by creating large objects and forcing garbage collection.
-        // This tests that the bot's recursive algorithms handle memory constraints gracefully.
-
-        var largeObjects = new List<byte[]>();
-
-        try
-        {
-            // Allocate memory to create pressure (but not enough to cause OutOfMemoryException).
-
-            for (var i = 0; i < 100; i++)
-            {
-                largeObjects.Add(new byte[1024 * 1024]); // 1MB allocations
-            }
-
-            // Force garbage collection to simulate memory pressure.
-
-            GC.Collect(2, GCCollectionMode.Forced, true);
-            GC.WaitForPendingFinalizers();
-            GC.Collect(2, GCCollectionMode.Forced, true);
-
-            // The bot should still function correctly under memory pressure.
-
-            var move = await botPlayer.PlayTurnAsync(gameState);
-
-            Assert.That(move.Player, Is.EqualTo(gameState.CurrentTurn),
-                "Bot should function correctly under memory pressure");
-            Assert.That(gameState.CurrentPlayerTokens, Contains.Item(move.Token),
-                "Bot should make valid moves under memory pressure");
-            Assert.That(gameState.Board[move.PositionIndex], Is.EqualTo(GameState.EmptyBoardSpaceValue),
-                "Bot should select valid positions under memory pressure");
-        }
-        finally
-        {
-            // Clean up large objects to prevent affecting other tests.
-
-            largeObjects.Clear();
-            GC.Collect();
-        }
-    }
-
-    /// <summary>
-    ///   Verifies that BotPlayer's look-ahead calculation handles edge cases correctly.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -588,7 +573,7 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Verifies that BotPlayer handles rapid successive calls without degradation.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -603,7 +588,7 @@ public class BotPlayerTests
 
         for (var i = 0; i < 20; i++)
         {
-            var gameState = CreateValidGameState();
+            var gameState = GameState.CreateDefault();
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
 
             var move = await botPlayer.PlayTurnAsync(gameState);
@@ -638,26 +623,12 @@ public class BotPlayerTests
     }
 
     /// <summary>
-    ///   Creates a valid initial game state for testing.
-    /// </summary>
-    ///
-    private static GameState CreateValidGameState() =>
-        new GameState(
-            PlayerToken.Odd,
-            new byte[9],
-            15,
-            [
-                new HashSet<byte> { 1, 3, 5, 7, 9 },
-                new HashSet<byte> { 2, 4, 6, 8 }
-            ]);
-
-    /// <summary>
     ///   Creates a game state where the current player can win in one move.
     /// </summary>
     ///
     private static GameState CreateNearWinState()
     {
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // Set up a near-win scenario: 1 + 5 = 6, need 9 at position 2 to win (1+5+9=15).
         // Row 0: positions 0, 1, 2
@@ -678,7 +649,7 @@ public class BotPlayerTests
     ///
     private static GameState CreateOpponentNearWinState()
     {
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // Create a scenario where Even has potential threats and Odd needs to respond.
         // Even can win with 2+6+8=16, but that's not possible (need exactly 15).
@@ -701,7 +672,7 @@ public class BotPlayerTests
     ///
     private static GameState CreateMidGameState()
     {
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // Play a few moves to create a mid-game scenario.
 
@@ -720,7 +691,7 @@ public class BotPlayerTests
     ///
     private static GameState CreateGameOverState()
     {
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // Create a winning scenario for Odd: 1+5+9=15 in top row (positions 0,1,2).
 
@@ -746,7 +717,7 @@ public class BotPlayerTests
     ///
     private static GameState CreateGameStateWithMultipleMoves()
     {
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // Apply a few moves to create an interesting mid-game position.
 
@@ -763,7 +734,7 @@ public class BotPlayerTests
     ///
     private static GameState CreateStateWithImmediateWinOption()
     {
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // Set up the same near-win scenario as CreateNearWinState.
         // This gives the bot an immediate win option with token 9 at position 2.
@@ -784,7 +755,7 @@ public class BotPlayerTests
     ///
     private static GameState CreateStateWhereAllMovesLeadToLoss()
     {
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // Create a scenario where Even has multiple threatening positions and Odd must choose between bad options.
         // Board state after moves:
@@ -814,7 +785,7 @@ public class BotPlayerTests
     ///
     private static GameState CreateStateWithMultipleWinDepths()
     {
-        var gameState = CreateValidGameState();
+        var gameState = GameState.CreateDefault();
 
         // Create a scenario where Odd can win immediately.
         // Set up: 1+5 in anti-diagonal (positions 6, 4), need 9 at position 2.

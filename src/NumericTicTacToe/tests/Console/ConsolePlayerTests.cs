@@ -6,8 +6,7 @@ using Squire.NumTic.Contracts;
 namespace Squire.NumTic.Tests;
 
 /// <summary>
-///   Tests for the <see cref="ConsolePlayer"/> class focusing on contract compliance
-///   and valid game scenarios rather than UI specifics or built-in .NET functionality.
+///   The suite of tests for the <see cref="ConsolePlayer"/> class.
 /// </summary>
 ///
 [TestFixture]
@@ -17,7 +16,7 @@ public class ConsolePlayerTests
 {
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync validates the gameState parameter properly.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -31,7 +30,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles cancellation appropriately.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -49,7 +48,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync uses the game interface to render player information.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -77,7 +76,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync returns a valid Move with proper game state interactions.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -100,7 +99,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles invalid input by retrying.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -129,7 +128,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync respects different board configurations.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -149,7 +148,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles non-numeric token input gracefully.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -179,7 +178,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles negative token input gracefully.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -200,7 +199,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles empty string input gracefully.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -221,7 +220,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles extremely large token values gracefully.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -242,7 +241,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles decimal number input gracefully.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -263,7 +262,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles Unicode digit input gracefully.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -284,7 +283,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles emoji input gracefully.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -305,7 +304,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles extremely long input strings without crashing.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -336,7 +335,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles input with leading and trailing whitespace correctly.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]
@@ -362,7 +361,7 @@ public class ConsolePlayerTests
     }
 
     /// <summary>
-    ///   Verifies that PlayTurnAsync handles tab character input correctly.
+    ///   Verifies functionality of the PlayTurnAsync method.
     /// </summary>
     ///
     [Test]

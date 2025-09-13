@@ -7,8 +7,7 @@ using Squire.NumTic.Console;
 namespace Squire.NumTic.Tests;
 
 /// <summary>
-///   Tests for the <see cref="ConsoleGameInterface"/> class focusing on custom behavior
-///   and valid game scenarios rather than built-in .NET functionality.
+///   The suite of tests for the <see cref="ConsoleGameInterface"/> class.
 /// </summary>
 ///
 [TestFixture]
@@ -17,7 +16,7 @@ namespace Squire.NumTic.Tests;
 public class ConsoleGameInterfaceTests
 {
     /// <summary>
-    ///   Verifies that RenderAsync throws when gameState is null.
+    ///   Verifies functionality of the RenderAsync method.
     /// </summary>
     ///
     [Test]
@@ -32,7 +31,7 @@ public class ConsoleGameInterfaceTests
     }
 
     /// <summary>
-    ///   Verifies that RenderAsync handles cancellation appropriately when requested.
+    ///   Verifies functionality of the RenderAsync method.
     /// </summary>
     ///
     [Test]
@@ -50,7 +49,7 @@ public class ConsoleGameInterfaceTests
     }
 
     /// <summary>
-    ///   Verifies that RenderAsync handles winning game state information correctly.
+    ///   Verifies functionality of the RenderAsync method.
     /// </summary>
     ///
     [Test]
@@ -83,7 +82,7 @@ public class ConsoleGameInterfaceTests
     }
 
     /// <summary>
-    ///   Verifies that RenderPlayerTextAsync handles different TextType values correctly.
+    ///   Verifies functionality of the RenderPlayerTextAsync method.
     /// </summary>
     ///
     [Test]
@@ -114,7 +113,7 @@ public class ConsoleGameInterfaceTests
     }
 
     /// <summary>
-    ///   Verifies that ReadPlayerResponseAsync returns the correct input from the console.
+    ///   Verifies functionality of the ReadPlayerResponseAsync method.
     /// </summary>
     ///
     [Test]
@@ -137,7 +136,7 @@ public class ConsoleGameInterfaceTests
     }
 
     /// <summary>
-    ///   Verifies that ConsoleGameInterface displays board state correctly after moves are played.
+    ///   Verifies functionality of the RenderAsync method.
     /// </summary>
     ///
     [Test]
@@ -171,7 +170,7 @@ public class ConsoleGameInterfaceTests
     }
 
     /// <summary>
-    ///   Verifies that ReadPlayerResponseAsync handles multiple sequential input operations correctly.
+    ///   Verifies functionality of the ReadPlayerResponseAsync method.
     /// </summary>
     ///
     [Test]

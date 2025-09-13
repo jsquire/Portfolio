@@ -1,0 +1,58 @@
+{
+  "name": "numeric-tic-tac-toe-mcp",
+  "displayName": "Numeric Tic-Tac-Toe MCP",
+  "description": "VS Code extension that provides MCP integration for playing Numeric Tic-Tac-Toe with natural language",
+  "version": "0.1.0",
+  "publisher": "squire",
+  "engines": {
+    "vscode": "^1.95.0"
+  },
+  "categories": ["Other"],
+  "keywords": ["mcp", "tic-tac-toe", "game", "ai", "natural-language"],
+  "contributes": {
+    "mcpServerDefinitionProviders": [
+      {
+        "id": "numeric-tic-tac-toe-provider",
+        "label": "Numeric Tic-Tac-Toe MCP Server Provider"
+      }
+    ]
+  },
+  "activationEvents": [
+    "onLanguage:*",
+    "onStartupFinished"
+  ],
+  "main": "./dist/extension.js",
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "npm run check-types && node esbuild.config.js --production",
+    "check-types": "tsc --noEmit",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.config.js --watch",
+    "watch:tsc": "tsc --noEmit --watch",
+    "package": "npm run build && npx vsce package --no-yarn",
+    "package-only": "npx vsce package --no-yarn",
+    "build": "pwsh -ExecutionPolicy Bypass -File ./build.ps1",
+    "build:release": "pwsh -ExecutionPolicy Bypass -File ./build.ps1 -Configuration Release",
+    "build:debug": "pwsh -ExecutionPolicy Bypass -File ./build.ps1 -Configuration Debug",
+    "build:bash": "./build.sh",
+    "build:bash:release": "./build.sh Release",
+    "build:bash:debug": "./build.sh Debug",
+    "lint": "eslint src",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/node": "^24.3.3",
+    "@types/vscode": "^1.95.0",
+    "@eslint/js": "^9.35.0",
+    "eslint": "^9.35.0",
+    "typescript-eslint": "^8.43.0",
+    "typescript": "^5.6.3",
+    "esbuild": "^0.25.9",
+    "npm-run-all2": "^8.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/squire-projects/numeric-tic-tac-toe.git"
+  },
+  "license": "MIT"
+}

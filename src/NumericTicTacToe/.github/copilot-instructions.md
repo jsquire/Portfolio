@@ -14,6 +14,209 @@ Numeric Tic-Tac-Toe is a strategic variant of classic Tic-Tac-Toe that uses numb
 - Clearly explain your reasoning by verifying claims step by step.
 - Avoid hallucinations at all costs—only respond with grounded, verifiable information.
 
+## Data Validation and Anti-Hallucination Framework
+
+### CRITICAL: Never Make Assumptions - Always Validate
+
+**Fundamental Principle**: Every technical decision must be based on verified, authoritative data. Assumptions and "best guesses" during implementation are strictly forbidden.
+
+### Pre-Implementation Validation Protocol
+
+**BEFORE making any code changes:**
+
+1. **Verify Current State**
+   - Read existing files to understand current implementation
+   - Use `grep_search` or `semantic_search` to understand usage patterns
+   - Check test files to understand expected behavior
+   - Validate assumptions about existing APIs and interfaces
+
+2. **Research Authoritative Sources**
+   - For .NET APIs: Use official Microsoft documentation
+   - For third-party libraries: Check official documentation and GitHub repositories  
+   - For VS Code APIs: Verify against official VS Code API documentation
+   - For project patterns: Analyze existing codebase patterns, not external assumptions
+
+3. **Surface Uncertainty**
+   - When data is insufficient: State "I don't have enough information to make this decision"
+   - When multiple approaches exist: Present options with trade-offs for human decision
+   - When authoritative sources are unavailable: Request guidance rather than guessing
+
+### Mandatory Analysis Steps
+
+**For every implementation task:**
+
+1. **Current State Analysis**
+   ```
+   - What exists now? (verified by reading actual files)
+   - What are the current patterns? (verified by code analysis)
+   - What are the constraints? (verified by project structure/dependencies)
+   ```
+
+2. **Requirements Validation**
+   ```
+   - What exactly needs to be implemented? (clarify ambiguous requirements)
+   - What are the acceptance criteria? (verify against existing test patterns)
+   - What are the dependencies? (verify by examining current codebase)
+   ```
+
+3. **Approach Planning**
+   ```
+   - What approach aligns with existing patterns? (verified by codebase analysis)
+   - What are the risks and unknowns? (identify areas needing validation)
+   - What assumptions need verification? (list all assumptions explicitly)
+   ```
+
+### Forbidden Practices
+
+**❌ NEVER:**
+- Make API calls or use library features without first verifying they exist
+- Assume file structures or patterns without reading actual files
+- Implement based on "standard practices" without verifying project-specific patterns
+- Guess at parameter types, method signatures, or interface contracts
+- Use placeholder implementations with TODO comments
+- Make breaking changes without analyzing impact on existing code
+
+**✅ ALWAYS:**
+- Present plans to chat for review before implementation
+- Verify all APIs and patterns against actual codebase
+- Read existing files to understand current state
+- Ask for clarification when requirements are ambiguous
+- Provide specific file/line references when discussing existing code
+
+## Research and Verification Workflow
+
+### Step 1: Gather Authoritative Data
+
+**Use tools systematically to collect facts:**
+
+1. **For existing code understanding:**
+   - `read_file`: Get current implementation details
+   - `semantic_search`: Understand usage patterns across codebase
+   - `grep_search`: Find specific patterns or API usage
+   - `list_code_usages`: Understand how interfaces/classes are implemented
+
+2. **For external API verification:**
+   - `fetch_webpage`: Get official documentation
+   - `get_vscode_api`: For VS Code extension development
+   - `github_repo`: For understanding third-party library patterns (when specified)
+
+3. **For project structure validation:**
+   - `list_dir`: Understand actual directory structure
+   - `file_search`: Find configuration files and dependencies
+   - `get_errors`: Verify current compilation state
+
+### Step 2: Validate All Assumptions
+
+**Before proposing any solution:**
+
+1. **List all assumptions explicitly:**
+   ```
+   "I am assuming that..."
+   "Based on the existing pattern in [specific file], I believe..."
+   "The requirements suggest X, but I need to verify..."
+   ```
+
+2. **Provide evidence for each assumption:**
+   ```
+   "Verified by reading [file] lines [X-Y]"
+   "Confirmed by documentation at [URL]"
+   "Pattern established in [specific examples with file references]"
+   ```
+
+3. **Identify knowledge gaps:**
+   ```
+   "I don't have enough information about..."
+   "This assumption needs verification because..."
+   "I would need to research [specific topic] to be certain..."
+   ```
+
+### Step 3: Present Plans for Review
+
+**Always surface implementation plans to chat BEFORE coding:**
+
+1. **Current State Summary:**
+   - What exists now (with specific file references)
+   - What patterns are established (with examples)
+   - What constraints exist (with evidence)
+
+2. **Proposed Approach:**
+   - Specific changes planned (with rationale)
+   - Files to be modified/created (with justification)
+   - Dependencies and integration points (verified)
+
+3. **Risks and Unknowns:**
+   - What could go wrong?
+   - What needs further research?
+   - What assumptions still need validation?
+
+4. **Request for Approval:**
+   - "Does this approach align with project goals?"
+   - "Are there constraints I haven't considered?"
+   - "Should I proceed with this implementation?"
+
+## Quality Assurance Checkpoints
+
+### Before Every Code Change
+
+**Mandatory verification checklist:**
+
+- [ ] Have I read all relevant existing files?
+- [ ] Have I verified all API references against authoritative sources?
+- [ ] Have I identified and validated all assumptions?
+- [ ] Have I presented the plan for human review?
+- [ ] Do I have specific evidence for every technical decision?
+- [ ] Have I checked for integration impacts on existing code?
+
+### During Implementation
+
+**Continuous validation:**
+
+- Verify each API call/method signature before use
+- Check existing patterns before introducing new approaches
+- Test assumptions against actual codebase behavior
+- Stop and ask for guidance when encountering unknowns
+
+### After Implementation
+
+**Validation requirements:**
+
+- Run tests to verify functionality
+- Check for compilation errors
+- Validate against original requirements
+- Confirm integration with existing patterns
+
+## Communication Standards for Technical Decisions
+
+### When You Don't Know
+
+**Required phrasing patterns:**
+
+- "I don't have sufficient information to determine..."
+- "This would require research into..."
+- "I can see X in the codebase, but I'm uncertain about Y..."
+- "The official documentation would need to be consulted for..."
+- "I should verify this assumption before proceeding..."
+
+### When Presenting Analysis
+
+**Required structure:**
+
+1. **Facts** (with sources): "Based on reading [file], I can see..."
+2. **Analysis** (with reasoning): "This suggests that..."
+3. **Uncertainties** (explicitly stated): "However, I'm unclear about..."
+4. **Recommendations** (with rationale): "I recommend... because..."
+5. **Next Steps** (specific actions): "To validate this, I should..."
+
+### When Requesting Approval
+
+**Always include:**
+
+- Current state summary (verified)
+- Proposed changes (specific)
+- Rationale (evidence-based)
+- Risks/unknowns (honest assessment)
+- Request for guidance (explicit)
+
 ## Code Standards & Conventions
 
 ### .NET Performance and Memory Allocation Guidelines
@@ -57,6 +260,7 @@ Modern .NET performance best practices emphasize **allocation reduction** as a p
 - **Methods**: PascalCase (`PlayTurnAsync`, `CreateValidGameState`)
 - **Properties**: PascalCase (`CurrentTurn`, `PlayerToken`)
 - **Fields**: camelCase with underscore prefix (`_players`, `_interface`)
+- **ReadOnly Fields**: PascalCase (`CurrentTurn`, `PlayerToken`)
 - **Parameters**: camelCase (`gameState`, `cancellationToken`)
 - **Local Variables**: camelCase (`mockGameInterface`, `player`)
 
@@ -89,10 +293,10 @@ public class ExampleClass
 
     // Fields (static first, by visibility, then instance by visibility)
     // Should have a blank line between static and instance fields.
-    private static readonly object _lock = new();
+    private static readonly object Lock = new();
     public static readonly string DefaultName = "Default";
 
-    private readonly IService _service;
+    private readonly IService Service;
     public readonly int Id;
 
     // Properties (static first, by visibility, then instance by visibility)
@@ -194,6 +398,35 @@ public async Task<Move> PlayTurnAsync(GameState gameState,
 - When writing tests, DO NOT attempt to work around gaps in testability.  If the scenario being tested does not support the right level of abstraction to be mocked or have behavior injected, surface this in chat for discussion.
 - Never make changes to the implementation to expose members or change behavior for testability unless explicitly directed to do so.  Surface your analysis for blockers in chat for discussion.
 
+### API Contract Testing
+- **Test External Behavior Only**: Focus on what users of the API can observe, not internal implementation details
+- **Respect Class Invariants**: Never test patterns that would violate the intended usage of a class or method
+- **Constructor Patterns**: Use public constructors and factory methods as intended - avoid accessing internal state or bypassing normal instantiation
+- **Surface API Issues**: If testing reveals API design problems (e.g., required internal access), discuss the API design rather than working around it
+
+**Example - Testing Constructor Behavior:**
+```csharp
+// ✅ GOOD: Tests observable behavior through public API
+[Test]
+public void ConstructorInitializesWithExpectedDefaults()
+{
+    var tools = new NumericTicTacToeGameTools();
+
+    // Test observable behavior through public methods
+    Assert.That(async () => await tools.CreateGameAsync(...), Throws.Nothing);
+}
+
+// ❌ BAD: Tests internal implementation details
+[Test]
+public void ConstructorSetsInternalFields()
+{
+    var tools = new NumericTicTacToeGameTools();
+    
+    // This tests internal state, not user behavior
+    Assert.That(tools._internalField, Is.Not.Null); // ❌ Accessing internals
+}
+```
+
 ### Test Organization
 - **Test Namespace**: All test classes must use `Squire.NumTic.Tests` namespace (never area-specific namespaces like `NumTic.Tests.Game`)
 - **Test File Organization**: Create test files on a **per-class basis** - all behavior for a class should be tested in a single corresponding test file (e.g., `GameState` → `GameStateTests.cs`, `ConsolePlayer` → `ConsolePlayerTests.cs`)
@@ -202,6 +435,8 @@ public async Task<Move> PlayTurnAsync(GameState gameState,
 - **No Regions**: Do not use `#region`/`#endregion` directives
 - **Local Variables Only**: No class-level test subjects or setup methods
 - **Non-Parallelizable**: Mark test classes with `[NonParallelizable]` if needed
+- **API-Focused Test Design**: Structure tests around user scenarios and API contracts, not implementation details
+- **Test Method Naming**: Name tests based on user behavior being validated, not internal implementation being exercised
 
 ### Test Naming Conventions
 - **Use generic concepts** rather than specific exception types in test names
@@ -220,7 +455,7 @@ public class ConsolePlayerTests
     [Test]
     public async Task MethodNameWithScenarioShouldExpectedBehavior()
     {
-        // Arrange: Create local instances.
+        // Arrange: Create local instances using proper API patterns.
         var mockGameInterface = Substitute.For<IGameInterface>();
         var player = new ConsolePlayer(mockGameInterface);
         var gameState = CreateValidGameState();
@@ -243,17 +478,52 @@ public class ConsolePlayerTests
 - Create mocks locally in each test method
 - Use `Substitute.For<IInterface>()` for interface mocks
 - Verify interactions with `.Received()` and `.DidNotReceive()`
+- **Focus on User-Observable Behavior**: Mock interactions that represent external behavior, not internal implementation details
+- **Avoid Implementation Coupling**: Don't mock internal services or components that users don't directly interact with
 
 ```csharp
-// Setup mock behavior.
-mockGameInterface.ReadPlayerResponseAsnyc(Arg.Any<CancellationToken>())
-    .Returns("1", "1", "1");
+// ✅ GOOD: Mocking user-facing interactions
+mockGameInterface.ReadPlayerResponseAsync(Arg.Any<CancellationToken>())
+    .Returns("1,1,5");
 
-// Verify interactions.
-await mockGameInterface.Received().RenderPlayerTextAsync(
-    Arg.Any<TextType>(),
-    Arg.Is<string>(s => s.Contains("Available tokens")),
+// Verify user-observable behavior occurred
+await mockGameInterface.Received().RenderBoardAsync(
+    Arg.Any<GameState>(), 
     Arg.Any<CancellationToken>());
+
+// ❌ BAD: Mocking internal implementation details
+mockInternalCache.Get(Arg.Any<string>())  // Internal detail, not user behavior
+    .Returns(someObject);
+```
+
+### Test Subject Instantiation
+- **Use Intended Construction Patterns**: Create test subjects through their designed public API (constructors, factory methods, builders)
+- **Avoid Internal Access**: Never bypass normal instantiation to set internal fields or call private methods
+- **Respect API Design**: If normal instantiation is difficult, this suggests an API design issue to discuss, not a testing problem to work around
+
+```csharp
+// ✅ GOOD: Using intended API patterns
+[Test]
+public void CreateGameAsyncCreatesValidGame()
+{
+    var tools = new NumericTicTacToeGameTools();
+    
+    // Use the public API as intended
+    var result = await tools.CreateGameAsync(validRequest);
+    
+    Assert.That(result.Game, Is.Not.Null);
+}
+
+// ❌ BAD: Bypassing normal instantiation
+[Test]
+public void InternalFieldsAreSetCorrectly()
+{
+    var tools = new NumericTicTacToeGameTools();
+
+    // Don't access internal state directly
+    tools._cache = mockCache; // ❌ Setting internal fields
+    var result = tools.GetInternalState(); // ❌ Calling private methods
+}
 ```
 
 ### ❌ **NEVER Create Tests That Only Verify "DoesNotThrow" For:**
@@ -483,12 +753,15 @@ When making changes:
 ## Summary
 
 When working on this codebase:
-1. Follow the established patterns for architecture and naming
-2. Always write comprehensive XML documentation
-3. Use local variables in tests, never class members
-4. Prefer `Assert.ThatAsync` over older assertion methods
-5. Support cancellation tokens in all async operations
-6. Follow the comment standards (full sentences, periods, blank lines)
-7. Maintain the clean separation between game logic and UI concerns
+1. **Always validate assumptions and verify data from authoritative sources before implementation**
+2. **Present implementation plans to chat for review before making code changes**
+3. **Surface uncertainties and knowledge gaps rather than making assumptions**
+4. Follow the established patterns for architecture and naming
+5. Always write comprehensive XML documentation
+6. Use local variables in tests, never class members
+7. Prefer `Assert.ThatAsync` over older assertion methods
+8. Support cancellation tokens in all async operations
+9. Follow the comment standards (full sentences, periods, blank lines)
+10. Maintain the clean separation between game logic and UI concerns
 
 These guidelines ensure consistency and maintainability across the entire Numeric Tic-Tac-Toe codebase.

@@ -3,7 +3,7 @@ using NUnit.Framework;
 namespace Squire.NumTic.Tests;
 
 /// <summary>
-///   Tests for the <see cref="GameState"/> class.
+///   The suite of tests for the <see cref="GameState"/> class.
 /// </summary>
 ///
 [TestFixture]
@@ -11,7 +11,7 @@ namespace Squire.NumTic.Tests;
 public class GameStateTests
 {
     /// <summary>
-    ///   Verifies that GetCurrentPlayerTokens returns the correct token set for the current player.
+    ///   Verifies functionality of the GetCurrentPlayerTokens method.
     /// </summary>
     ///
     /// <param name="currentTurn">The current turn to test.</param>
@@ -30,7 +30,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that CurrentPlayerTokens returns consistent results.
+    ///   Verifies functionality of the CurrentPlayerTokens method.
     /// </summary>
     ///
     [Test]
@@ -44,7 +44,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetPlayerTokens returns the correct token set for the specified player.
+    ///   Verifies functionality of the GetPlayerTokens method.
     /// </summary>
     ///
     /// <param name="player">The player to get tokens for.</param>
@@ -63,7 +63,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetPlayerTokens returns different references for different players.
+    ///   Verifies functionality of the GetPlayerTokens method.
     /// </summary>
     ///
     [Test]
@@ -78,7 +78,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetPlayerTokens works correctly when called multiple times for the same player.
+    ///   Verifies functionality of the GetPlayerTokens method.
     /// </summary>
     ///
     [Test]
@@ -98,7 +98,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState can be created with custom values and maintains those values.
+    ///   Verifies functionality of the GameState constructor.
     /// </summary>
     ///
     [Test]
@@ -118,7 +118,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState record equality works correctly for the same instance.
+    ///   Verifies functionality of the GameState equality.
     /// </summary>
     ///
     [Test]
@@ -132,7 +132,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState 'with' expressions work correctly for creating modified copies.
+    ///   Verifies functionality of the GameState with expressions.
     /// </summary>
     ///
     [Test]
@@ -149,7 +149,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState handles edge cases with empty token sets gracefully.
+    ///   Verifies functionality of the GameState constructor.
     /// </summary>
     ///
     [Test]
@@ -167,7 +167,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState works correctly with modified token sets.
+    ///   Verifies functionality of the GameState token management.
     /// </summary>
     ///
     [Test]
@@ -187,7 +187,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState maintains referential integrity after token modifications.
+    ///   Verifies functionality of the GameState token management.
     /// </summary>
     ///
     [Test]
@@ -207,7 +207,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that AlternatePlayerTurn works correctly with all valid PlayerToken values using TestCase parameters.
+    ///   Verifies functionality of the AlternatePlayerTurn method.
     /// </summary>
     ///
     /// <param name="inputToken">The input token to start with.</param>
@@ -226,7 +226,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that AlternatePlayerTurn is symmetric - alternating twice returns the original player.
+    ///   Verifies functionality of the AlternatePlayerTurn method.
     /// </summary>
     ///
     /// <param name="originalToken">The original token to test.</param>
@@ -245,7 +245,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that AlternatePlayerTurn works correctly in a round-trip scenario with multiple alternations.
+    ///   Verifies functionality of the AlternatePlayerTurn method.
     /// </summary>
     ///
     [Test]
@@ -266,7 +266,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that AlternatePlayerTurn produces the expected sequence when called repeatedly.
+    ///   Verifies functionality of the AlternatePlayerTurn method.
     /// </summary>
     ///
     [Test]
@@ -283,12 +283,12 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that AssertValidBoardPosition works correctly with valid positions.
+    ///   Verifies functionality of the AssertValidBoardPosition method.
     /// </summary>
     ///
     /// <param name="row">The row to test.</param>
     /// <summary>
-    ///   Verifies that AssertValidBoardPosition throws ArgumentOutOfRangeException for invalid row positions.
+    ///   Verifies functionality of the AssertValidBoardPosition method.
     /// </summary>
     ///
     /// <param name="row">The invalid row to test.</param>
@@ -309,7 +309,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that AssertValidBoardPosition throws ArgumentOutOfRangeException for invalid column positions.
+    ///   Verifies functionality of the AssertValidBoardPosition method.
     /// </summary>
     ///
     /// <param name="column">The invalid column to test.</param>
@@ -331,7 +331,7 @@ public class GameStateTests
 
 
     /// <summary>
-    ///   Verifies that GetBoardPositionFromIndex works correctly for valid indices.
+    ///   Verifies functionality of the GetBoardPositionFromIndex method.
     /// </summary>
     ///
     /// <param name="index">The array index to convert.</param>
@@ -358,7 +358,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetBoardPositionFromIndex throws ArgumentOutOfRangeException for invalid indices.
+    ///   Verifies functionality of the GetBoardPositionFromIndex method.
     /// </summary>
     ///
     /// <param name="invalidIndex">The invalid index to test.</param>
@@ -378,7 +378,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that board position methods work correctly with different board sizes.
+    ///   Verifies functionality of the board position methods.
     /// </summary>
     ///
     [Test]
@@ -419,7 +419,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState constructor throws InvalidOperationException for non-square boards.
+    ///   Verifies functionality of the GameState constructor.
     /// </summary>
     ///
     /// <param name="boardSize">The size of the non-square board to test.</param>
@@ -448,7 +448,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner returns null for a new game.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -461,7 +461,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner returns the correct winner when there is a winning combination.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -483,7 +483,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner works correctly for different board sizes.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     /// <param name="boardSize">The size of the board to test (must be a perfect square).</param>
@@ -503,7 +503,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner identifies a diagonal victory correctly.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -523,7 +523,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner identifies a column victory correctly.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -543,7 +543,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner returns null when there is no winner.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -556,7 +556,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner returns null for a partial game with no winning combination.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -576,7 +576,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner works correctly when multiple combinations could win simultaneously.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -597,7 +597,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner works correctly with edge case of 1x1 board.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -618,7 +618,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner returns null for 1x1 board without winning total.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -639,7 +639,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner works correctly with 4x4 board.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -659,7 +659,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner identifies anti-diagonal victory correctly.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -679,7 +679,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner identifies top row victory correctly.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -699,7 +699,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner identifies main diagonal victory with detailed verification.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -719,7 +719,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner identifies middle column victory with detailed verification.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -739,7 +739,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GetWinner handles boundary case where sum is close to but not equal to WinningTotal.
+    ///   Verifies functionality of the GetWinner method.
     /// </summary>
     ///
     [Test]
@@ -759,7 +759,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ScanForWinner returns null when sum equals WinningTotal but not all squares are populated.
+    ///   Verifies functionality of the ScanForWinner method.
     ///   This tests the fix for a bug where partial lines could incorrectly trigger wins.
     /// </summary>
     ///
@@ -780,7 +780,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ScanForWinner returns null for partial diagonal with sum equaling WinningTotal.
+    ///   Verifies functionality of the ScanForWinner method.
     /// </summary>
     ///
     [Test]
@@ -800,7 +800,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ScanForWinner returns null for partial column with sum equaling WinningTotal.
+    ///   Verifies functionality of the ScanForWinner method.
     /// </summary>
     ///
     [Test]
@@ -820,7 +820,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove applies a valid move and updates game state correctly.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -840,7 +840,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove throws InvalidOperationException when token is not available for current player.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -856,7 +856,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove throws ArgumentOutOfRangeException when position index is out of bounds.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     /// <param name="invalidIndex">The invalid position index to test.</param>
@@ -878,7 +878,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove throws InvalidOperationException when position is already occupied.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -896,7 +896,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly detects a winning move and returns the winner.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -917,7 +917,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove works correctly with different board positions.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     /// <param name="positionIndex">The board position index to test.</param>
@@ -942,7 +942,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove alternates turns correctly between players.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -965,7 +965,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly removes tokens from player's available tokens.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -997,7 +997,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove works correctly with larger board sizes.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -1021,7 +1021,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly handles edge case with last available token.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -1050,7 +1050,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove validates token ownership correctly for different players.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     /// <param name="currentPlayer">The current player making the move.</param>
@@ -1088,7 +1088,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly handles complete game scenario with winner detection.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -1127,7 +1127,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly handles edge case with zero position index.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -1144,7 +1144,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly handles different token values for odd players.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     /// <param name="token">The odd token to test.</param>
@@ -1168,7 +1168,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly handles different token values for even players.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     /// <param name="token">The even token to test.</param>
@@ -1191,7 +1191,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly detects diagonal wins.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -1214,7 +1214,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly detects column wins.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -1237,7 +1237,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove throws InvalidOperationException for token already used by same player.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -1265,7 +1265,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly handles moves that don't result in immediate wins.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -1299,7 +1299,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that ApplyMove correctly validates Move.PositionIndex parameter name in exception.
+    ///   Verifies functionality of the ApplyMove method.
     /// </summary>
     ///
     [Test]
@@ -1315,7 +1315,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that UndoMove throws ArgumentOutOfRangeException when position index is invalid.
+    ///   Verifies functionality of the UndoMove method.
     /// </summary>
     ///
     [Test]
@@ -1330,7 +1330,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that UndoMove throws InvalidOperationException when position is already empty.
+    ///   Verifies functionality of the UndoMove method.
     /// </summary>
     ///
     [Test]
@@ -1345,7 +1345,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that UndoMove correctly undoes a simple move without winner.
+    ///   Verifies functionality of the UndoMove method.
     /// </summary>
     ///
     [Test]
@@ -1377,7 +1377,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that UndoMove correctly handles undoing a winning move.
+    ///   Verifies functionality of the UndoMove method.
     /// </summary>
     ///
     [Test]
@@ -1419,7 +1419,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that UndoMove correctly handles multiple move sequences.
+    ///   Verifies functionality of the UndoMove method.
     /// </summary>
     ///
     [Test]
@@ -1458,7 +1458,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that UndoMove correctly restores the turn when undoing the last move in a sequence.
+    ///   Verifies functionality of the UndoMove method.
     /// </summary>
     ///
     [Test]
@@ -1490,8 +1490,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that UndoMove correctly handles undoing a move that doesn't result in a win
-    ///   when there are already winning conditions on the board.
+    ///   Verifies functionality of the UndoMove method.
     /// </summary>
     ///
     [Test]
@@ -1520,8 +1519,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that UndoMove can only remove winners, never create them.
-    ///   This validates the mathematical impossibility of creating wins by removing tokens.
+    ///   Verifies functionality of the UndoMove method.
     /// </summary>
     ///
     [Test]
@@ -1570,7 +1568,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsGameOver returns false for a new game with available moves.
+    ///   Verifies functionality of the IsGameOver property.
     /// </summary>
     ///
     [Test]
@@ -1582,7 +1580,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsGameOver returns true when there is a winner.
+    ///   Verifies functionality of the IsGameOver property.
     /// </summary>
     ///
     [Test]
@@ -1602,7 +1600,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsGameOver returns true when current player has no tokens left.
+    ///   Verifies functionality of the IsGameOver property.
     /// </summary>
     ///
     [Test]
@@ -1618,7 +1616,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsGameOver returns true when the board is completely full.
+    ///   Verifies functionality of the IsGameOver property.
     /// </summary>
     ///
     [Test]
@@ -1642,7 +1640,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsGameOver returns false when there are empty spaces and tokens available.
+    ///   Verifies functionality of the IsGameOver property.
     /// </summary>
     ///
     [Test]
@@ -1666,7 +1664,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsGameOver returns true when board is full even with tokens remaining.
+    ///   Verifies functionality of the IsGameOver property.
     /// </summary>
     ///
     [Test]
@@ -1696,7 +1694,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsGameOver works correctly with different board sizes.
+    ///   Verifies functionality of the IsGameOver property.
     /// </summary>
     ///
     [Test]
@@ -1725,7 +1723,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that CreateCopy creates completely independent copies with proper state preservation.
+    ///   Verifies functionality of the CreateCopy method.
     /// </summary>
     ///
     [Test]
@@ -1764,7 +1762,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that CreateCopy works correctly with different board sizes and winning states.
+    ///   Verifies functionality of the CreateCopy method.
     /// </summary>
     ///
     [Test]
@@ -1811,7 +1809,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that game state handles corrupted board scenarios gracefully.
+    ///   Verifies functionality of the GameState with invalid scenarios.
     /// </summary>
     ///
     [Test]
@@ -1843,7 +1841,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that game state maintains consistency after multiple operations.
+    ///   Verifies functionality of the GameState consistency.
     /// </summary>
     ///
     [Test]
@@ -1877,7 +1875,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState handles extremely large winning totals correctly.
+    ///   Verifies functionality of the GameState with large winning totals.
     /// </summary>
     ///
     [Test]
@@ -1920,7 +1918,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState performs efficiently with rapid successive state changes.
+    ///   Verifies functionality of the GameState performance.
     /// </summary>
     ///
     [Test]
@@ -1961,7 +1959,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState handles minimum and maximum token values correctly.
+    ///   Verifies functionality of the GameState with extreme token values.
     /// </summary>
     ///
     [Test]
@@ -1996,7 +1994,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState maintains data integrity under concurrent access patterns.
+    ///   Verifies functionality of the GameState with concurrent access.
     /// </summary>
     ///
     [Test]
@@ -2048,7 +2046,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that GameState handles the theoretical maximum game length correctly.
+    ///   Verifies functionality of the GameState with maximum game length.
     /// </summary>
     ///
     [Test]
@@ -2091,7 +2089,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove returns null when no winning move exists for empty board.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2104,7 +2102,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove returns null when no winning move exists for the specified player.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2120,7 +2118,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove identifies a winning move in the top row.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2142,7 +2140,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove identifies a winning move in the main diagonal.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2164,7 +2162,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove identifies a winning move in the anti-diagonal.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2186,7 +2184,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove can identify winning moves for even player in valid scenarios.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2211,7 +2209,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove returns null when player doesn't have required token.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2234,7 +2232,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove returns null when line has multiple empty positions.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2251,7 +2249,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove returns first winning move when multiple exist.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2288,7 +2286,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove handles column wins correctly.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2310,7 +2308,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove handles used tokens correctly.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2332,7 +2330,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that FindWinningMove returns null when required token was already used.
+    ///   Verifies functionality of the FindWinningMove method.
     /// </summary>
     ///
     [Test]
@@ -2353,7 +2351,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsEmptyPosition returns true for empty positions on new board.
+    ///   Verifies functionality of the IsEmptyPosition method.
     /// </summary>
     ///
     [Test]
@@ -2372,7 +2370,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsEmptyPosition returns false for occupied positions.
+    ///   Verifies functionality of the IsEmptyPosition method.
     /// </summary>
     ///
     [Test]
@@ -2391,7 +2389,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsEmptyPosition throws for invalid coordinates.
+    ///   Verifies functionality of the IsEmptyPosition method.
     /// </summary>
     ///
     [Test]
@@ -2410,7 +2408,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsEmptyPosition works correctly after undoing moves.
+    ///   Verifies functionality of the IsEmptyPosition method.
     /// </summary>
     ///
     [Test]
@@ -2429,7 +2427,7 @@ public class GameStateTests
     }
 
     /// <summary>
-    ///   Verifies that IsEmptyPosition works with different board sizes.
+    ///   Verifies functionality of the IsEmptyPosition method.
     /// </summary>
     ///
     [Test]

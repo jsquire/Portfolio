@@ -4,9 +4,18 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
 
+  <!-- Shared Versions -->
+  <PropertyGroup>
+    <SpectreConsoleVersion>0.51.1</SpectreConsoleVersion>
+  </PropertyGroup>
+
   <!-- General Dependencies -->
   <ItemGroup>
-    <PackageVersion Include="Spectre.Console" Version="0.50.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="9.0.9" />
+    <PackageVersion Include="ModelContextProtocol" Version="0.3.0-preview.4" />
+    <PackageVersion Include="Spectre.Console" Version="$(SpectreConsoleVersion)" />
   </ItemGroup>
 
   <!-- Test-Only Dependencies -->
@@ -17,6 +26,6 @@
     <PackageVersion Include="NUnit" Version="4.2.2" />
     <PackageVersion Include="NUnit.Analyzers" Version="4.4.0" />
     <PackageVersion Include="NUnit3TestAdapter" Version="4.6.0" />
-    <PackageVersion Include="Spectre.Console.Testing" Version="0.50.0" />
+    <PackageVersion Include="Spectre.Console.Testing" Version="$(SpectreConsoleVersion)" />
   </ItemGroup>
 </Project>

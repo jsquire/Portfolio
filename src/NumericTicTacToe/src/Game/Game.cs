@@ -11,10 +11,10 @@ namespace Squire.NumTic;
 public class Game
 {
     /// <summary>The players in the game.</summary>
-    private readonly IReadOnlyDictionary<PlayerToken, IPlayer> _players;
+    private readonly IReadOnlyDictionary<PlayerToken, IPlayer> Players;
 
     /// <summary>The renderer used to display the game state.</summary>
-    private readonly IGameInterface _interface;
+    private readonly IGameInterface Interface;
 
     /// <summary>The state of the game at this moment in time.  Data will mutate as the game is played.</summary>
     private GameState _state;
@@ -56,9 +56,9 @@ public class Game
         ArgumentNullException.ThrowIfNull(state, nameof(state));
 
         _state = state;
-        _interface = gameInterface;
+        Interface = gameInterface;
 
-        _players = new Dictionary<PlayerToken, IPlayer>(2)
+        Players = new Dictionary<PlayerToken, IPlayer>(2)
         {
             { PlayerToken.Odd, oddPlayer },
             { PlayerToken.Even, evenPlayer }
@@ -74,12 +74,11 @@ public class Game
     ///
     public async Task PlayAsync(CancellationToken cancellationToken = default)
     {
-
         var move = default(Move);
 
         // Render the initial state of the game.
 
-        await _interface.RenderAsync(_state, cancellationToken);
+        await Interface.RenderAsync(_state, cancellationToken);
 
         // Loop until the game has a winner or a cancellation is requested.
 
@@ -87,10 +86,10 @@ public class Game
         {
             try
             {
-                move = await _players[_state.CurrentTurn].PlayTurnAsync(_state, cancellationToken);
+                move = await Players[_state.CurrentTurn].PlayTurnAsync(_state, cancellationToken);
                 _state.ApplyMove(move);
 
-                await _interface.RenderAsync(_state, cancellationToken);
+                await Interface.RenderAsync(_state, cancellationToken);
             }
             catch (OperationCanceledException)
             {

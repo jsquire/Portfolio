@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(CommonTargetFramework)</TargetFramework>
+    <RootNamespace>Squire.NumTic.Mcp</RootNamespace>
+    <OutputType>Exe</OutputType>
+    <IsTrimmable Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net6.0'))">true</IsTrimmable>
+    <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
+  </PropertyGroup>
+
+   <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="vs-code-extension\**" />
+    <EmbeddedResource Remove="vs-code-extension\**" />
+    <None Remove="vs-code-extension\**" />
+  </ItemGroup>
+
+  <!-- Package References -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" />
+    <PackageReference Include="ModelContextProtocol" />
+  </ItemGroup>
+
+  <!-- Project References -->
+  <ItemGroup>
+    <ProjectReference Include="..\Game\NumTic.Game.csproj" />
+  </ItemGroup>
+
+  <!-- Publishing Properties for VS Code Extension  -->
+  <PropertyGroup>
+    <PublishDir>$(MSBuildProjectDirectory)\vs-code-extension\dist\mcp-server</PublishDir>
+  </PropertyGroup>
+</Project>
