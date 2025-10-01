@@ -1,0 +1,6 @@
+{
+    "recommendations": [
+        "ms-vscode.vscode-typescript-next",
+        "connor4312.esbuild-problem-matchers"
+    ]
+}

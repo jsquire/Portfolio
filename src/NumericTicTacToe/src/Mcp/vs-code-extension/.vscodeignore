@@ -1,0 +1,12 @@
+src/**
+node_modules
+.vscode-test/
+.vscode-test-web/
+*.vsix
+.eslintcache
+eslint.config.mjs
+esbuild.config.js
+tsconfig.json
+
+# Don't ignore the MCP server binaries
+!dist/mcp-server/

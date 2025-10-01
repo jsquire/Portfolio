@@ -77,6 +77,8 @@ public class ConsoleGameInterface : IGameInterface
     public ConsoleGameInterface(GameState gameState,
                                 IAnsiConsole? console)
     {
+        ArgumentNullException.ThrowIfNull(gameState, nameof(gameState));
+
         AnsiConsole = console ?? Spectre.Console.AnsiConsole.Console;
         FormattedTokenLookup = BuildFormattedTokenLookup(gameState);
         PositionGuideContent = BuildPositionGuideMarkup(gameState.TokensPerRow);
@@ -131,10 +133,16 @@ public class ConsoleGameInterface : IGameInterface
     ///   be rendered immediately.
     /// </remarks>
     ///
+    /// <exception cref="ArgumentException">Occurs when <paramref name="text" /> is <c>null</c> or empty.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Occurs when <paramref name="type" /> is invalid.</exception>
+    /// <exception cref="OperationCanceledException">Thrown when the operation is canceled.</exception>
+    ///
     public Task RenderPlayerTextAsync(TextType type,
                                       string text,
                                       CancellationToken cancellationToken = default)
     {
+        ArgumentException.ThrowIfNullOrEmpty(text, nameof(text));
+
         switch (type)
         {
             case TextType.Message:
@@ -468,7 +476,7 @@ public class ConsoleGameInterface : IGameInterface
     ///
     /// <returns>A markup string for the position guide.</returns>
     ///
-    public static Markup BuildPositionGuideMarkup(int tokensPerRow)
+    private static Markup BuildPositionGuideMarkup(int tokensPerRow)
     {
         // Calculate exact size needed.
 
@@ -813,7 +821,7 @@ public class ConsoleGameInterface : IGameInterface
             destination[2] = (char)('0' + token % 10);
             return 3;
         }
-}
+    }
 
     /// <summary>
     ///   Calculates the exact length needed for the formatted token string.

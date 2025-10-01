@@ -5,7 +5,7 @@ using Squire.NumTic.Contracts;
 namespace Squire.NumTic.Tests;
 
 /// <summary>
-///   Tests for the <see cref="Game"/> class.
+///   The suite of tests for the <see cref="Game"/> class.
 /// </summary>
 ///
 [TestFixture]
@@ -13,7 +13,7 @@ namespace Squire.NumTic.Tests;
 public class GameTests
 {
     /// <summary>
-    ///   Verifies that the constructor throws ArgumentNullException when oddPlayer is null.
+    ///   Verifies functionality of the constructor.
     /// </summary>
     ///
     [Test]
@@ -29,7 +29,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that the constructor throws ArgumentNullException when evenPlayer is null.
+    ///   Verifies functionality of the constructor.
     /// </summary>
     ///
     [Test]
@@ -45,7 +45,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that the constructor throws ArgumentNullException when renderer is null.
+    ///   Verifies functionality of the constructor.
     /// </summary>
     ///
     [Test]
@@ -61,7 +61,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that the constructor throws ArgumentNullException when state is null.
+    ///   Verifies functionality of the constructor.
     /// </summary>
     ///
     [Test]
@@ -77,7 +77,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that PlayAsync completes a game successfully when a winner is determined.
+    ///   Verifies functionality of the PlayAsync method.
     /// </summary>
     ///
     [Test]
@@ -139,7 +139,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that PlayAsync handles cancellation gracefully.
+    ///   Verifies functionality of the PlayAsync method.
     /// </summary>
     ///
     [Test]
@@ -168,7 +168,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that PlayAsync handles OperationCanceledException from player gracefully.
+    ///   Verifies functionality of the PlayAsync method.
     /// </summary>
     ///
     [Test]
@@ -203,7 +203,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that PlayAsync renders after each successful move.
+    ///   Verifies functionality of the PlayAsync method.
     /// </summary>
     ///
     [Test]
@@ -239,7 +239,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that PlayAsync continues game until winner or cancellation.
+    ///   Verifies functionality of the PlayAsync method.
     /// </summary>
     ///
     [Test]
@@ -282,7 +282,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that Reset(GameState) sets the game to the specified state.
+    ///   Verifies functionality of the Reset method.
     /// </summary>
     ///
     [Test]
@@ -308,7 +308,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that Reset(GameState) throws ArgumentNullException when state is null.
+    ///   Verifies functionality of the Reset method.
     /// </summary>
     ///
     [Test]
@@ -327,7 +327,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that Reset(GameState) can switch between different game configurations.
+    ///   Verifies functionality of the Reset method.
     /// </summary>
     ///
     [Test]
@@ -366,7 +366,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that game maintains player and renderer references after reset.
+    ///   Verifies functionality of the Reset method.
     /// </summary>
     ///
     [Test]
@@ -401,7 +401,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that PlayAsync handles extremely long games without performance degradation.
+    ///   Verifies functionality of the PlayAsync method.
     /// </summary>
     ///
     [Test]
@@ -464,7 +464,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that PlayAsync handles rapid player responses without timing issues.
+    ///   Verifies functionality of the PlayAsync method.
     /// </summary>
     ///
     [Test]
@@ -511,7 +511,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that Game properly handles memory cleanup after multiple play sessions.
+    ///   Verifies functionality of the PlayAsync method.
     /// </summary>
     ///
     [Test]
@@ -576,7 +576,7 @@ public class GameTests
     }
 
     /// <summary>
-    ///   Verifies that Game handles edge case where players alternate very quickly between winning and losing positions.
+    ///   Verifies functionality of the PlayAsync method.
     /// </summary>
     ///
     [Test]

@@ -17,8 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Game\NumTic.Game.csproj" />
     <ProjectReference Include="..\src\Console\NumTic.Console.csproj" />
+    <ProjectReference Include="..\src\Game\NumTic.Game.csproj" />
+    <ProjectReference Include="..\src\Mcp\NumTic.Mcp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Mcp\" />
+  </ItemGroup>
 </Project>
