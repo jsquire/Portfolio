@@ -11,7 +11,7 @@ namespace Squire.NumTic.Tests;
 ///
 [TestFixture]
 [NonParallelizable]
-[Category("Console")]
+[Category(TestCategory.Console)]
 public class ConsolePlayerTests
 {
 

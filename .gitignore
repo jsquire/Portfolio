@@ -45,6 +45,7 @@ project.lock.json
 /data
 .secrets
 appsettings.json
+appsettings.*.json
 local.settings.json
 
 ###################

@@ -11,7 +11,7 @@ namespace Squire.NumTic.Tests;
 /// </summary>
 ///
 [TestFixture]
-[Category("Mcp")]
+[Category(TestCategory.MCP)]
 public class NumericTicTacToeGameToolsTests
 {
     /// <summary>

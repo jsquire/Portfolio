@@ -7,7 +7,7 @@ namespace Squire.NumTic.Tests;
 /// </summary>
 ///
 [TestFixture]
-[Category("Game")]
+[Category(TestCategory.Game)]
 public class GameStateTests
 {
     /// <summary>
@@ -844,7 +844,7 @@ public class GameStateTests
     /// </summary>
     ///
     [Test]
-    public void ApplyMoveThrowsInvalidOperationExceptionWhenTokenNotAvailable()
+    public void ApplyMoveWithUnavailableTokenThrows()
     {
         var gameState = GameState.CreateDefault();
         var invalidMove = new Move(PlayerToken.Odd, 0, 2); // Token 2 belongs to even player
