@@ -1,0 +1,15 @@
+<Project ToolsVersion="Current" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Remove non-project assets needed only for packaging -->
+  <ItemGroup>
+    <None Remove="**\*.md" />
+    <None Remove="deployment\**" />
+    <None Remove="dist\**" />
+
+    <Compile Remove="deployment\**" />
+    <Compile Remove="dist\**" />
+
+    <EmbeddedResource Remove="deployment\**" />
+    <EmbeddedResource Remove="dist\**" />
+  </ItemGroup>
+</Project>

@@ -9,7 +9,7 @@ namespace Squire.NumTic.Tests;
 /// </summary>
 ///
 [TestFixture]
-[Category("Game")]
+[Category(TestCategory.Game)]
 public class GameTests
 {
     /// <summary>

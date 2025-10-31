@@ -2,18 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>$(CommonTargetFramework)</TargetFramework>
-    <RootNamespace>Squire.NumTic.Console</RootNamespace>
-    <OutputType>Exe</OutputType>
+    <RootNamespace>Squire.NumTic.AI</RootNamespace>
     <IsAotCompatible Condition="$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net7.0'))">true</IsAotCompatible>
   </PropertyGroup>
 
-  <ItemGroup>
+   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
 
   <!-- Package References -->
   <ItemGroup>
-    <PackageReference Include="Spectre.Console" />
+    <PackageReference Include="OpenAI" />
   </ItemGroup>
 
   <!-- Project References -->

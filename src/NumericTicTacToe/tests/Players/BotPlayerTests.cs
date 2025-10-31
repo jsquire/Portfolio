@@ -11,7 +11,7 @@ namespace Squire.NumTic.Tests;
 /// </summary>
 ///
 [TestFixture]
-[Category("Players")]
+[Category(TestCategory.Players)]
 public class BotPlayerTests
 {
     /// <summary>

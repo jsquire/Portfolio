@@ -1,4 +1,9 @@
 namespace Squire.NumTic.Players;
+
+/// <summary>
+///   The set of options for configuring a <see cref="BotPlayer" />.
+/// </summary>
+///
 public class BotPlayerOptions
 {
     /// <summary>The default set of options./summary>

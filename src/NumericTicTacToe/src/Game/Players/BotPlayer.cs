@@ -40,6 +40,8 @@ public class BotPlayer : IPlayer
     /// <param name="gameInterface">The game interface to interact with for player operations.</param>
     /// <param name="options">The set of options to use for configuring player behavior.  If not provided a default set is assumed.</param>
     ///
+    /// <exception cref="ArgumentNullException">Occurs when the <paramref name="gameInterface"/> is <c>null</c>.</exception>
+    ///
     public BotPlayer(IGameInterface gameInterface,
                      BotPlayerOptions? options = default)
     {
