@@ -52,7 +52,7 @@ internal class LiveTestAttribute : TestAttribute, IApplyToTest
 
         // Apply Explicit behavior unless Live tests should always run.
 
-        if (!TestEnvironment.RunLiveTestsByDefault)
+        if ((test.RunState != RunState.NotRunnable) && (!TestEnvironment.RunLiveTestsByDefault))
         {
             // Remove all existing categories to ensure Live is the only category.
             // This prevents tests from being included in other category filters.

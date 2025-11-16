@@ -43,5 +43,27 @@ public static class TestEnvironment
     ///   The Azure OpenAI endpoint URL for testing.
     /// </summary>
     ///
-    public static string? AzureOpenAIEndpoint => Configuration["Azure:OpenAI:Endpoint"];
+    public static Uri? AzureOpenAIEndpoint
+    {
+        get
+        {
+            var endpoint = Configuration["Azure:OpenAI:Endpoint"];
+            return endpoint is { Length: 0 } ? null : new Uri(endpoint!);
+        }
+    }
+
+    /// <summary>
+    ///   The Azure OpenAI authorization scope for testing.
+    /// </summary>
+    ///
+    public static string? AzureOpenAIAuthorizationScope =>
+        Configuration["Azure:OpenAI:AuthorizationScope"];
+
+    /// <summary>
+    ///   The name of the model deployment to use as the OpenAI model for
+    ///   client operations.
+    /// </summary>
+    ///
+    public static string? AzureOpenAIModelName =>
+        Configuration["Azure:OpenAI:ModelDeploymentName"];
 }
