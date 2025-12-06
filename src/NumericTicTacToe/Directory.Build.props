@@ -26,6 +26,6 @@
 
   <!-- Custom Properties -->
   <PropertyGroup>
-    <CommonTargetFramework>net9.0</CommonTargetFramework>
+    <CommonTargetFramework>net10.0</CommonTargetFramework>
   </PropertyGroup>
 </Project>

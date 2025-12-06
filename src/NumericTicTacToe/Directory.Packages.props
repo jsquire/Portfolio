@@ -6,8 +6,8 @@
 
   <!-- Shared Versions -->
   <PropertyGroup>
-    <MicrosoftExtensionsVersion>9.0.10</MicrosoftExtensionsVersion>
-    <SpectreConsoleVersion>0.53.0</SpectreConsoleVersion>
+    <MicrosoftExtensionsVersion>10.0.0</MicrosoftExtensionsVersion>
+    <SpectreConsoleVersion>0.54.0</SpectreConsoleVersion>
   </PropertyGroup>
 
   <!-- General Dependencies -->
@@ -19,18 +19,19 @@
     <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MicrosoftExtensionsVersion)" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MicrosoftExtensionsVersion)" />
-    <PackageVersion Include="ModelContextProtocol" Version="0.4.0-preview.2" />
-    <PackageVersion Include="OpenAI" Version="2.5.0" />
+    <PackageVersion Include="ModelContextProtocol" Version="0.4.1-preview.1" />
+    <PackageVersion Include="OpenAI" Version="2.7.0" />
     <PackageVersion Include="Spectre.Console" Version="$(SpectreConsoleVersion)" />
   </ItemGroup>
 
   <!-- Test-Only Dependencies -->
   <ItemGroup Condition="'$(IsTestProject)' == 'true'">
-    <PackageVersion Include="BenchmarkDotNet" Version="0.15.5" />
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />
+    <PackageVersion Include="Azure.Identity" Version="1.17.1" />
+    <PackageVersion Include="BenchmarkDotNet" Version="0.15.6" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="NUnit" Version="4.4.0" />
-    <PackageVersion Include="NUnit.Analyzers" Version="4.11.1" />
+    <PackageVersion Include="NUnit.Analyzers" Version="4.11.2" />
     <PackageVersion Include="NUnit3TestAdapter" Version="5.2.0" />
     <PackageVersion Include="Spectre.Console.Testing" Version="$(SpectreConsoleVersion)" />
   </ItemGroup>

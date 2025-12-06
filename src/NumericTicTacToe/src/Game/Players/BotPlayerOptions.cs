@@ -13,6 +13,8 @@ public class BotPlayerOptions
     ///   The difficulty level of the bot player.
     /// </summary>
     ///
+    /// <value>The difficulty defaults to <see cref="Difficulty.Perfect"/>, if not specified.</value>
+    ///
     public Difficulty Difficulty { get; set; } = Difficulty.Perfect;
 
     /// <summary>

@@ -10,6 +10,7 @@ using Squire.NumTic.Players;
 namespace Squire.NumTic.AI;
 
 // OpenAI features are mostly still in an experimental state and require opt-in by disabling warnings.
+
 #pragma warning disable OPENAI001
 #pragma warning disable SCME0001
 
@@ -118,10 +119,11 @@ public class OpenAIPlayer : IPlayer
         {
             // Call API with conversation history and instructions.
 
-            var response = (await ResponseClient.CreateResponseAsync(
-                ConversationHistory,
-                ResponseOptions,
-                cancellationToken)).Value;
+            OpenAIResponse response =
+                await ResponseClient.CreateResponseAsync(
+                    ConversationHistory,
+                    ResponseOptions,
+                    cancellationToken).ConfigureAwait(false);
 
             // Extract the response and preserve it in the conversation history.
 
@@ -348,19 +350,20 @@ public class OpenAIPlayer : IPlayer
           "type": "object",
           "properties": {
             "position": {
-              "type": "integer"
-              "minimum": 0
+              "type": "integer",
+              "minimum": 0,
               "maximum": {{(gameState.TokensPerRow * gameState.TokensPerRow) - 1}}
             },
             "token": {
-              "type": "enum"
-              "minimum": {{allTokens.Min()}}
+              "type": "integer",
+              "minimum": {{allTokens.Min()}},
               "maximum": {{allTokens.Max()}}
             },
             "random": {
               "type": "boolean"
             }
           },
+          "additionalProperties": false,
           "required": [
             "position",
             "token",
@@ -423,6 +426,3 @@ public class OpenAIPlayer : IPlayer
             new (IsValid: false, Move: null, IsRandom: false, ErrorMessage: errorMessage);
     }
 }
-
-#pragma warning restore SCME0001
-#pragma warning restore OPENAI001

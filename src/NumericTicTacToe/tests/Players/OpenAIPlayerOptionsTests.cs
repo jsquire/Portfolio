@@ -1,5 +1,5 @@
 using NUnit.Framework;
-using Squire.NumTic.Players;
+using Squire.NumTic.AI;
 
 namespace Squire.NumTic.Tests;
 
