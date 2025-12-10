@@ -78,6 +78,7 @@ public class OpenAIPlayerOptions
         new()
         {
             Difficulty = this.Difficulty,
-            ModelName = this.ModelName
+            ModelName = this.ModelName,
+            MaxMoveRetries = this.MaxMoveRetries
         };
 }

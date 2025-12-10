@@ -75,8 +75,9 @@ public class OpenAIPlayerOptionsTests
     {
         var original = new OpenAIPlayerOptions
         {
-            Difficulty = Difficulty.Medium,
-            ModelName = "custom-model"
+            Difficulty = Difficulty.Easy,
+            ModelName = "custom-model",
+            MaxMoveRetries = 9
         };
 
         var cloned = original.Clone();
@@ -86,13 +87,16 @@ public class OpenAIPlayerOptionsTests
         Assert.That(cloned, Is.Not.SameAs(original), "Clone should create a new instance");
         Assert.That(cloned.Difficulty, Is.EqualTo(original.Difficulty), "Clone should preserve Difficulty value");
         Assert.That(cloned.ModelName, Is.EqualTo(original.ModelName), "Clone should preserve ModelName value");
+        Assert.That(cloned.MaxMoveRetries, Is.EqualTo(original.MaxMoveRetries), "Clone should preserve MaxMoveRetries value");
 
         // Modify cloned instance to verify independence.
 
         cloned.Difficulty = Difficulty.Hard;
         cloned.ModelName = "different-model";
+        cloned.MaxMoveRetries = 12;
 
         Assert.That(original.Difficulty, Is.EqualTo(Difficulty.Medium), "Modifying clone should not affect original Difficulty");
         Assert.That(original.ModelName, Is.EqualTo("custom-model"), "Modifying clone should not affect original ModelName");
+        Assert.That(original.MaxMoveRetries, Is.EqualTo(9), "Modifying clone should not affect original MaxMoveRetries");
     }
 }
