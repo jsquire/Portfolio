@@ -15,16 +15,16 @@
 
 Accomplished technical professional with more than twenty-five years of diverse experience in various roles involving the architecture, development, delivery, and management of software products and the teams that deliver them.  
 
-Recognized as one of Microsoft’s experts in Azure Messaging client patterns and a leader in cross-language SDK development. Authored and led libraries that serve as foundational components for much of Microsoft’s Azure cloud and many customer-facing services, including Xbox, Microsoft 365, and Dynamics, as well as third-party applications such as large portions of OpenAI’s workload. Work spans cloud messaging, AI-driven developer tooling, and strategic leadership across Microsoft and the open-source ecosystem.
+Recognized as one of Microsoft's experts in Azure Messaging client patterns and a leader in cross-language SDK development. Authored and led libraries that serve as foundational components for Microsoft products and services including Azure, Xbox, Microsoft 365, and Dynamics, as well as major partners including OpenAI. Engineering owner of the official OpenAI SDK for .NET. Work spans messaging and distributed systems, AI-driven developer tooling, and strategic leadership across Microsoft and the open-source ecosystem.
 
 
-- **Azure Messaging expertise**: Engineering lead for the Service Bus, Event Hubs, Event Grid, and Schema Registry libraries, driving hands-on implementation in .NET and guiding cross-language efforts in Python, JavaScript, Go, Java, C++, and Rust.  
+- **Azure Messaging expertise**: Engineering lead for the Service Bus, Event Hubs, Event Grid, and Schema Registry libraries, driving hands-on implementation in .NET and guiding cross-language efforts in Python, JavaScript, Java, Go, C++, and Rust.  
 
-- **Ecosystem impact**: My work enables critical workloads across Microsoft’s services and customer applications, including OpenAI, delivering the reliability and performance required at hyperscale.
+- **Ecosystem impact**: My work enables critical workloads across Microsoft and major partners including OpenAI, delivering the reliability and performance required at hyperscale.
  
-- **AI-driven innovation**: Spearheaded AI-assisted developer tools and intelligent issue triage systems, adopted across Microsoft’s Developer Division to accelerate problem resolution and improve developer productivity.  
+- **AI-driven innovation**: Created an AI-driven issue triage and assistance platform, adopted division-wide as a foundation for broader internal tooling. Leading development of agentic AI tooling used across Microsoft for SDK creation.  
 
-- **Open source leadership**: Engineering Manager for the official .NET SDK for OpenAI and active leader in the open-source community, shaping SDK standards and mentoring engineers across teams.
+- **Leadership and open source**: Engineering Manager for the official OpenAI SDK for .NET and active leader in the open-source community, shaping SDK standards and mentoring engineers across teams.
 
 ## Skills
 
@@ -46,38 +46,44 @@ Recognized as one of Microsoft’s experts in Azure Messaging client patterns an
   - **_Familiar_**: Python, C/C++, Ruby, Java
   - **_Exposure_**: Rust, Go
   
-- **AI-assisted developer tooling:**: Model Context Protocol (MCP), Retrieval-Augmented Generation (RAG), agentic flows, persistent agents, AI-assisted coding
+- **AI and developer tooling**: Large Language Models (LLMs), Generative AI, OpenAI API, Azure OpenAI, Azure AI Foundry, Model Context Protocol (MCP), Retrieval-Augmented Generation (RAG), agentic workflows, persistent agents, AI-assisted coding
 
 - **Platforms**: Microsoft Azure, Windows, Linux, macOS, Xbox  
 
 - **Distributed systems and architecture**: Event-driven architecture, Microservices, CQRS, Domain-Driven Design (DDD), Eventual Consistency
 
-- **Messaging and data**: AMQP, REST APIs, Event Hubs, Service Bus, Kafka, SQL Server, Cosmos DB MongoDB  
+- **Messaging and data**: AMQP, REST APIs, Event Hubs, Service Bus, Kafka, SQL Server, Cosmos DB, MongoDB  
 
 - **DevOps and observability**: CI/CD, Git/GitHub, cloud-native monitoring
 
 ## Experience
 
 ### Microsoft  
-**Principal Software Engineering Manager, Azure Developer Experience**  
+**Principal Software Engineering Manager, CoreAI Developer Experience**  
 *Sept 2022 – Present* _(Remote)_  
 
-As engineering manager for the Azure SDK for .NET team, I lead a globally distributed group, setting strategy, partnering with service teams, and owning the platforms that produce our SDK libraries. I balance technical depth with people leadership, driving SDK adoption across millions of developers.
+As engineering manager for the CoreAI Cloud and Tools team, I lead a globally distributed group producing libraries and tooling used by millions of developers across third-party applications and internal Microsoft products and services. I set strategy, partner with service teams, and balance hands-on technical depth with people leadership.
+
+My primary focus is the .NET developer experience, with cross-language engineering oversight for product verticals including Azure Messaging and AI-driven developer tools. As a member of technical leadership, I contribute to cross-product architecture and strategy for the Azure MCP server, Azure Developer CLI, and agentic tooling for library creation. I help drive and facilitate the process and governance that Azure service teams follow to ship their SDK libraries.
 
 Key areas of impact:
 
-- **Azure Messaging leadership**: Engineering lead for messaging SDKs across .NET, Python, JavaScript, Go, C++, Java, and Rust—defining architecture, ensuring cross-language consistency, and establishing a developer-first design.  
+- **Azure Messaging leadership**: Engineering lead for messaging SDKs across .NET, Python, JavaScript, Java, Go, C++, and Rust, defining architecture, ensuring cross-language consistency, and establishing a developer-first design.  
 
-- **Notable techincal contributions**: Authored and maintained Event Hubs and Service Bus .NET libraries, which are foundational to Azure services, Microsoft workloads (Xbox, M365, Dynamics), and large portions of OpenAI’s infrastructure.  
+- **Notable technical contributions**: Authored and maintained Event Hubs and Service Bus .NET libraries, which are foundational to Azure services, Microsoft workloads (Xbox, M365, Dynamics), and large portions of OpenAI’s infrastructure.  
 
-- **OpenAI SDK ownership**: Owner of the official OpenAI .NET SDK, shaping technical strategy, developer experience, and community engagement.  
+- **OpenAI SDK ownership**: Engineering owner of the official OpenAI SDK for .NET, shaping technical strategy, developer experience, and community engagement, while contributing hands-on. The library powers experiences for OpenAI, Azure OpenAI, and Foundry services, and is leveraged extensively by Copilot integrations across Visual Studio Code, Visual Studio, the CLI, and the GitHub coding agent.  
 
-- **AI developer tooling**: Spearheading agentic AI flows in SDK tools, enabling Azure service teams to auto-generate and refine client libraries, fix errors in real time, and guide developers to success.  
+- **AI developer tooling**: Spearheading the agentic tooling that Azure service teams use to create and refine their libraries. This includes persistent agents that auto-generate code, detect and fix errors in real time, and leverage MCP and RAG to weave documentation and context into the workflow.  
 
-- **Division-wide innovation**: Created and directed an AI-assisted triage automation that was recognized by Microsoft’s Developer Division and adapted for use as a division-wide offering.  
+- **Azure AI Foundry advisory**: Serve as technical advisor for the Azure AI Foundry SDK experience, including Azure OpenAI, AI Projects, the Agent Service, and the Foundry portal. The Foundry team owns their SDK packages; I provide expertise in API design, developer experience patterns, code review, and the shared infrastructure their packages are built on.  
+
+- **Division-wide innovation**: Created an AI-driven issue triage, categorization, and assistance platform at Microsoft. This platform was adopted division wide as the foundation for a larger Developer Division internal offering.  
 
 **Senior Software Engineer, Azure Developer Experience**  
 *Mar 2019 – Aug 2022* _(Remote)_  
+
+I joined the Azure SDK initiative at its inception, helping to solve one of Microsoft's most persistent platform problems: fragmented, inconsistent developer experience across hundreds of Azure services.
 
 As a software engineer on the Azure SDK for .NET team, I designed and delivered Azure client libraries with a focus on hands-on implementation. I led Azure Messaging libraries across languages, defining architecture, guiding features, and ensuring alignment with overall messaging priorities. I was the primary developer of the Event Hubs .NET library and a contributor across multiple Azure SDKs, while championing developer usability and partnering with service teams. 
 
@@ -85,11 +91,9 @@ Key areas of impact:
 
 - **Cross-language leadership**: Directed design and implementation of Azure Messaging SDKs across .NET, Python, JavaScript, and Java, ensuring a consistent developer experience.   
 
-- **Deep technical contributions**: Designed and implemented the Event Hubs .NET client library, including high-throughput publishing, partition management, and checkpointing for mission-critical workloads  
+- **Deep technical contributions**: Designed and implemented the Event Hubs .NET client library, including high-throughput publishing, partition management, and checkpointing for mission-critical workloads.
 
-- **Service and developer alignment**: Acted as liaison to Azure Messaging service teams to set priorities and ensure SDKs supported evolving scenarios; helped to shape the modern Azure SDK guidelines still used today.  
-
-- **Developer experience focus**: Championed principles of usability, performance, and clarity, helping to shape the modern Azure SDK guidelines still used today.  
+- **Service and developer alignment**: Acted as liaison to Azure Messaging service teams to set priorities and ensure SDKs supported evolving scenarios; helping to shape the modern Azure SDK guidelines still used today.  
 
 - **Mentorship and collaboration**: Guided engineers across teams and languages, fostering alignment on architecture and best practices for distributed systems and SDK design.  
 
@@ -136,12 +140,12 @@ Software engineering, architecture, and leadership roles across small to mid-siz
 **Microsoft Azure SDK**  
   _2019 – Present_ · [GitHub](https://github.com/Azure/azure-sdk-for-net)  
 
-  The Microsoft Azure software development kit (SDK) is a set of open-source libraries and tools for developers to build applications on the Azure platform. Their goal is to provide a development experience that is intuitive, approachable, and which has been designed around real-world scenarios. Use of an SDK will look and feel consistent with the language and technology stack that an application is built on and the API should clearly express the intent of the developer with minimal ceremony and boilerplate code. A common design is maintained across the SDKs, so that those using multiple languages or technology stacks can leverage the Azure SDK in a familiar way.  
+  The Microsoft Azure software development kit (SDK) is a set of open-source libraries and tools for developers to build applications on the Azure platform. Their goal is to provide a development experience that is intuitive, approachable, and which has been designed around real-world scenarios. Use of an SDK will look and feel consistent with the language and technology stack that an application is built on, and the API should clearly express the intent of the developer with minimal ceremony and boilerplate code. A common design is maintained across the SDKs, so that those using multiple languages or technology stacks can leverage the Azure SDK in a familiar way.  
 
-**OpenAI .NET SDK**  
+**OpenAI SDK for .NET**  
   _2025 – Present_ · [GitHub](https://github.com/openai/openai-dotnet)  
 
-  The OpenAI .NET SDK is the official client library for developers building applications on the OpenAI platform using .NET. It provides a first-class, idiomatic .NET experience for interacting with OpenAI services, including models for natural language processing, code generation, and image generation. The SDK emphasizes clarity, consistency, and ease of use, allowing developers to quickly integrate OpenAI capabilities into applications with minimal ceremony or boilerplate. As the development lead, I own end-to-end strategy, implementation, and community engagement for the SDK.  
+  The OpenAI SDK for .NET is the official client library for developers building applications on the OpenAI platform using .NET. It provides a first-class, idiomatic .NET experience for interacting with OpenAI services, including models for natural language processing, code generation, and image generation. The SDK emphasizes clarity, consistency, and ease of use, allowing developers to quickly integrate OpenAI capabilities into applications with minimal ceremony or boilerplate. As the engineering lead, I own end-to-end strategy, implementation, and community engagement for the SDK.  
 
 **Numeric Tic-Tac-Toe**  
   _2025 – Present_ · [GitHub](https://github.com/jsquire/Portfolio/tree/main/src/NumericTicTacToe)  
@@ -163,5 +167,5 @@ Software engineering, architecture, and leadership roles across small to mid-siz
 
 ## Education
 
-**Stockton University**  
-_B.S. Computer Science_
+**Stockton University**, Pomona, NJ
+_Bachelor of Science — Computer Science_
