@@ -3,7 +3,6 @@ using System.ClientModel.Primitives;
 using System.Reflection;
 using NSubstitute;
 using NUnit.Framework;
-using OpenAI;
 using OpenAI.Responses;
 using Squire.NumTic.AI;
 using Squire.NumTic.Contracts;
@@ -30,7 +29,7 @@ public class OpenAIPlayerTests
     [Test]
     public void ConstructorWithNullGameInterfaceThrows()
     {
-        var mockClient = Substitute.For<OpenAIClient>();
+        var mockClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
 
         Assert.That(() => new OpenAIPlayer(null!, mockClient, gameState),
@@ -49,8 +48,8 @@ public class OpenAIPlayerTests
         var gameState = GameState.CreateDefault();
 
         Assert.That(() => new OpenAIPlayer(mockGameInterface, null!, gameState),
-            Throws.InstanceOf<ArgumentNullException>().With.Property("ParamName").EqualTo("openAIClient"),
-            "Constructor should throw ArgumentNullException for null openAIClient");
+            Throws.InstanceOf<ArgumentNullException>().With.Property("ParamName").EqualTo("responsesClient"),
+            "Constructor should throw ArgumentNullException for null responsesClient");
     }
 
     /// <summary>
@@ -61,7 +60,7 @@ public class OpenAIPlayerTests
     public void ConstructorWithNullGameStateThrows()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockClient = Substitute.For<OpenAIClient>();
+        var mockClient = Substitute.For<ResponsesClient>();
 
         Assert.That(() => new OpenAIPlayer(mockGameInterface, mockClient, null!),
             Throws.InstanceOf<ArgumentNullException>().With.Property("ParamName").EqualTo("gameState"),
@@ -76,7 +75,7 @@ public class OpenAIPlayerTests
     public void ConstructorClonesProvidedOptions()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockClient = CreateMockOpenAIClient();
+        var mockClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
         var originalOptions = new OpenAIPlayerOptions { Difficulty = Difficulty.Hard, ModelName = "gpt-4o" };
         var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState, originalOptions);
@@ -99,7 +98,7 @@ public class OpenAIPlayerTests
     public void ConstructorUsesDefaultOptionsWhenNoneProvided()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockClient = CreateMockOpenAIClient();
+        var mockClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
         var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState);
 
@@ -119,7 +118,7 @@ public class OpenAIPlayerTests
     public async Task PlayTurnAsyncWithNullGameStateThrows()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockClient = CreateMockOpenAIClient();
+        var mockClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
         var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState);
 
@@ -136,7 +135,7 @@ public class OpenAIPlayerTests
     public async Task PlayTurnAsyncRespectsCancellation()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockClient = CreateMockOpenAIClient();
+        var mockClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
         var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState);
 
@@ -156,10 +155,9 @@ public class OpenAIPlayerTests
     public async Task PlayTurnAsyncReturnsValidMoveForValidResponse()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockResponseClient = Substitute.For<OpenAIResponseClient>();
-        var mockClient = CreateMockOpenAIClient(mockResponseClient);
+        var mockResponseClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
-        var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState);
+        var player = new OpenAIPlayer(mockGameInterface, mockResponseClient, gameState);
 
         // Set up expected values for the move.
 
@@ -174,8 +172,7 @@ public class OpenAIPlayerTests
 
         mockResponseClient
             .CreateResponseAsync(
-                Arg.Any<IEnumerable<ResponseItem>>(),
-                Arg.Any<ResponseCreationOptions>(),
+                Arg.Any<CreateResponseOptions>(),
                 Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ClientResult.FromValue(mockResponse, Substitute.For<PipelineResponse>())));
 
@@ -194,10 +191,9 @@ public class OpenAIPlayerTests
     public async Task PlayTurnAsyncRetriesOnInvalidPosition()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockResponseClient = Substitute.For<OpenAIResponseClient>();
-        var mockClient = CreateMockOpenAIClient(mockResponseClient);
+        var mockResponseClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
-        var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState);
+        var player = new OpenAIPlayer(mockGameInterface, mockResponseClient, gameState);
         var callCount = 0;
 
         // First response has invalid position, second response is valid.
@@ -207,8 +203,7 @@ public class OpenAIPlayerTests
 
         mockResponseClient
             .CreateResponseAsync(
-                Arg.Any<IEnumerable<ResponseItem>>(),
-                Arg.Any<ResponseCreationOptions>(),
+                Arg.Any<CreateResponseOptions>(),
                 Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -233,10 +228,9 @@ public class OpenAIPlayerTests
     public async Task PlayTurnAsyncRetriesOnOccupiedPosition()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockResponseClient = Substitute.For<OpenAIResponseClient>();
-        var mockClient = CreateMockOpenAIClient(mockResponseClient);
+        var mockResponseClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
-        var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState);
+        var player = new OpenAIPlayer(mockGameInterface, mockResponseClient, gameState);
         var callCount = 0;
 
         // Occupy position 0.
@@ -250,8 +244,7 @@ public class OpenAIPlayerTests
 
         mockResponseClient
             .CreateResponseAsync(
-                Arg.Any<IEnumerable<ResponseItem>>(),
-                Arg.Any<ResponseCreationOptions>(),
+                Arg.Any<CreateResponseOptions>(),
                 Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -278,10 +271,9 @@ public class OpenAIPlayerTests
     public async Task PlayTurnAsyncRetriesOnUnavailableToken()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockResponseClient = Substitute.For<OpenAIResponseClient>();
-        var mockClient = CreateMockOpenAIClient(mockResponseClient);
+        var mockResponseClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
-        var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState);
+        var player = new OpenAIPlayer(mockGameInterface, mockResponseClient, gameState);
         var callCount = 0;
 
         // Use token 1 so it's unavailable.
@@ -295,8 +287,7 @@ public class OpenAIPlayerTests
 
         mockResponseClient
             .CreateResponseAsync(
-                Arg.Any<IEnumerable<ResponseItem>>(),
-                Arg.Any<ResponseCreationOptions>(),
+                Arg.Any<CreateResponseOptions>(),
                 Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -323,10 +314,9 @@ public class OpenAIPlayerTests
     public async Task PlayTurnAsyncRetriesOnMalformedJson()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockResponseClient = Substitute.For<OpenAIResponseClient>();
-        var mockClient = CreateMockOpenAIClient(mockResponseClient);
+        var mockResponseClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
-        var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState);
+        var player = new OpenAIPlayer(mockGameInterface, mockResponseClient, gameState);
         var callCount = 0;
 
         // First response is malformed JSON, second response is valid.
@@ -336,8 +326,7 @@ public class OpenAIPlayerTests
 
         mockResponseClient
             .CreateResponseAsync(
-                Arg.Any<IEnumerable<ResponseItem>>(),
-                Arg.Any<ResponseCreationOptions>(),
+                Arg.Any<CreateResponseOptions>(),
                 Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -364,11 +353,10 @@ public class OpenAIPlayerTests
     public async Task PlayTurnAsyncWithMaxRetriesExceededThrows()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockResponseClient = Substitute.For<OpenAIResponseClient>();
-        var mockClient = CreateMockOpenAIClient(mockResponseClient);
+        var mockResponseClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
         var options = new OpenAIPlayerOptions { MaxMoveRetries = 3 };
-        var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState, options);
+        var player = new OpenAIPlayer(mockGameInterface, mockResponseClient, gameState, options);
 
         // Always return invalid response.
 
@@ -376,8 +364,7 @@ public class OpenAIPlayerTests
 
         mockResponseClient
             .CreateResponseAsync(
-                Arg.Any<IEnumerable<ResponseItem>>(),
-                Arg.Any<ResponseCreationOptions>(),
+                Arg.Any<CreateResponseOptions>(),
                 Arg.Any<CancellationToken>())
             .Returns(Task.FromResult(ClientResult.FromValue(
                 CreateMockResponse(invalidResponse),
@@ -396,10 +383,9 @@ public class OpenAIPlayerTests
     public async Task PlayTurnAsyncTracksRandomMoveCounter()
     {
         var mockGameInterface = Substitute.For<IGameInterface>();
-        var mockResponseClient = Substitute.For<OpenAIResponseClient>();
-        var mockClient = CreateMockOpenAIClient(mockResponseClient);
+        var mockResponseClient = Substitute.For<ResponsesClient>();
         var gameState = GameState.CreateDefault();
-        var player = new OpenAIPlayer(mockGameInterface, mockClient, gameState);
+        var player = new OpenAIPlayer(mockGameInterface, mockResponseClient, gameState);
 
         var capturedMessages = new List<string>();
         var callCount = 0;
@@ -413,11 +399,11 @@ public class OpenAIPlayerTests
 
         mockResponseClient
             .CreateResponseAsync(
-                Arg.Do<IEnumerable<ResponseItem>>(items =>
+                Arg.Do<CreateResponseOptions>(options =>
                 {
-                    // Capture the user message text from the request.
+                    // Capture the user message text from the request input items.
 
-                    var userMessage = items.OfType<MessageResponseItem>().LastOrDefault();
+                    var userMessage = options.InputItems.OfType<MessageResponseItem>().LastOrDefault();
 
                     if (userMessage != null)
                     {
@@ -431,7 +417,6 @@ public class OpenAIPlayerTests
                         }
                     }
                 }),
-                Arg.Any<ResponseCreationOptions>(),
                 Arg.Any<CancellationToken>())
             .Returns(_ =>
             {
@@ -473,33 +458,23 @@ public class OpenAIPlayerTests
     }
 
     /// <summary>
-    ///   Creates a mock OpenAI client for testing.
-    /// </summary>
-    ///
-    private static OpenAIClient CreateMockOpenAIClient(OpenAIResponseClient? responseClient = null)
-    {
-        var mockClient = Substitute.For<OpenAIClient>();
-        var mockResponseClient = responseClient ?? Substitute.For<OpenAIResponseClient>();
-
-        mockClient.GetOpenAIResponseClient(Arg.Any<string>()).Returns(mockResponseClient);
-        return mockClient;
-    }
-
-    /// <summary>
     ///   Creates a mock OpenAI response with the specified output text.
     /// </summary>
     ///
-    private static OpenAIResponse CreateMockResponse(string outputText)
+    private static ResponseResult CreateMockResponse(string outputText)
     {
         // Create a message item with output text content.
 
         var messageItem = ResponseItem.CreateAssistantMessageItem(outputText);
-        var outputItems = new List<ResponseItem> { messageItem };
 
-        return OpenAIResponsesModelFactory.OpenAIResponse(
-            id: "test-response",
-            status: ResponseStatus.Completed,
-            outputItems: outputItems);
+        var response = new ResponseResult
+        {
+            Id = "test-response",
+            Status = ResponseStatus.Completed
+        };
+
+        response.OutputItems.Add(messageItem);
+        return response;
     }
 }
 

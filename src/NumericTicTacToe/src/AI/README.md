@@ -8,9 +8,9 @@ The AI player can be deployed using different cloud providers and AI services. C
 
 ### Azure OpenAI Service
 
-Deploy using Azure's managed OpenAI service with GPT-4.1 model support.
+Deploy using Azure's managed OpenAI service with GPT-5.2 model support.
 
-- **Model**: GPT-4.1 (2025-04-14)
+- **Model**: GPT-5.2
 - **Deployment Method**: PowerShell script with Bicep template
 - **Prerequisites**: Azure CLI, Azure subscription
 - **Deployment Script**: `Deploy-AzureOpenAI.ps1`

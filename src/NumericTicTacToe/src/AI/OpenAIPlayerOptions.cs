@@ -10,7 +10,7 @@ public class OpenAIPlayerOptions
     internal static readonly OpenAIPlayerOptions Default = new();
 
     /// <summary>The name of the model to use with the OpenAI API.</summary>
-    private string _modelName = "gpt-5";
+    private string _modelName = "gpt-5.2";
 
     /// <summary>The maximum number retries of retries to attempt when the model returns a malformed response or invalid move.</summary>
     private int _maxMoveRetries = 5;
@@ -27,7 +27,7 @@ public class OpenAIPlayerOptions
     ///   The name of the model to use with the OpenAI API.
     /// </summary>
     ///
-    /// <value>The model name defaults to <c>"gpt-5"</c>, if not specified.</value>
+    /// <value>The model name defaults to <c>"gpt-5.2"</c>, if not specified.</value>
     ///
     /// <exception cref="ArgumentNullException">Occurs when the <see cref="ModelName" /> is <c>null</c>.</exception>
     /// <exception cref="ArgumentException">Occurs when the <see cref="ModelName" /> is empty.</exception>"

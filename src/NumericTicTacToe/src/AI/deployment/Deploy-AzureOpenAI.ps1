@@ -3,7 +3,7 @@
     Deploys Azure OpenAI service for Numeric Tic-Tac-Toe AI player.
 
 .DESCRIPTION
-    This script deploys an Azure OpenAI service with GPT-4.1 model using Azure CLI.
+    This script deploys an Azure OpenAI service with GPT-5.2 model using Azure CLI.
     The Bicep template creates the resource group and all Azure resources.
     Outputs the service endpoint and API keys for use as environment variables.
 
