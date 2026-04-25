@@ -5,7 +5,7 @@ This directory contains the infrastructure-as-code (Bicep) template for deployin
 ## Overview
 
 The Bicep template deploys:
-- **Azure OpenAI Service** with GPT-4.1 model (version 2025-04-14)
+- **Azure OpenAI Service** with GPT-5.2 model
 - **Role Assignments** for the deploying user:
   - Owner role on the resource group
   - Cognitive Services Contributor role on the OpenAI service
@@ -19,7 +19,7 @@ The Bicep template deploys:
 
 ## Model Selection
 
-This template uses **GPT-4.1 (2025-04-14)** which:
+This template uses **GPT-5.2** which:
 - Does not require registration or special approval
 - Is available in multiple regions including West US
 - Supports text and image input, text output
@@ -89,8 +89,8 @@ This template uses **GPT-4.1 (2025-04-14)** which:
 |-----------|------|---------|-------------|
 | `openAiServiceName` | string | Auto-generated | Globally unique name for the OpenAI service |
 | `location` | string | `westus` | Azure region for deployment |
-| `modelDeploymentName` | string | `gpt-4.1-deployment` | Name for the model deployment |
-| `modelVersion` | string | `2025-04-14` | Version of GPT-4.1 to deploy |
+| `modelDeploymentName` | string | `gpt-5.2-deployment` | Name for the model deployment |
+| `modelVersion` | string | `2026-03-11` | Version of GPT-5.2 to deploy |
 | `skuName` | string | `S0` | SKU for the OpenAI service (S0 only) |
 | `deploymentCapacity` | int | `10` | TPM capacity in thousands |
 | `tags` | object | See template | Tags to apply to resources |
@@ -116,17 +116,17 @@ After deployment, configure these environment variables for your application:
 # Bash/Linux
 export AZURE_OPENAI_ENDPOINT="https://your-service.openai.azure.com/"
 export AZURE_OPENAI_API_KEY="your-api-key-here"
-export AZURE_OPENAI_DEPLOYMENT_NAME="gpt-4.1-deployment"
+export AZURE_OPENAI_DEPLOYMENT_NAME="gpt-5.2-deployment"
 
 # PowerShell
 $env:AZURE_OPENAI_ENDPOINT = "https://your-service.openai.azure.com/"
 $env:AZURE_OPENAI_API_KEY = "your-api-key-here"
-$env:AZURE_OPENAI_DEPLOYMENT_NAME = "gpt-4.1-deployment"
+$env:AZURE_OPENAI_DEPLOYMENT_NAME = "gpt-5.2-deployment"
 
 # Windows CMD
 set AZURE_OPENAI_ENDPOINT=https://your-service.openai.azure.com/
 set AZURE_OPENAI_API_KEY=your-api-key-here
-set AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4.1-deployment
+set AZURE_OPENAI_DEPLOYMENT_NAME=gpt-5.2-deployment
 ```
 
 ## Security Considerations
@@ -149,7 +149,7 @@ set AZURE_OPENAI_DEPLOYMENT_NAME=gpt-4.1-deployment
 - **Pricing**: Standard (S0) SKU with pay-per-use model
 - **Monitor Usage**: Check Azure Portal → Cost Management
 - **Set Budgets**: Configure alerts in Azure Cost Management
-- **Token Usage**: GPT-4.1 pricing varies by region
+- **Token Usage**: GPT-5.2 pricing varies by region
 
 See [Azure OpenAI Pricing](https://azure.microsoft.com/en-us/pricing/details/cognitive-services/openai-service/) for details.
 
@@ -184,7 +184,7 @@ az group delete --name rg-numtictactoe-ai --yes --no-wait
 ## Additional Resources
 
 - [Azure OpenAI Service Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/)
-- [GPT-4.1 Model Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#gpt-41-series)
+- [GPT-5.2 Model Documentation](https://learn.microsoft.com/en-us/azure/ai-services/openai/concepts/models#gpt-5-series)
 - [Bicep Documentation](https://learn.microsoft.com/en-us/azure/azure-resource-manager/bicep/)
 - [Azure CLI Reference](https://learn.microsoft.com/en-us/cli/azure/)
 

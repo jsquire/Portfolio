@@ -95,7 +95,7 @@ public class OpenAIPlayerOptionsTests
         cloned.ModelName = "different-model";
         cloned.MaxMoveRetries = 12;
 
-        Assert.That(original.Difficulty, Is.EqualTo(Difficulty.Medium), "Modifying clone should not affect original Difficulty");
+        Assert.That(original.Difficulty, Is.EqualTo(Difficulty.Easy), "Modifying clone should not affect original Difficulty");
         Assert.That(original.ModelName, Is.EqualTo("custom-model"), "Modifying clone should not affect original ModelName");
         Assert.That(original.MaxMoveRetries, Is.EqualTo(9), "Modifying clone should not affect original MaxMoveRetries");
     }

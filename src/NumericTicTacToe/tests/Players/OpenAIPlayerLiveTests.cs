@@ -260,23 +260,18 @@ public class OpenAIPlayerLiveTests
     }
 
     /// <summary>
-    ///   Creates an <see cref="OpenAIClient"/> for testing using <see cref="DefaultAzureCredential"/>
+    ///   Creates a <see cref="ResponsesClient"/> for testing using <see cref="DefaultAzureCredential"/>
     ///   for authorization.
     /// </summary>
     ///
-    /// <param name="options">The <see cref="OpenAIClientOptions" /> to use when creating the client.  If <c>null</c>, defaults will be used.</param>
+    /// <returns>The <see cref="ResponsesClient"/> instance for testing.</returns>
     ///
-    /// <returns>The <see cref="OpenAIClient"/> instance for testing.</returns>
-    ///
-    /// <exception cref="InvalidOperationException">Occurs when no <paramref name="options"/> are passed and the test environment is not configured with an Azure OpenAI endpoint.</exception>
+    /// <exception cref="InvalidOperationException">Occurs when the test environment is not configured with an Azure OpenAI endpoint.</exception>
     /// <exception cref="InvalidOperationException">Occurs when the test environment is not configured with an Azure OpenAI authorization scope.</exception>
     ///
-    private static OpenAIClient CreateClient(OpenAIClientOptions? options = default)
+    private static ResponsesClient CreateClient()
     {
-        options ??= new OpenAIClientOptions
-        {
-            Endpoint = TestEnvironment.AzureOpenAIEndpoint ?? throw new InvalidOperationException("Azure OpenAI endpoint is not configured in the test environment.")
-        };
+        var endpoint = TestEnvironment.AzureOpenAIEndpoint ?? throw new InvalidOperationException("Azure OpenAI endpoint is not configured in the test environment.");
 
         // Visual Studio and Visual Studio Code credentials can be problematic in mixed identity cases,
         // so they're being excluded here to avoid potential issues.
@@ -290,11 +285,16 @@ public class OpenAIPlayerLiveTests
         var authScope = TestEnvironment.AzureOpenAIAuthorizationScope ?? throw new InvalidOperationException("Azure OpenAI authorization scope is not configured in the test environment.");
         var policy = new BearerTokenPolicy(credential, authScope);
 
-        return new OpenAIClient(policy, options);
+        var options = new OpenAIClientOptions
+        {
+            Endpoint = endpoint
+        };
+
+        return new ResponsesClient(policy, options);
     }
 
     /// <summary>
-    ///   Creates an <see cref="OpenAIClient"/> that proxies to a real client but captures
+    ///   Creates a <see cref="ResponsesClient"/> that proxies to a real client but captures
     ///   all response text for inspection.
     /// </summary>
     ///
@@ -302,36 +302,27 @@ public class OpenAIPlayerLiveTests
     ///   The list that will be populated with captured response texts as calls are made.
     /// </param>
     ///
-    /// <returns>The mock <see cref="OpenAIClient"/> instance that proxies to the real client.</returns>
+    /// <returns>The mock <see cref="ResponsesClient"/> instance that proxies to the real client.</returns>
     ///
-    private static OpenAIClient CreateCapturingClient(List<string> capturedResponses)
+    private static ResponsesClient CreateCapturingClient(List<string> capturedResponses)
     {
         var realClient = CreateClient();
-        var realResponseClient = realClient.GetOpenAIResponseClient(DefaultPlayerOptions.ModelName);
-        var mockResponseClient = Substitute.For<OpenAIResponseClient>();
+        var mockClient = Substitute.For<ResponsesClient>();
 
-        mockResponseClient
+        mockClient
             .CreateResponseAsync(
-                Arg.Any<IEnumerable<ResponseItem>>(),
-                Arg.Any<ResponseCreationOptions>(),
+                Arg.Any<CreateResponseOptions>(),
                 Arg.Any<CancellationToken>())
             .Returns(async callInfo =>
             {
-                var items = callInfo.ArgAt<IEnumerable<ResponseItem>>(0);
-                var options = callInfo.ArgAt<ResponseCreationOptions>(1);
-                var cancellationToken = callInfo.ArgAt<CancellationToken>(2);
+                var options = callInfo.ArgAt<CreateResponseOptions>(0);
+                var cancellationToken = callInfo.ArgAt<CancellationToken>(1);
 
-                var result = await realResponseClient.CreateResponseAsync(items, options, cancellationToken);
+                var result = await realClient.CreateResponseAsync(options, cancellationToken);
                 capturedResponses.Add(result.Value.GetOutputText());
 
                 return result;
             });
-
-        var mockClient = Substitute.For<OpenAIClient>();
-
-        mockClient
-            .GetOpenAIResponseClient(Arg.Any<string>())
-            .Returns(mockResponseClient);
 
         return mockClient;
     }

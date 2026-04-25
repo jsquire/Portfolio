@@ -2,7 +2,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Encodings.Web;
 using System.Text.Json;
-using OpenAI;
 using OpenAI.Responses;
 using Squire.NumTic.Contracts;
 using Squire.NumTic.Players;
@@ -42,10 +41,10 @@ public class OpenAIPlayer : IPlayer
     private readonly OpenAIPlayerOptions Options;
 
     /// <summary>The client to use for interacting with the OpenAI Responses API.</summary>
-    private readonly OpenAIResponseClient ResponseClient;
+    private readonly ResponsesClient ResponseClient;
 
     /// <summary>The set of options to use for interacting with the OpenAI Responses API.</summary>
-    private readonly ResponseCreationOptions ResponseOptions;
+    private readonly CreateResponseOptions ResponseOptions;
 
     /// <summary>The set of items that comprise the conversation history with the LLM for the game.</summary>
     private readonly List<ResponseItem> ConversationHistory = new();
@@ -58,29 +57,29 @@ public class OpenAIPlayer : IPlayer
     /// </summary>
     ///
     /// <param name="gameInterface">The game interface to interact with for player operations.</param>
-    /// <param name="openAIClient">The OpenAI client to use for model interactions.</param>
+    /// <param name="responsesClient">The OpenAI Responses client to use for model interactions.</param>
     /// <param name="gameState">The state that the current game is based on.</param>
     /// <param name="options">The set of options to use for configuring player behavior.  If not provided a default set is assumed.</param>
     ///
     /// <exception cref="ArgumentNullException">Occurs when the <paramref name="gameInterface"/> is <c>null</c>.</exception>
-    /// <exception cref="ArgumentNullException">Occurs when the <paramref name="openAIClient"/> is <c>null</c>.</exception>
+    /// <exception cref="ArgumentNullException">Occurs when the <paramref name="responsesClient"/> is <c>null</c>.</exception>
     /// <exception cref="ArgumentNullException">Occurs when the <paramref name="gameState"/> is <c>null</c>.</exception>
     ///
     public OpenAIPlayer(IGameInterface gameInterface,
-                        OpenAIClient openAIClient,
+                        ResponsesClient responsesClient,
                         GameState gameState,
                         OpenAIPlayerOptions? options = default)
     {
         Interface = gameInterface ?? throw new ArgumentNullException(nameof(gameInterface));
         Options = options?.Clone() ?? OpenAIPlayerOptions.Default;
 
-        ArgumentNullException.ThrowIfNull(openAIClient, nameof(openAIClient));
-        ResponseClient = openAIClient.GetOpenAIResponseClient(Options.ModelName);
+        ResponseClient = responsesClient ?? throw new ArgumentNullException(nameof(responsesClient));
 
         ArgumentNullException.ThrowIfNull(gameState, nameof(gameState));
 
-        ResponseOptions = new ResponseCreationOptions
+        ResponseOptions = new CreateResponseOptions
         {
+            Model = Options.ModelName,
             Instructions = GenerateInstructions(gameState, Options),
             TextOptions = new ResponseTextOptions
             {
@@ -119,15 +118,21 @@ public class OpenAIPlayer : IPlayer
         {
             // Call API with conversation history and instructions.
 
-            OpenAIResponse response =
+            ResponseOptions.InputItems.Clear();
+
+            foreach (var item in ConversationHistory)
+            {
+                ResponseOptions.InputItems.Add(item);
+            }
+
+            var response =
                 await ResponseClient.CreateResponseAsync(
-                    ConversationHistory,
                     ResponseOptions,
                     cancellationToken).ConfigureAwait(false);
 
             // Extract the response and preserve it in the conversation history.
 
-            var assistantResponse = response.GetOutputText();
+            var assistantResponse = response.Value.GetOutputText();
             ConversationHistory.Add(ResponseItem.CreateAssistantMessageItem(assistantResponse));
 
             // Attempt to parse and validate the move.

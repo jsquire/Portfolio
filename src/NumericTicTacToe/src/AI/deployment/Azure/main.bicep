@@ -1,5 +1,5 @@
 // Azure OpenAI Service Deployment Template for Numeric Tic-Tac-Toe AI Player
-// This template deploys an Azure OpenAI service with GPT-4.1 model
+// This template deploys an Azure OpenAI service with GPT-5.2 model
 
 targetScope = 'subscription'
 
@@ -12,11 +12,11 @@ param location string = 'westus'
 @description('The name of the Azure OpenAI service. Must be globally unique.')
 param openAiServiceName string = 'numtictactoe-openai-${uniqueString(subscription().id, resourceGroupName)}'
 
-@description('The name of the GPT-4.1 model deployment.')
-param modelDeploymentName string = 'gpt-4.1-deployment'
+@description('The name of the GPT-5.2 model deployment.')
+param modelDeploymentName string = 'gpt-5.2-deployment'
 
-@description('The version of the GPT-4.1 model to deploy.')
-param modelVersion string = '2025-04-14'
+@description('The version of the GPT-5.2 model to deploy.')
+param modelVersion string = '2026-03-11'
 
 @description('The SKU name for the Azure OpenAI service.')
 @allowed([

@@ -7,10 +7,10 @@ param openAiServiceName string
 @description('The location for the Azure OpenAI service.')
 param location string
 
-@description('The name of the GPT-4.1 model deployment.')
+@description('The name of the GPT-5.2 model deployment.')
 param modelDeploymentName string
 
-@description('The version of the GPT-4.1 model to deploy.')
+@description('The version of the GPT-5.2 model to deploy.')
 param modelVersion string
 
 @description('The SKU name for the Azure OpenAI service.')
@@ -53,7 +53,7 @@ resource modelDeployment 'Microsoft.CognitiveServices/accounts/deployments@2023-
   properties: {
     model: {
       format: 'OpenAI'
-      name: 'gpt-4.1'
+      name: 'gpt-5.2'
       version: modelVersion
     }
   }
