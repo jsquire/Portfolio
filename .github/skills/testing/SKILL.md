@@ -32,6 +32,21 @@ Name tests by behavior validated, not implementation details:
 - For async operations: `Assert.ThatAsync`
 - For exceptions: `Throws.ArgumentNullException.With.Property(...)`
 - Redirect `System.Console.Out` in tests involving rendering
+- Give every `Assert.That` a descriptive message so a failure in a multi-assert test identifies which check failed; interpolate context where it helps (e.g. `$"Token set for {player} should not be null"`)
+
+## Documentation & Layout
+
+- Every fixture, test, and helper carries an XML `<summary>` (fields use the single-line form; everything else uses the multi-line block). The fixture summary reads `The suite of tests for the <see cref="Type"/> class.`
+
+- Test-method summaries name the member under test in a uniform voice: `Verifies functionality of the {Member} method.` (or `... property.` / `... constructor.`). Multiple tests of the same member share the identical summary; the specific scenario is carried by the test method name, not the summary.
+
+- Document `<param>` for each parameter of a parameterized test. Never add `<returns>` to an async test method: it returns a void-like `Task`, which is not documented (see the documentation skill for the `Task` vs `Task<T>` rule).
+
+- Separate a test into logical groups with single blank lines (setup, the act, the assertion block), keeping tightly-coupled statements together. This is a readability judgment, not a mechanical one-blank-per-statement rule.
+
+- Hoist fixed test data and constants to the top of the method.
+
+- Keep a test's calls on a single line rather than wrapping arguments onto continuation lines. For a multi-line raw string argument, place the opening `"""` on its own line below the call, with the closing `"""` at the delimiter's indentation.
 
 ## Mocking (NSubstitute)
 

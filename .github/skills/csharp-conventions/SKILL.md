@@ -16,6 +16,7 @@ description: C# code standards including naming, formatting, member organization
 
 - 4-space indentation, Allman brace style, LF line endings, UTF-8 encoding
 - Omit final newlines in files
+- Within a method body, separate logical steps with single blank lines and keep tightly-coupled statements (a declaration and the statement that consumes it, a two-line swap) together; set control-flow blocks off with blank lines and precede a trailing `return` with one. This is a readability judgment, not a mechanical one-blank-per-statement rule.
 
 ## Naming
 
@@ -34,9 +35,9 @@ description: C# code standards including naming, formatting, member organization
 
 ## Member Organization
 
-Order within a class: **Constants → Fields → Properties → Constructors → Methods → Nested Types**
+Order within a class: **Constants → Fields → Events → Properties → Constructors → Methods → Nested Types**
 
-Within each section, order by visibility: **private → protected → internal → public**
+Within each section, order by visibility **most-visible-first**: **public → internal → protected → private**
 
 Static vs instance rules:
 - Constants, fields, properties: static members before instance members
@@ -47,37 +48,37 @@ Static vs instance rules:
 public class ExampleClass
 {
     // Constants (static first, by visibility)
-    private const int DefaultValue = 10;
     public const string Version = "1.0";
+    private const int DefaultValue = 10;
 
-    // Fields (static first, by visibility, then instance by visibility)
-    private static readonly object Lock = new();
+    // Fields (static first, by visibility, then instance; readonly before mutable)
     public static readonly string DefaultName = "Default";
+    private static readonly object Lock = new();
 
-    private readonly IService Service;
     public readonly int Id;
+    private readonly IService Service;
 
     // Properties (static first, by visibility, then instance by visibility)
-    private static int StaticCounter { get; set; }
     public static string GlobalSetting { get; set; }
+    private static int StaticCounter { get; set; }
 
-    private int _counter;
     public string Name { get; set; }
+    private int _counter;
 
     // Constructors
     public ExampleClass() { }
     public ExampleClass(IService service) { }
 
     // Methods (instance first, by visibility, then static by visibility)
-    private void HelperMethod() { }
     public void DoSomething() { }
+    private void HelperMethod() { }
 
-    private static void StaticHelperMethod() { }
     public static void StaticMethod() { }
+    private static void StaticHelperMethod() { }
 
     // Nested Types
-    private class NestedClass { }
     public enum Status { }
+    private class NestedClass { }
 }
 ```
 
@@ -101,4 +102,4 @@ public class ExampleClass
 
 ## Using Statements
 
-Group: System → third-party → project namespaces, with blank lines between groups. Alphabetize namespaces within each group. Use file-scoped namespaces.
+Order: System → third-party → project namespaces, all **contiguous** (no blank lines between these groups). Separate only a genuinely different directive kind (a `using static` or a `using X = ...` alias) with a blank line. Alphabetize within each group. Place using directives outside the file-scoped namespace. Omit a `using` for a namespace already in scope through an enclosing namespace (for example, a `Squire.Foo.Tests` file does not need `using Squire.Foo;`).

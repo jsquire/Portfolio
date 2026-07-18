@@ -25,6 +25,14 @@ Required for all members regardless of visibility. Follow this structure:
 
 **Required tags**: `<summary>` for all APIs, `<param>` for all parameters, `<exception>` for documented exceptions, `<seealso>` for related documentation.
 
+### Summary form
+
+Fields and constants use the single-line `/// <summary>…</summary>`. All other members, and every type including nested types, use the multi-line block with a trailing blank `///` line.
+
+### `<returns>` and `Task`
+
+Document `<returns>` only for a member that produces a value: a synchronous value-returning method, or a `Task<T>` (describe the produced value). Do not add `<returns>` to a `void` method or a non-generic `Task` (including every async test method), which produce no value.
+
 ### Descriptive Parameter Documentation
 
 Parameter docs must describe the **purpose, behavior, or context** — avoid restating the parameter name or type.
